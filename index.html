@@ -1,22 +1,1173 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Navigator Trading Systems</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navigator Algo — Professional MT5 Trading Tools</title>
+<meta name="description" content="Professional Expert Advisors for MetaTrader 5. Trade management, copy trading, prop firm protection, and market scanning tools built for serious traders.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080b0e;
+  --bg2:      #0d1117;
+  --panel:    #0f1520;
+  --border:   #1a2535;
+  --border2:  #243040;
+  --teal:     #00d4c8;
+  --teal2:    #00a89e;
+  --gold:     #f0a500;
+  --gold2:    #c4850a;
+  --text:     #c5d3e0;
+  --muted:    #4e6070;
+  --muted2:   #38505f;
+  --green:    #00e676;
+  --red:      #ff5555;
+  --white:    #edf2f7;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-body: 'Barlow', sans-serif;
+  --font-cond: 'Barlow Condensed', sans-serif;
+  --font-head: 'Orbitron', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── SCANLINE ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px);
+  pointer-events: none;
+  z-index: 9000;
+}
+
+/* ── GRID BG ── */
+.bg-grid {
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,200,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,200,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── NAV ── */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+  background: rgba(8,11,14,0.94);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.nav-logo-mark {
+  width: 32px; height: 32px;
+  border: 1.5px solid var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.nav-logo-mark::before {
+  content: '';
+  width: 10px; height: 10px;
+  background: var(--teal);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+.nav-logo-mark::after {
+  content: '';
+  position: absolute; inset: 3px;
+  border: 1px solid rgba(0,212,200,0.2);
+}
+.nav-logo-text {
+  font-family: var(--font-head);
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--white);
+}
+.nav-logo-text span { color: var(--teal); }
+
+.nav-links {
+  display: flex; align-items: center; gap: 8px;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em;
+  color: var(--muted);
+  text-decoration: none; text-transform: uppercase;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.nav-links a:hover { color: var(--teal); border-color: rgba(0,212,200,0.2); }
+.nav-links .nav-btn {
+  color: var(--bg) !important;
+  background: var(--teal);
+  border-color: var(--teal) !important;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  transition: background 0.2s !important;
+}
+.nav-links .nav-btn:hover { background: var(--gold) !important; }
+
+/* ── STATUS BAR ── */
+.status-bar {
+  position: fixed; top: 58px; left: 0; right: 0; z-index: 499;
+  height: 32px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 48px;
+  gap: 0;
+  overflow: hidden;
+}
+.status-item {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 0 20px;
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+  height: 100%; display: flex; align-items: center;
+}
+.status-item:first-child { padding-left: 0; }
+.status-item .val-up   { color: var(--green); }
+.status-item .val-down { color: var(--red); }
+.status-item .val-teal { color: var(--teal); }
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  display: inline-block; margin-right: 7px;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── HERO ── */
+#hero {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 130px 48px 80px;
+  overflow: hidden;
+}
+
+.hero-glow-l, .hero-glow-r {
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-glow-l {
+  background: radial-gradient(circle, rgba(0,212,200,0.06) 0%, transparent 70%);
+  top: 30%; left: -100px;
+}
+.hero-glow-r {
+  background: radial-gradient(circle, rgba(240,165,0,0.05) 0%, transparent 70%);
+  top: 40%; right: -100px;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.22em;
+  color: var(--teal);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 12px;
+  opacity: 0; animation: up 0.7s 0.1s forwards;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  height: 1px; width: 40px;
+  background: linear-gradient(90deg, transparent, var(--teal));
+}
+.hero-eyebrow::after { background: linear-gradient(90deg, var(--teal), transparent); }
+
+.hero-h1 {
+  font-family: var(--font-head);
+  font-size: clamp(44px, 7.5vw, 96px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  text-align: center;
+  margin-bottom: 6px;
+  opacity: 0; animation: up 0.7s 0.25s forwards;
+}
+.hero-h1 em { color: var(--teal); font-style: normal; }
+
+.hero-h2 {
+  font-family: var(--font-cond);
+  font-size: clamp(16px, 2.5vw, 26px);
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: var(--gold);
+  text-align: center; text-transform: uppercase;
+  margin-bottom: 28px;
+  opacity: 0; animation: up 0.7s 0.4s forwards;
+}
+
+.hero-desc {
+  max-width: 560px; text-align: center;
+  font-size: 16px; font-weight: 300;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 48px;
+  opacity: 0; animation: up 0.7s 0.55s forwards;
+}
+
+.hero-btns {
+  display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+  opacity: 0; animation: up 0.7s 0.7s forwards;
+}
+
+.btn {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 13px 34px;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all 0.2s;
+  clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+}
+.btn-primary { background: var(--teal); color: var(--bg); }
+.btn-primary:hover { background: var(--gold); transform: translateY(-2px); }
+.btn-ghost { background: transparent; color: var(--teal); border: 1px solid rgba(0,212,200,0.35); }
+.btn-ghost:hover { border-color: var(--teal); color: var(--white); transform: translateY(-2px); }
+
+.hero-stats {
+  display: flex; gap: 0; margin-top: 72px;
+  border: 1px solid var(--border);
+  opacity: 0; animation: up 0.7s 0.85s forwards;
+}
+.hero-stat {
+  padding: 20px 36px;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat-num {
+  font-family: var(--font-head);
+  font-size: 26px; font-weight: 700;
+  color: var(--teal); display: block;
+}
+.hero-stat-label {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.16em;
+  color: var(--muted); text-transform: uppercase;
+  margin-top: 3px; display: block;
+}
+
+@keyframes up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SECTION WRAPPER ── */
+.section {
+  position: relative; z-index: 1;
+  max-width: 1240px; margin: 0 auto;
+  padding: 90px 48px;
+}
+
+.section-full {
+  position: relative; z-index: 1;
+  padding: 80px 0;
+}
+
+.sec-header { margin-bottom: 56px; }
+.sec-tag {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.2em;
+  color: var(--teal); text-transform: uppercase;
+  display: block; margin-bottom: 10px;
+}
+.sec-title {
+  font-family: var(--font-head);
+  font-size: clamp(22px, 3vw, 38px);
+  font-weight: 700; letter-spacing: 0.03em;
+  color: var(--white);
+}
+.sec-title em { color: var(--gold); font-style: normal; }
+.sec-rule {
+  height: 1px; margin-top: 14px;
+  background: linear-gradient(90deg, rgba(0,212,200,0.5), transparent);
+}
+
+/* ── PRODUCTS GRID ── */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.product-card {
+  background: var(--panel);
+  padding: 30px 26px 26px;
+  position: relative;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: background 0.3s;
+  text-decoration: none;
+  color: inherit;
+}
+.product-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.35s;
+}
+.product-card.accent-teal::before { background: var(--teal); }
+.product-card.accent-gold::before { background: var(--gold); }
+.product-card.accent-green::before { background: var(--green); }
+.product-card:hover { background: #121c28; }
+.product-card:hover::before { transform: scaleX(1); }
+
+.product-card-corner {
+  position: absolute; top: 12px; right: 14px;
+  font-family: var(--font-mono);
+  font-size: 18px; font-weight: 900;
+  opacity: 0.04; color: var(--white);
+  line-height: 1;
+}
+
+.p-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 3px 9px; margin-bottom: 18px;
+  border: 1px solid;
+}
+.p-badge-paid { background: rgba(0,212,200,0.08); color: var(--teal); border-color: rgba(0,212,200,0.25); }
+.p-badge-free { background: rgba(0,230,118,0.08); color: var(--green); border-color: rgba(0,230,118,0.25); }
+
+.p-name {
+  font-family: var(--font-head);
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 0.05em; color: var(--white);
+  margin-bottom: 8px; line-height: 1.2;
+}
+
+.p-desc {
+  font-size: 12.5px; font-weight: 300;
+  color: var(--muted); line-height: 1.55;
+  margin-bottom: 20px; flex: 1;
+}
+
+.p-features {
+  list-style: none; margin-bottom: 22px;
+  border-top: 1px solid var(--border); padding-top: 16px;
+}
+.p-features li {
+  font-family: var(--font-mono);
+  font-size: 10.5px; color: var(--text);
+  padding: 4px 0 4px 14px;
+  position: relative;
+  border-bottom: 1px solid rgba(255,255,255,0.025);
+  letter-spacing: 0.03em;
+}
+.p-features li::before {
+  content: '›'; position: absolute; left: 0;
+}
+.accent-teal .p-features li::before { color: var(--teal); }
+.accent-gold .p-features li::before { color: var(--gold); }
+.accent-green .p-features li::before { color: var(--green); }
+
+.p-footer {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-top: auto;
+}
+.p-price {
+  font-family: var(--font-head);
+  font-size: 22px; font-weight: 700;
+}
+.accent-teal .p-price { color: var(--teal); }
+.accent-gold .p-price { color: var(--gold); }
+.accent-green .p-price { color: var(--green); }
+
+.p-price-unit {
+  font-family: var(--font-mono);
+  font-size: 9px; color: var(--muted);
+  display: block; margin-top: 2px;
+  letter-spacing: 0.1em;
+}
+.p-cta {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.12em;
+  color: var(--teal);
+  text-decoration: none; text-transform: uppercase;
+  border-bottom: 1px solid rgba(0,212,200,0.3);
+  padding-bottom: 1px;
+  transition: color 0.2s;
+}
+.p-cta:hover { color: var(--gold); border-color: rgba(240,165,0,0.4); }
+.accent-gold .p-cta { color: var(--gold); border-color: rgba(240,165,0,0.3); }
+.accent-gold .p-cta:hover { color: var(--teal); }
+
+.p-rating {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--gold);
+  margin-bottom: 14px; letter-spacing: 0.05em;
+}
+
+/* ── FLAGSHIP FEATURE ── */
+.flagship {
+  position: relative; z-index: 1;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.flagship-inner {
+  max-width: 1240px; margin: 0 auto;
+  padding: 80px 48px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 72px; align-items: center;
+}
+.flagship::before {
+  content: '';
+  position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, transparent, var(--teal), transparent);
+}
+.flagship-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.2em;
+  color: var(--bg); background: var(--teal);
+  padding: 4px 10px; margin-bottom: 20px; text-transform: uppercase;
+}
+.flagship-title {
+  font-family: var(--font-head);
+  font-size: clamp(26px, 3.5vw, 46px);
+  font-weight: 900; letter-spacing: 0.03em;
+  color: var(--white); line-height: 1.05;
+  margin-bottom: 20px;
+}
+.flagship-title span { color: var(--teal); display: block; }
+.flagship-desc {
+  font-size: 15px; font-weight: 300;
+  color: var(--muted); line-height: 1.75;
+  margin-bottom: 32px;
+}
+.flagship-modules {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--border);
+  margin-bottom: 36px;
+}
+.flagship-module {
+  background: var(--bg);
+  padding: 14px 16px;
+}
+.flagship-module-name {
+  font-family: var(--font-head);
+  font-size: 11px; font-weight: 700;
+  color: var(--teal); margin-bottom: 4px; letter-spacing: 0.08em;
+}
+.flagship-module-desc {
+  font-size: 11px; font-weight: 300;
+  color: var(--muted); line-height: 1.4;
+}
+.flagship-price {
+  display: flex; align-items: center; gap: 20px;
+}
+.flagship-price-num {
+  font-family: var(--font-head);
+  font-size: 40px; font-weight: 900;
+  color: var(--teal);
+}
+.flagship-price-info {
+  font-family: var(--font-mono);
+  font-size: 10px; color: var(--muted);
+  letter-spacing: 0.1em; line-height: 1.8;
+}
+
+/* Mockup panel on right */
+.flagship-mockup {
+  position: relative;
+}
+.flagship-mockup-frame {
+  background: #060a0d;
+  border: 1px solid var(--border2);
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.mockup-titlebar {
+  background: var(--border);
+  padding: 8px 14px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border2);
+}
+.mockup-dot { width: 8px; height: 8px; border-radius: 50%; }
+.mockup-title { font-size: 10px; letter-spacing: 0.1em; color: var(--text); margin-left: 4px; }
+.mockup-body { padding: 16px; }
+.mockup-tab-row {
+  display: flex; gap: 1px; margin-bottom: 16px;
+}
+.mockup-tab {
+  font-size: 9px; letter-spacing: 0.1em;
+  padding: 5px 10px; color: var(--muted);
+  border: 1px solid var(--border);
+  text-transform: uppercase;
+  background: var(--bg);
+}
+.mockup-tab.active { background: var(--teal); color: var(--bg); border-color: var(--teal); }
+.mockup-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 10px;
+}
+.mockup-row:last-child { border-bottom: none; }
+.mockup-label { color: var(--muted); letter-spacing: 0.05em; }
+.mockup-val { color: var(--text); }
+.mockup-val.teal { color: var(--teal); }
+.mockup-val.gold { color: var(--gold); }
+.mockup-val.green { color: var(--green); }
+.mockup-val.red { color: var(--red); }
+.mockup-btn-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px; margin-top: 14px;
+}
+.mockup-btn {
+  font-size: 9px; letter-spacing: 0.1em;
+  padding: 7px; text-align: center;
+  text-transform: uppercase; border: 1px solid;
+}
+.mockup-btn-buy { background: rgba(0,230,118,0.12); color: var(--green); border-color: rgba(0,230,118,0.3); }
+.mockup-btn-sell { background: rgba(255,85,85,0.12); color: var(--red); border-color: rgba(255,85,85,0.3); }
+
+/* ── WHY SECTION ── */
+.why-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+}
+.why-card {
+  background: var(--panel);
+  padding: 32px 24px;
+  position: relative; overflow: hidden;
+}
+.why-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, var(--teal), transparent);
+  opacity: 0.15;
+}
+.why-num {
+  font-family: var(--font-head);
+  font-size: 36px; font-weight: 900;
+  color: rgba(0,212,200,0.08);
+  position: absolute; top: 12px; right: 16px;
+}
+.why-icon { font-size: 24px; margin-bottom: 14px; display: block; }
+.why-title {
+  font-family: var(--font-cond);
+  font-size: 15px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--white); margin-bottom: 10px;
+}
+.why-text { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.6; }
+
+/* ── CTA STRIP ── */
+.cta-strip {
+  position: relative; z-index: 1;
+  background: linear-gradient(135deg, rgba(0,212,200,0.04) 0%, rgba(240,165,0,0.04) 100%);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  padding: 72px 48px;
+}
+.cta-strip h2 {
+  font-family: var(--font-head);
+  font-size: clamp(22px, 3vw, 38px); font-weight: 700;
+  color: var(--white); letter-spacing: 0.04em;
+  margin-bottom: 16px;
+}
+.cta-strip h2 em { color: var(--teal); font-style: normal; }
+.cta-strip p {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 36px;
+}
+.mql5-link {
+  display: inline-block;
+  font-family: var(--font-head);
+  font-size: 13px; letter-spacing: 0.1em;
+  color: var(--teal); text-decoration: none;
+  border-bottom: 1px solid rgba(0,212,200,0.35);
+  padding-bottom: 3px;
+  transition: color 0.2s, border-color 0.2s;
+  margin-top: 20px;
+}
+.mql5-link:hover { color: var(--gold); border-color: rgba(240,165,0,0.4); }
+
+/* ── FOOTER ── */
+footer {
+  position: relative; z-index: 1;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+}
+.footer-main {
+  max-width: 1240px; margin: 0 auto;
+  padding: 56px 48px 40px;
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+}
+.footer-brand-name {
+  font-family: var(--font-head);
+  font-size: 15px; font-weight: 700;
+  letter-spacing: 0.1em; color: var(--white);
+  margin-bottom: 6px;
+}
+.footer-brand-name span { color: var(--teal); }
+.footer-brand-sub {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.12em;
+  color: var(--muted); margin-bottom: 20px;
+}
+.footer-brand-desc {
+  font-size: 12.5px; font-weight: 300;
+  color: var(--muted2); line-height: 1.65; max-width: 260px;
+}
+.footer-col h4 {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.2em;
+  color: var(--teal); text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.footer-col a {
+  display: block;
+  font-size: 12.5px; font-weight: 300;
+  color: var(--muted); text-decoration: none;
+  margin-bottom: 9px;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--text); }
+.footer-bottom {
+  border-top: 1px solid var(--border);
+  padding: 20px 48px;
+  max-width: 1240px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.08em; color: var(--muted);
+}
+.footer-sys {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em; color: var(--muted);
+  display: flex; align-items: center; gap: 7px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); }
+::-webkit-scrollbar-thumb:hover { background: var(--teal2); }
+
+/* ── MOBILE ── */
+@media (max-width: 1024px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .flagship-inner { grid-template-columns: 1fr; gap: 48px; }
+  .why-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-main { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  #nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .status-bar { padding: 0 20px; }
+  .section { padding: 60px 20px; }
+  .products-grid { grid-template-columns: 1fr; }
+  .flagship-inner { padding: 48px 20px; }
+  .flagship-modules { grid-template-columns: 1fr; }
+  .why-grid { grid-template-columns: 1fr; }
+  .hero-stat { padding: 16px 20px; }
+  .footer-main { grid-template-columns: 1fr; padding: 40px 20px; }
+  .footer-bottom { padding: 20px; flex-direction: column; gap: 10px; text-align: center; }
+  .cta-strip { padding: 60px 20px; }
+  #hero { padding: 130px 20px 60px; }
+  .hero-stats { flex-direction: column; }
+  .hero-stats .hero-stat { border-right: none; border-bottom: 1px solid var(--border); }
+}
+</style>
 </head>
-<body style="background:#0d1117; color:white; font-family:sans-serif; text-align:center; padding:50px;">
+<body>
+<div class="bg-grid"></div>
 
-  <h1>Navigator Trading Systems</h1>
-  <p>Advanced MT5 Trading Tools & Automation</p>
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark"></div>
+    <span class="nav-logo-text">NAVIGATOR <span>ALGO</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#products">Products</a></li>
+    <li><a href="#flagship">Trigger Pro</a></li>
+    <li><a href="#why">About</a></li>
+    <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
+  </ul>
+</nav>
 
-  <br><br>
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">ALL SYSTEMS ONLINE</span></div>
+  <div class="status-item">MT5 COMPATIBLE</div>
+  <div class="status-item">9 PRODUCTS PUBLISHED</div>
+  <div class="status-item">VPS OPTIMISED</div>
+  <div class="status-item">HEDGING &amp; NETTING</div>
+  <div class="status-item">PROP FIRM READY</div>
+</div>
 
-  <h2>Products</h2>
-  <p>Trade Copier Ultimate</p>
-  <p>Prop Firm Tools</p>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-glow-l"></div>
+  <div class="hero-glow-r"></div>
 
-  <br><br>
+  <div class="hero-eyebrow">MQL5 Marketplace · Navigator Trading Systems</div>
 
-  <p>Built by Janitha Sandaruwan</p>
+  <h1 class="hero-h1">NAVIGATOR<br><em>ALGO</em></h1>
+  <div class="hero-h2">Professional MT5 Trading Systems</div>
+
+  <p class="hero-desc">
+    Nine Expert Advisors built for real traders — news straddling,
+    trade copying, prop firm protection, market scanning, and precision
+    execution. All on MetaTrader 5.
+  </p>
+
+  <div class="hero-btns">
+    <a href="#products" class="btn btn-primary">Browse Products</a>
+    <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="btn btn-ghost">MQL5 Store →</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-num">9</span>
+      <span class="hero-stat-label">Published EAs</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">5★</span>
+      <span class="hero-stat-label">Avg Rating</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">MT5</span>
+      <span class="hero-stat-label">Native Platform</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">24/7</span>
+      <span class="hero-stat-label">VPS Ready</span>
+    </div>
+  </div>
+</section>
+
+<!-- FLAGSHIP: TRIGGER PRO -->
+<div id="flagship" class="flagship">
+  <div class="flagship-inner">
+    <div>
+      <span class="flagship-label">Flagship Product</span>
+      <h2 class="flagship-title">TRIGGER PRO<span>Straddle &amp; Trade Manager</span></h2>
+      <p class="flagship-desc">Seven execution modules, six trailing stop modes, virtual SL/TP, session triggers, news straddles, and pattern detection — all in one compact on-chart panel. The last trade management tool you'll ever need.</p>
+      <div class="flagship-modules">
+        <div class="flagship-module">
+          <div class="flagship-module-name">TRADE</div>
+          <div class="flagship-module-desc">Manual execution with on-chart SL/TP lines and risk-based sizing</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">NEWS</div>
+          <div class="flagship-module-desc">OCO straddle orders tied to MT5 economic calendar events</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">SESSION</div>
+          <div class="flagship-module-desc">London, New York, Tokyo, Sydney time-based setups</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">S/R</div>
+          <div class="flagship-module-desc">Auto-detected support &amp; resistance: daily, weekly, swing, round</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">RANGE</div>
+          <div class="flagship-module-desc">Breakout &amp; reversal trades from defined price ranges</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">PATTERN</div>
+          <div class="flagship-module-desc">Pin Bar, Engulfing, Inside Bar detection with auto-execution</div>
+        </div>
+      </div>
+      <div class="flagship-price">
+        <div class="flagship-price-num">$45</div>
+        <div class="flagship-price-info">
+          ONE-TIME LICENSE<br>
+          6-MONTH RENTAL: $30<br>
+          10 ACTIVATIONS
+        </div>
+        <a href="https://www.mql5.com/en/market/product/170008" target="_blank" class="btn btn-primary" style="margin-left:auto">Buy on MQL5 →</a>
+      </div>
+    </div>
+
+    <!-- Mockup Panel -->
+    <div class="flagship-mockup">
+      <div class="flagship-mockup-frame">
+        <div class="mockup-titlebar">
+          <div class="mockup-dot" style="background:#ff5555"></div>
+          <div class="mockup-dot" style="background:#f0a500;margin-left:4px"></div>
+          <div class="mockup-dot" style="background:#00e676;margin-left:4px"></div>
+          <span class="mockup-title">TRIGGER PRO v2.0 · XAUUSD</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-tab-row">
+            <div class="mockup-tab active">TRADE</div>
+            <div class="mockup-tab">NEWS</div>
+            <div class="mockup-tab">SESSION</div>
+            <div class="mockup-tab">S/R</div>
+            <div class="mockup-tab">RANGE</div>
+          </div>
+          <div class="mockup-row"><span class="mockup-label">SYMBOL</span><span class="mockup-val teal">XAUUSD</span></div>
+          <div class="mockup-row"><span class="mockup-label">SPREAD</span><span class="mockup-val">18 pts</span></div>
+          <div class="mockup-row"><span class="mockup-label">LOT SIZE</span><span class="mockup-val">0.10</span></div>
+          <div class="mockup-row"><span class="mockup-label">RISK %</span><span class="mockup-val gold">1.0%</span></div>
+          <div class="mockup-row"><span class="mockup-label">SL DISTANCE</span><span class="mockup-val">200 pts</span></div>
+          <div class="mockup-row"><span class="mockup-label">TP DISTANCE</span><span class="mockup-val">400 pts</span></div>
+          <div class="mockup-row"><span class="mockup-label">EQUITY</span><span class="mockup-val green">$10,248.50</span></div>
+          <div class="mockup-row"><span class="mockup-label">DAILY P/L</span><span class="mockup-val green">+$142.30</span></div>
+          <div class="mockup-row"><span class="mockup-label">TRAILING</span><span class="mockup-val teal">ATR · ARMED</span></div>
+          <div class="mockup-btn-row">
+            <div class="mockup-btn mockup-btn-buy">BUY STOP</div>
+            <div class="mockup-btn mockup-btn-sell">SELL STOP</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div id="products">
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-tag">// Full Product Suite</span>
+      <h2 class="sec-title">ALL <em>NINE</em> TOOLS</h2>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="products-grid">
+
+      <!-- 1. Trigger Pro -->
+      <div class="product-card accent-gold">
+        <div class="product-card-corner">01</div>
+        <span class="p-badge p-badge-paid">Paid · $45</span>
+        <div class="p-name">TRIGGER PRO<br>Straddle &amp; Trade Manager</div>
+        <div class="p-rating">★★★★★ · v2.0 · 7 demo downloads</div>
+        <div class="p-desc">Seven execution modules — trade, news, session, range, S/R, pattern, schedule — with six trailing modes, virtual SL/TP, and full risk controls. The complete trade management panel.</div>
+        <ul class="p-features">
+          <li>News OCO straddle with economic calendar</li>
+          <li>6 trailing stop modes incl. ATR &amp; chandelier</li>
+          <li>Virtual SL/TP (broker-invisible)</li>
+          <li>Compact UI + VPS mode</li>
+          <li>Daily loss &amp; profit targets</li>
+        </ul>
+        <div class="p-footer">
+          <div>
+            <div class="p-price">$45</div>
+            <span class="p-price-unit">ONE-TIME · RENT $30/6MO</span>
+          </div>
+          <a href="https://www.mql5.com/en/market/product/170008" target="_blank" class="p-cta">Buy on MQL5 →</a>
+        </div>
+      </div>
+
+      <!-- 2. Trade Copier Ultimate -->
+      <div class="product-card accent-teal">
+        <div class="product-card-corner">02</div>
+        <span class="p-badge p-badge-paid">Paid · $48.77</span>
+        <div class="p-name">TRADE COPIER ULTIMATE<br>Multi-Source Execution Engine</div>
+        <div class="p-rating">★★★★★ · v5.12</div>
+        <div class="p-desc">Receives signals from Telegram, Discord, or a Bridge app and copies trades between local MT5 terminals. Safe-by-default: starts DISARMED with strict validation, duplicate protection, and cooldowns.</div>
+        <ul class="p-features">
+          <li>Telegram &amp; Discord signal execution</li>
+          <li>Local MT5-to-MT5 copy mode</li>
+          <li>Duplicate &amp; cooldown protection</li>
+          <li>Multiple risk filters built in</li>
+          <li>Starts disarmed — manual arm required</li>
+        </ul>
+        <div class="p-footer">
+          <div>
+            <div class="p-price">$48.77</div>
+            <span class="p-price-unit">ONE-TIME LICENSE</span>
+          </div>
+          <a href="https://www.mql5.com/en/market/product/164907" target="_blank" class="p-cta">Buy on MQL5 →</a>
+        </div>
+      </div>
+
+      <!-- 3. Prop Firm Protector -->
+      <div class="product-card accent-teal">
+        <div class="product-card-corner">03</div>
+        <span class="p-badge p-badge-paid">Paid · $30</span>
+        <div class="p-name">PROP FIRM PROTECTOR<br>Complete Risk Management Suite</div>
+        <div class="p-rating">★★★★★ · Most capable protector</div>
+        <div class="p-desc">Comprehensive risk management covering symbol whitelisting, lot enforcement, daily drawdown hard stop, max total loss, trailing equity watermark, news blocking, and Telegram alerts.</div>
+        <ul class="p-features">
+          <li>Daily drawdown hard-stop enforcement</li>
+          <li>Max total loss protection</li>
+          <li>Symbol &amp; lot whitelist monitoring</li>
+          <li>News event trade blocker</li>
+          <li>Telegram alerts on breach</li>
+        </ul>
+        <div class="p-footer">
+          <div>
+            <div class="p-price">$30</div>
+            <span class="p-price-unit">ONE-TIME LICENSE</span>
+          </div>
+          <a href="https://www.mql5.com/en/market/product/163674" target="_blank" class="p-cta">Buy on MQL5 →</a>
+        </div>
+      </div>
+
+      <!-- 4. NTS Local Copier (Free) -->
+      <div class="product-card accent-green">
+        <div class="product-card-corner">04</div>
+        <span class="p-badge p-badge-free">Free · Unlimited</span>
+        <div class="p-name">NTS LOCAL COPIER<br>Simple Local Trade Copier</div>
+        <div class="p-rating">★★★★★ (7 reviews)</div>
+        <div class="p-desc">Lightning-fast file-based trade copying between MT5 terminals — and now MT4 too — all on the same PC. No internet, no DLLs, no complex setup. Fully functional and unlimited forever.</div>
+        <ul class="p-features">
+          <li>MT5 Master → MT5 &amp; MT4 Slave</li>
+          <li>Zero-latency file-based copy</li>
+          <li>Custom symbol mapping</li>
+          <li>Fixed &amp; proportional lot modes</li>
+          <li>No installation, no configuration</li>
+        </ul>
+        <div class="p-footer">
+          <div>
+            <div class="p-price">FREE</div>
+            <span class="p-price-unit">FULLY UNLIMITED</span>
+          </div>
+          <a href="https://www.mql5.com/en/market/product/165390" target="_blank" class="p-cta">Download →</a>
+        </div>
+      </div>
+
+      <!-- 5. Trade Journal Ultimate (Free) -->
+      <div class="product-card accent-green">
+        <div class="product-card-corner">05</div>
+        <span class="p-badge p-badge-free">Free</span>
+        <div class="p-name">TRADE JOURNAL ULTIMATE<br>Analytics &amp; Performance Suite</div>
+        <div class="p-rating">★★★★★ (1 review)</div>
+        <div class="p-desc">Transforms your MT5 trade history into actionable data. Eight-tab interactive dashboard covering charts, psychology tracking, goal setting, equity curves, and session analytics — live in-terminal.</div>
+        <ul class="p-features">
+          <li>8-tab interactive dashboard</li>
+          <li>Psychology &amp; mindset tracker</li>
+          <li>Equity curve &amp; drawdown chart</li>
+          <li>Goal &amp; target monitoring</li>
+          <li>Replaces manual spreadsheets</li>
+        </ul>
+        <div class="p-footer">
+          <div>
+            <div class="p-price">FREE</div>
+            <span class="p-price-unit">FULLY UNLIMITED</span>
+          </div>
+          <a href="https://www.mql5.com/en/market/product/163764" target="_blank" class="p-cta">Download →</a>
+        </div>
+      </div>
+
+      <!-- 6. Multi Pair Scanner Ultimate (Free) -->
+      <div class="product-card accent-green">
+        <div class="product-card-corner">06</div>
+        <span class="p-badge p-badge-free">Free</span>
+        <div class="p-name">MULTI PAIR SCANNER ULTIMATE<br>28-Pair Market Dashboard</div>
+        <div class="p-rating">★★★★★ (2 reviews)</div>
+        <div class="p-desc">Monitors 28 Forex pairs + Gold simultaneously with trend, momentum, currency strength, and signals in one lightweight panel. "God Mode" view of the full market — without freezing your terminal.</div>
+        <ul class="p-features">
+          <li>28 pairs + Gold monitored live</li>
+          <li>Trend, momentum &amp; strength signals</li>
+          <li>Lightweight — never freezes MT5</li>
+          <li>Scanner only — not an auto-trader</li>
+          <li>One-glance market overview</li>
+        </ul>
+        <div class="p-footer">
+          <div>
+            <div class="p-price">FREE</div>
+            <span class="p-price-unit">FULLY UNLIMITED</span>
+          </div>
+          <a href="https://www.mql5.com/en/market/product/165793" target="_blank" class="p-cta">Download →</a>
+        </div>
+      </div>
+
+      <!-- 7. Prop Firm Protector Basic (Free) -->
+      <div class="product-card accent-green">
+        <div class="product-card-corner">07</div>
+        <span class="p-badge p-badge-free">Free</span>
+        <div class="p-name">PROP FIRM PROTECTOR BASIC<br>Essential Risk Lite</div>
+        <div class="p-rating">★★★★★ (1 review)</div>
+        <div class="p-desc">The lightweight version of Prop Firm Protector. Runs silently in the background monitoring all trades — manual, signal, or EA — against predefined symbol and lot rules. No frills, all protection.</div>
+        <ul class="p-features">
+          <li>Symbol whitelist monitoring</li>
+          <li>Lot size enforcement</li>
+          <li>Works with any EA or signal</li>
+          <li>Runs silently in background</li>
+          <li>Zero configuration needed</li>
+        </ul>
+        <div class="p-footer">
+          <div>
+            <div class="p-price">FREE</div>
+            <span class="p-price-unit">FULLY UNLIMITED</span>
+          </div>
+          <a href="https://www.mql5.com/en/market/product/163692" target="_blank" class="p-cta">Download →</a>
+        </div>
+      </div>
+
+      <!-- 8. Navigator Trade Assistant (Free) -->
+      <div class="product-card accent-green">
+        <div class="product-card-corner">08</div>
+        <span class="p-badge p-badge-free">Free</span>
+        <div class="p-name">NAVIGATOR TRADE ASSISTANT<br>Professional Trading Panel</div>
+        <div class="p-rating">New Release</div>
+        <div class="p-desc">Replaces your calculator, notepad, and manual management routine. Lot sizing, breakeven moves, and multi-position closes — all with a single click directly on the chart. Speed and precision for active traders.</div>
+        <ul class="p-features">
+          <li>One-click lot size calculator</li>
+          <li>Breakeven &amp; trail management</li>
+          <li>Close all / partial close</li>
+          <li>Clean interactive dashboard</li>
+          <li>Works on any symbol</li>
+        </ul>
+        <div class="p-footer">
+          <div>
+            <div class="p-price">FREE</div>
+            <span class="p-price-unit">FULLY UNLIMITED</span>
+          </div>
+          <a href="https://www.mql5.com/en/market/product/165896" target="_blank" class="p-cta">Download →</a>
+        </div>
+      </div>
+
+      <!-- 9. NTS Local Copier MT4 Slave -->
+      <div class="product-card accent-green">
+        <div class="product-card-corner">09</div>
+        <span class="p-badge p-badge-free">Free · MT4</span>
+        <div class="p-name">NTS LOCAL COPIER<br>MT4 Slave Plugin</div>
+        <div class="p-rating">Companion Tool</div>
+        <div class="p-desc">The official MT4 companion to Trade Copier Ultimate and NTS Local Copier (MT5). Place on any MT4 chart — it reads the MT5 master's shared file and executes trades instantly. Zero config on master side.</div>
+        <ul class="p-features">
+          <li>MT5 Master → MT4 Slave bridge</li>
+          <li>Reads shared file automatically</li>
+          <li>No DLLs, no internet required</li>
+          <li>Zero configuration on master</li>
+          <li>Instant trade execution</li>
+        </ul>
+        <div class="p-footer">
+          <div>
+            <div class="p-price">FREE</div>
+            <span class="p-price-unit">MT4 UTILITY</span>
+          </div>
+          <a href="https://www.mql5.com/en/market/product/168242" target="_blank" class="p-cta">Download →</a>
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+  </div>
+</div>
+
+<!-- WHY NAVIGATOR -->
+<div id="why">
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-tag">// Philosophy</span>
+      <h2 class="sec-title">WHY <em>NAVIGATOR</em></h2>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="why-num">01</span>
+        <span class="why-icon">⚡</span>
+        <div class="why-title">VPS Optimised</div>
+        <p class="why-text">Every EA is engineered for VPS environments — throttled redraws, minimal CPU overhead, and instant OnTradeTransaction execution. Runs lean on any server.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-num">02</span>
+        <span class="why-icon">🛡</span>
+        <div class="why-title">Prop Firm Ready</div>
+        <p class="why-text">Hard drawdown enforcement, daily loss limits, news blocking, and equity watermarks built into the suite. Stay compliant on any funded account challenge.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-num">03</span>
+        <span class="why-icon">🎛</span>
+        <div class="why-title">Unified UI</div>
+        <p class="why-text">All products share the same dark CCanvas panel system — consistent, fast, and genuinely enjoyable to trade with across every tool in the suite.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-num">04</span>
+        <span class="why-icon">📦</span>
+        <div class="why-title">MQL5 Verified</div>
+        <p class="why-text">Sold and distributed exclusively through the MQL5 marketplace. Your purchase is protected, license-managed, and updates are delivered automatically.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA STRIP -->
+<div class="cta-strip">
+  <h2>READY TO <em>UPGRADE</em> YOUR TRADING?</h2>
+  <p>// All products available exclusively on the MQL5 Marketplace — verified, protected, auto-updated</p>
+  <div class="hero-btns" style="opacity:1;animation:none;">
+    <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="btn btn-primary">Browse All 9 Products</a>
+    <a href="#products" class="btn btn-ghost">View Product List</a>
+  </div>
+  <br>
+  <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="mql5-link">mql5.com → Navigator Trading Systems</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-name">NAVIGATOR <span>ALGO</span></div>
+      <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
+      <p class="footer-brand-desc">Nine professional Expert Advisors for MetaTrader 5. Built for funded account traders, signal traders, manual traders, and everyone in between.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Paid Tools</h4>
+      <a href="https://www.mql5.com/en/market/product/170008" target="_blank">Trigger Pro</a>
+      <a href="https://www.mql5.com/en/market/product/164907" target="_blank">Trade Copier Ultimate</a>
+      <a href="https://www.mql5.com/en/market/product/163674" target="_blank">Prop Firm Protector</a>
+    </div>
+    <div class="footer-col">
+      <h4>Free Tools</h4>
+      <a href="https://www.mql5.com/en/market/product/165390" target="_blank">NTS Local Copier</a>
+      <a href="https://www.mql5.com/en/market/product/163764" target="_blank">Trade Journal Ultimate</a>
+      <a href="https://www.mql5.com/en/market/product/165793" target="_blank">Multi Pair Scanner</a>
+      <a href="https://www.mql5.com/en/market/product/163692" target="_blank">Protector Basic</a>
+      <a href="https://www.mql5.com/en/market/product/165896" target="_blank">Trade Assistant</a>
+      <a href="https://www.mql5.com/en/market/product/168242" target="_blank">MT4 Slave Plugin</a>
+    </div>
+    <div class="footer-col">
+      <h4>Links</h4>
+      <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank">MQL5 Store</a>
+      <a href="#products">Products</a>
+      <a href="#flagship">Trigger Pro</a>
+      <a href="#why">About</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Navigator Trading Systems · All rights reserved · navigatoralgo.com</div>
+    <div class="footer-sys">
+      <span class="status-dot"></span> ALL SYSTEMS OPERATIONAL
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>
