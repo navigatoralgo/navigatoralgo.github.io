@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trigger Pro — Interactive Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#0e1117;
+  font-family:'Rajdhani',sans-serif;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;
+  min-height:100vh;
+  padding:40px 20px 80px;
+}
+body.embedded{
+  background:transparent;
+  min-height:auto;
+  padding:0;
+}
+body.embedded .page-label{display:none;}
+body.embedded .panel{
+  width:min(100%,480px);
+  max-width:100%;
+  margin:0 auto;
+  box-shadow:0 24px 64px rgba(0,0,0,0.72);
+}
+
+/* ── PAGE CHROME ── */
+.page-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:0.18em;
+  color:#00d4c8;text-transform:uppercase;
+  margin-bottom:28px;text-align:center;
+}
+.page-label a{color:#f0a500;text-decoration:none;}
+.page-label a:hover{text-decoration:underline;}
+
+/* ── PANEL ── */
+.panel{
+  width:370px;
+  background:#0f1318;
+  border:1px solid #1e2530;
+  position:relative;
+  user-select:none;
+  box-shadow:0 20px 60px rgba(0,0,0,0.8);
+}
+
+/* ── TITLEBAR ── */
+.titlebar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 10px 6px;
+  border-bottom:1px solid #1e2530;
+}
+.titlebar-left h1{
+  font-family:'Share Tech Mono',monospace;
+  font-size:14px;font-weight:700;
+  color:#e8f0f8;letter-spacing:0.08em;
+}
+.titlebar-left p{font-size:10px;color:#3d5060;letter-spacing:0.05em;}
+.titlebar-right{display:flex;align-items:center;gap:6px;}
+.tb-btn{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;letter-spacing:0.1em;
+  color:#5a7080;border:1px solid #1e2530;
+  background:#0a0d10;padding:3px 8px;cursor:pointer;
+  transition:color 0.15s,border-color 0.15s;
+}
+.tb-btn:hover{color:#00d4c8;border-color:#00d4c8;}
+.tb-orders{color:#c8d4e0;}
+
+/* ── TABS ── */
+.tabs{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  align-items:center;
+  padding:6px 8px;gap:2px;
+  border-bottom:1px solid #1a2230;
+  background:#0b0e12;
+}
+.tab{
+  font-family:'Rajdhani',sans-serif;
+  font-size:11px;font-weight:600;
+  color:#4a6070;
+  padding:5px 4px;
+  cursor:pointer;letter-spacing:0.05em;
+  border:1px solid transparent;
+  transition:all 0.15s;
+  border-radius:2px;
+  text-align:center;
+  white-space:nowrap;
+}
+.tab:hover{color:#a0b8c8;}
+.tab.active{
+  background:#00d4c8;
+  color:#070a0d;
+  border-color:#00d4c8;
+}
+
+/* ── STATUS BAR ── */
+.status-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 10px;
+  border-bottom:1px solid #1a2230;
+  background:#0c0f14;
+}
+.status-symbol{
+  font-family:'Share Tech Mono',monospace;
+  font-size:13px;color:#c8d4e0;letter-spacing:0.04em;
+}
+.status-spread{font-size:12px;color:#f0a500;margin-left:8px;letter-spacing:0.03em;}
+.status-right{text-align:right;}
+.status-eq{
+  font-family:'Share Tech Mono',monospace;
+  font-size:13px;color:#c8d4e0;
+}
+.status-mode{font-size:11px;color:#3d5060;letter-spacing:0.08em;}
+.status-armed{color:#00d4c8 !important;}
+.status-pl{font-size:11px;color:#00e676;}
+
+/* ── CONTENT AREA ── */
+.tab-content{display:none;padding:10px;}
+.tab-content.active{display:block;}
+
+/* ── GENERIC LABELS ── */
+.row-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:0.14em;
+  color:#3d5060;text-transform:uppercase;
+  margin-bottom:6px;margin-top:10px;
+}
+.row-label:first-child{margin-top:0;}
+
+/* ── TOGGLE BUTTON GROUP ── */
+.btn-group{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.grp-btn{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;letter-spacing:0.08em;
+  padding:5px 10px;
+  border:1px solid #1e2530;
+  background:#0a0d10;color:#5a7080;
+  cursor:pointer;transition:all 0.15s;
+}
+.grp-btn:hover{color:#a0b8c8;border-color:#2a3a4a;}
+.grp-btn.active-teal{background:#00d4c8;color:#070a0d;border-color:#00d4c8;}
+.grp-btn.active-magenta{background:#c0287a;color:#fff;border-color:#c0287a;}
+.grp-btn.active-blue{background:#1e6ed4;color:#fff;border-color:#1e6ed4;}
+.grp-btn.active-gold{background:#f0a500;color:#070a0d;border-color:#f0a500;}
+.grp-btn.active-red{background:#cc2222;color:#fff;border-color:#cc2222;}
+.grp-btn.active-green{background:#00b85a;color:#070a0d;border-color:#00b85a;}
+
+/* ── INPUT ROW ── */
+.input-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.inp-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:#4a6070;letter-spacing:0.06em;
+  min-width:30px;
+}
+.inp{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:#c8d4e0;
+  background:#070a0d;border:1px solid #1e2530;
+  padding:4px 8px;width:52px;text-align:center;
+  outline:none;
+}
+.inp:focus{border-color:#00d4c8;}
+.inp-wide{width:80px;}
+
+/* ── CALC LOT ── */
+.calc-lot{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:#00d4c8;
+  margin:4px 0 8px;letter-spacing:0.06em;
+}
+.fixed-badge{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:0.12em;
+  background:#1e2530;color:#5a7080;
+  padding:3px 8px;margin-left:auto;
+}
+
+/* ── MARKET BUTTONS ── */
+.market-row{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:8px 0;}
+.mkt-sell{background:#cc2222;color:#fff;border:none;padding:10px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.06em;
+  cursor:pointer;transition:opacity 0.15s;}
+.mkt-sell:hover{opacity:0.85;}
+.mkt-buy{background:#00b85a;color:#070a0d;border:none;padding:10px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.06em;
+  cursor:pointer;transition:opacity 0.15s;}
+.mkt-buy:hover{opacity:0.85;}
+.straddle-btn{
+  grid-column:1/-1;
+  background:#00d4c8;color:#070a0d;border:none;padding:9px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.1em;
+  cursor:pointer;transition:opacity 0.15s;text-transform:uppercase;
+}
+.straddle-btn:hover{opacity:0.85;}
+
+/* ── PENDING ORDERS ── */
+.pend-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:3px;margin:6px 0;}
+.pend-btn{
+  background:#0a0d10;color:#6a8090;
+  border:1px solid #1e2530;padding:7px 4px;
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.06em;
+  cursor:pointer;text-align:center;transition:all 0.15s;
+}
+.pend-btn:hover{color:#c8d4e0;border-color:#2a3a4a;}
+
+/* ── NO DRAFT ── */
+.no-draft{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:#2a3a4a;
+  margin:10px 0;letter-spacing:0.05em;
+}
+.no-draft p{font-size:9px;color:#1e2a35;margin-top:3px;}
+
+/* ── BOTTOM BAR ── */
+.bottom-bar{
+  border:1px solid #1e2530;
+  margin-top:10px;padding:8px;
+  background:#080b0e;
+}
+.bb-row1{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.bb-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px;letter-spacing:0.12em;color:#2a3a4a;
+  white-space:nowrap;
+}
+.bb-seg{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:#3a5060;
+  background:#070a0d;border:1px solid #151f28;
+  padding:4px 8px;cursor:pointer;transition:all 0.15s;
+  white-space:nowrap;
+}
+.bb-seg:hover{color:#a0b8c8;}
+.bb-seg.active-teal{background:#00d4c8 !important;color:#070a0d !important;border-color:#00d4c8;}
+.bb-num-inp{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:#c8d4e0;
+  background:#070a0d;border:1px solid #1e2530;
+  padding:3px 6px;width:38px;text-align:center;outline:none;
+}
+.bb-num-inp:focus{border-color:#00d4c8;}
+.bb-close{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:#c8d4e0;
+  background:#1e2530;border:1px solid #2a3a4a;
+  padding:4px 10px;cursor:pointer;margin-left:auto;
+  transition:all 0.15s;white-space:nowrap;
+}
+.bb-close:hover{background:#2a3a4a;}
+.bb-row2{display:flex;align-items:center;gap:4px;margin-bottom:5px;}
+.bb-all{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;
+  background:#1e3a28;color:#00e676;
+  border:1px solid #00e676;
+  padding:4px 10px;cursor:pointer;transition:all 0.15s;
+  white-space:nowrap;
+}
+.bb-all:hover{background:#00e676;color:#070a0d;}
+.bb-trail-row{display:flex;align-items:center;gap:3px;margin-bottom:5px;}
+.bb-trail-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a3a4a;letter-spacing:0.1em;margin-right:2px;}
+.trail-mode{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:#3a5060;
+  background:#070a0d;border:1px solid #151f28;
+  padding:3px 7px;cursor:pointer;transition:all 0.15s;
+}
+.trail-mode:hover{color:#a0b8c8;}
+.trail-mode.act{background:#00d4c8;color:#070a0d;border-color:#00d4c8;}
+.trail-set{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:#070a0d;
+  background:#2a5a7a;border:1px solid #3a7a9a;color:#a0d0e0;
+  padding:3px 8px;cursor:pointer;transition:all 0.15s;
+}
+.trail-set:hover{background:#3a7a9a;}
+.trail-off{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:#cc2222;
+  background:#1a0808;border:1px solid #cc2222;
+  padding:3px 8px;cursor:pointer;transition:all 0.15s;
+}
+.trail-off:hover{background:#cc2222;color:#fff;}
+.bb-row4{display:flex;gap:3px;}
+.bb-hotkey,.bb-real,.bb-vis,.bb-vps,.bb-leg{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:0.08em;
+  padding:5px;flex:1;text-align:center;
+  border:1px solid #1e2530;cursor:pointer;transition:all 0.15s;
+}
+.bb-hotkey{background:#1a1200;color:#f0a500;border-color:#f0a500;}
+.bb-real{background:#0a0d10;color:#4a6070;}
+.bb-vis{background:#0a0d10;color:#00d4c8;border-color:#1e3a40;}
+.bb-vps{background:#0a0d10;color:#4a6070;}
+.bb-leg{background:#0a0d10;color:#4a6070;}
+.bb-hotkey:hover,.bb-real:hover,.bb-vis:hover,.bb-vps:hover,.bb-leg:hover{border-color:#2a3a4a;color:#c8d4e0;}
+
+/* ── NEWS TAB ── */
+.currency-row{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px;}
+.ccy-btn{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:#4a6070;letter-spacing:0.06em;
+  background:#0a0d10;border:1px solid #1e2530;
+  padding:4px 10px;cursor:pointer;transition:all 0.15s;
+}
+.ccy-btn:hover{color:#a0b8c8;border-color:#2a3a4a;}
+.ccy-btn.active-teal{background:#00d4c8;color:#070a0d;border-color:#00d4c8;}
+.events-empty{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:#1e2a35;
+  padding:30px 10px;text-align:center;
+}
+.news-footer{
+  border-top:1px solid #1a2230;padding-top:8px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;
+}
+.arm-btn{
+  background:#00d4c8;color:#070a0d;border:none;
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;
+  padding:6px 16px;cursor:pointer;transition:opacity 0.15s;
+}
+.arm-btn:hover{opacity:0.85;}
+.disarm-btn{
+  background:#cc2222;color:#fff;border:none;
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;
+  padding:6px 14px;cursor:pointer;transition:opacity 0.15s;
+}
+.disarm-btn:hover{opacity:0.85;}
+
+/* ── SESSION TAB ── */
+.session-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;}
+.sess-card{
+  background:#0a0d10;border:1px solid #1e2530;
+  padding:12px 10px;text-align:center;cursor:pointer;
+  transition:border-color 0.15s;
+}
+.sess-card:hover{border-color:#2a3a4a;}
+.sess-card.armed{border-color:#00d4c8;background:#0a1a1a;}
+.sess-name{font-family:'Share Tech Mono',monospace;font-size:12px;color:#c8d4e0;margin-bottom:3px;}
+.sess-time{font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;}
+.sess-card.armed .sess-name{color:#00d4c8;}
+.sess-actions{display:flex;gap:4px;margin-bottom:8px;}
+.sess-arm-all{background:#00d4c8;color:#070a0d;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.08em;padding:6px 12px;cursor:pointer;flex:1;transition:opacity 0.15s;}
+.sess-arm-all:hover{opacity:0.85;}
+.sess-disarm-all{background:#cc2222;color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.08em;padding:6px 12px;cursor:pointer;flex:1;transition:opacity 0.15s;}
+.sess-disarm-all:hover{opacity:0.85;}
+.sess-repeat{background:#0a0d10;color:#3d5060;border:1px solid #1e2530;font-family:'Share Tech Mono',monospace;font-size:10px;padding:6px 12px;cursor:pointer;flex:1;transition:all 0.15s;}
+.sess-repeat:hover{color:#a0b8c8;}
+.mins-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.sess-now{background:#00d4c8;color:#070a0d;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;padding:6px 14px;cursor:pointer;}
+.sess-arm{background:#1e3a28;color:#00e676;border:1px solid #00e676;font-family:'Share Tech Mono',monospace;font-size:10px;padding:6px 12px;cursor:pointer;}
+.armed-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a3a4a;letter-spacing:0.12em;margin:8px 0 4px;}
+.no-armed{font-family:'Share Tech Mono',monospace;font-size:10px;color:#1e2a35;}
+.schedule-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:#0a0d10;border:1px solid #1e2530;
+  color:#3d5060;font-family:'Share Tech Mono',monospace;font-size:10px;
+  padding:8px;cursor:pointer;margin-top:8px;width:100%;
+  transition:all 0.15s;
+}
+.schedule-btn:hover{color:#a0b8c8;border-color:#2a3a4a;}
+
+/* ── RANGE TAB ── */
+.range-time-row{display:grid;grid-template-columns:auto 1fr auto 1fr auto auto;align-items:center;gap:6px;margin-bottom:8px;}
+.range-tz-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;}
+.range-mode-row{display:flex;gap:4px;margin:8px 0;}
+.mode-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.08em;padding:7px 20px;border:1px solid #1e2530;background:#0a0d10;color:#4a6070;cursor:pointer;flex:1;text-align:center;transition:all 0.15s;}
+.mode-btn:hover{color:#a0b8c8;}
+.mode-btn.active-teal{background:#00d4c8;color:#070a0d;border-color:#00d4c8;}
+.range-info{font-family:'Share Tech Mono',monospace;font-size:9px;color:#3d5060;margin:6px 0;letter-spacing:0.06em;}
+.range-actions{display:flex;gap:4px;margin:8px 0;}
+.range-repeat{background:#0a0d10;color:#3d5060;border:1px solid #1e2530;font-family:'Share Tech Mono',monospace;font-size:9px;padding:7px 10px;cursor:pointer;flex:1;transition:all 0.15s;}
+.range-fire{background:#0a0d10;color:#3d5060;border:1px solid #1e2530;font-family:'Share Tech Mono',monospace;font-size:9px;padding:7px 10px;cursor:pointer;flex:1;transition:all 0.15s;}
+.range-fire:hover,.range-repeat:hover{color:#a0b8c8;}
+.range-arm{background:#00d4c8;color:#070a0d;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;padding:7px 20px;cursor:pointer;flex:1;}
+.range-recent-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a3a4a;letter-spacing:0.12em;margin:8px 0 4px;}
+.range-empty{font-family:'Share Tech Mono',monospace;font-size:10px;color:#1e2a35;}
+
+/* ── S/R TAB ── */
+.sr-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:3px;margin-bottom:3px;}
+.sr-btn{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.06em;background:#0a0d10;color:#4a6070;border:1px solid #1e2530;padding:6px 4px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.sr-btn:hover{color:#a0b8c8;border-color:#2a3a4a;}
+.sr-btn.active-teal{background:#00d4c8;color:#070a0d;border-color:#00d4c8;}
+.sr-btn.active-green{background:#00b85a;color:#070a0d;border-color:#00b85a;}
+.sr-lookback{display:flex;align-items:center;gap:8px;margin:8px 0;font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;}
+.sr-scan{background:#c0287a;color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;padding:6px 16px;cursor:pointer;transition:opacity 0.15s;}
+.sr-scan:hover{opacity:0.85;}
+.sr-setup{background:#c0287a;color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;padding:6px 14px;cursor:pointer;margin-left:auto;display:block;}
+.sr-prompt{font-family:'Share Tech Mono',monospace;font-size:10px;color:#1e2a35;padding:20px 0;text-align:center;}
+
+/* ── PATTERN TAB ── */
+.pat-status-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;}
+.pat-arm{background:#1a0808;color:#cc2222;border:1px solid #cc2222;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:4px 10px;cursor:pointer;transition:all 0.15s;}
+.pat-arm.armed{background:#cc2222;color:#fff;}
+.pat-arm:hover{background:#cc2222;color:#fff;}
+.pat-disabled{background:#1a0808;color:#cc2222;border:1px solid #3a1010;font-family:'Share Tech Mono',monospace;font-size:9px;padding:4px 10px;margin-left:auto;}
+.pat-setup{background:#c0287a;color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:9px;padding:4px 10px;cursor:pointer;}
+.pat-types{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-bottom:8px;}
+.pat-type{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.06em;background:#0a0d10;color:#4a6070;border:1px solid #1e2530;padding:7px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.pat-type:hover{color:#a0b8c8;}
+.pat-type.active-teal{background:#00d4c8;color:#070a0d;border-color:#00d4c8;}
+.pat-signal-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;}
+.pat-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a3a4a;letter-spacing:0.1em;margin:6px 0 4px;}
+.pat-detail-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;flex-wrap:wrap;}
+.pat-val{color:#c8d4e0;}
+.pat-2col{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:4px;}
+.pat-opt{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.06em;background:#0a0d10;color:#4a6070;border:1px solid #1e2530;padding:6px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.pat-opt:hover{color:#a0b8c8;}
+.pat-opt.active-teal{background:#00d4c8;color:#070a0d;border-color:#00d4c8;}
+.pat-opt.active-gold{background:#f0a500;color:#070a0d;border-color:#f0a500;}
+
+/* ── RISK TAB ── */
+.risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+.risk-field{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;}
+.risk-inp{font-family:'Share Tech Mono',monospace;font-size:11px;color:#c8d4e0;background:#070a0d;border:1px solid #1e2530;padding:4px 8px;width:60px;text-align:center;outline:none;}
+.risk-inp:focus{border-color:#00d4c8;}
+.risk-unit{color:#2a3a4a;font-size:9px;}
+.risk-apply{background:#00d4c8;color:#070a0d;border:none;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;padding:8px;cursor:pointer;width:100%;margin:8px 0;transition:opacity 0.15s;text-align:center;}
+.risk-apply:hover{opacity:0.85;}
+.risk-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-bottom:8px;}
+.risk-close-all{background:#cc2222;color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:9px;padding:7px;cursor:pointer;transition:opacity 0.15s;}
+.risk-close-all:hover{opacity:0.85;}
+.risk-action-btn{background:#0a0d10;color:#4a6070;border:1px solid #1e2530;font-family:'Share Tech Mono',monospace;font-size:9px;padding:7px;cursor:pointer;text-align:center;transition:all 0.15s;}
+.risk-action-btn:hover{color:#a0b8c8;border-color:#2a3a4a;}
+.risk-controls-row{display:flex;align-items:center;gap:4px;margin-bottom:6px;}
+.stats-box{background:#070a0d;border:1px solid #1a2230;padding:8px;margin-top:6px;}
+.stats-title{font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a3a4a;letter-spacing:0.14em;margin-bottom:6px;}
+.stats-row{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;margin-bottom:3px;}
+.stats-val{color:#c8d4e0;}
+.stats-val-green{color:#00e676;}
+.stats-val-red{color:#cc2222;}
+
+/* ── AUTO TIME ROW ── */
+.auto-close-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;}
+
+/* ── TRAILING POPUP ── */
+.popup-overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:200;
+}
+.popup-overlay.show{display:flex;align-items:center;justify-content:center;}
+.trail-popup{
+  background:#0f1318;
+  border:1px solid #2a3a4a;
+  width:300px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.9);
+}
+.trail-popup-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;border-bottom:1px solid #1a2230;
+}
+.trail-popup-title{font-family:'Share Tech Mono',monospace;font-size:12px;color:#c8d4e0;letter-spacing:0.08em;}
+.trail-popup-state{font-family:'Share Tech Mono',monospace;font-size:10px;background:#cc2222;color:#fff;padding:3px 10px;}
+.trail-popup-close{color:#4a6070;cursor:pointer;font-size:16px;transition:color 0.15s;}
+.trail-popup-close:hover{color:#c8d4e0;}
+.trail-popup-tabs{display:flex;gap:3px;padding:8px 10px 0;background:#0b0e12;}
+.trail-popup-tab{font-family:'Share Tech Mono',monospace;font-size:10px;color:#3d5060;padding:5px 10px;border:1px solid transparent;cursor:pointer;transition:all 0.15s;}
+.trail-popup-tab.active{background:#00d4c8;color:#070a0d;border-color:#00d4c8;}
+.trail-popup-tab:hover{color:#a0b8c8;}
+.trail-popup-body{padding:12px;}
+.trail-popup-mode-title{font-family:'Share Tech Mono',monospace;font-size:11px;color:#00d4c8;margin-bottom:12px;letter-spacing:0.08em;}
+.trail-field{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a6070;}
+.trail-inp{font-family:'Share Tech Mono',monospace;font-size:11px;color:#c8d4e0;background:#070a0d;border:1px solid #1e2530;padding:5px 8px;width:70px;text-align:center;outline:none;}
+.trail-inp:focus{border-color:#00d4c8;}
+.trail-apply-btn{background:#00d4c8;color:#070a0d;border:none;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;padding:10px;width:100%;cursor:pointer;margin-top:16px;transition:opacity 0.15s;}
+.trail-apply-btn:hover{opacity:0.85;}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:#1a2230;margin:8px 0;}
+
+/* ── TOOLTIP helper ── */
+.notice{font-family:'Share Tech Mono',monospace;font-size:9px;color:#1e2a35;margin:4px 0;letter-spacing:0.06em;}
+</style>
+</head>
+<body>
+
+<div class="page-label">
+  TRIGGER PRO · INTERACTIVE DEMO · 
+  <a href="https://www.mql5.com/en/market/product/170008" target="_blank">BUY ON MQL5 →</a>
+</div>
+
+<!-- ═══════════════════════════════════ PANEL ═══════════════════════════════════ -->
+<div class="panel">
+
+  <!-- TITLEBAR -->
+  <div class="titlebar">
+    <div class="titlebar-left">
+      <h1>TRIGGER PRO</h1>
+      <p>by Navigator Algo</p>
+    </div>
+    <div class="titlebar-right">
+      <button class="tb-btn">?</button>
+      <button class="tb-btn tb-orders">ORDERS</button>
+      <button class="tb-btn" id="compactToggle" onclick="toggleCompact()" title="Toggle compact/wide">C</button>
+      <button class="tb-btn">–</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('trade',this)">Trade</div>
+    <div class="tab" onclick="switchTab('news',this)">News</div>
+    <div class="tab" onclick="switchTab('session',this)">Session</div>
+    <div class="tab" onclick="switchTab('range',this)">Range</div>
+    <div class="tab" onclick="switchTab('sr',this)">S/R</div>
+    <div class="tab" onclick="switchTab('pattern',this)">Pattern</div>
+    <div class="tab" onclick="switchTab('risk',this)">Risk</div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div style="display:flex;align-items:center;">
+      <span class="status-symbol">US30m</span>
+      <span class="status-spread">Spread: 23.0</span>
+    </div>
+    <div class="status-right">
+      <div class="status-eq">$288804.42</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <span class="status-mode">REAL</span>
+        <span class="status-mode status-armed" id="armedLabel">IDLE</span>
+      </div>
+      <div class="status-pl" id="plLabel">+0.00</div>
+    </div>
+  </div>
+
+  <!-- ═══════ TAB: TRADE ═══════ -->
+  <div class="tab-content active" id="tab-trade">
+    <div class="row-label">ORDER PARAMETERS</div>
+    <div class="btn-group">
+      <button class="grp-btn" onclick="toggle(this,'active-blue')" title="Price input mode">PRICE</button>
+      <button class="grp-btn active-magenta" onclick="toggle(this,'active-magenta')" title="Points mode">POINTS</button>
+      <button class="grp-btn active-magenta" onclick="toggle(this,'active-magenta')" title="Setup mode">SETUP</button>
+    </div>
+    <div class="input-row">
+      <span class="inp-label">Lots:</span>
+      <input class="inp" value="0.01" type="number" step="0.01" min="0.01">
+      <span class="inp-label">SL:</span>
+      <input class="inp" value="30" type="number" min="1">
+      <span class="inp-label">TP:</span>
+      <input class="inp" value="30" type="number" min="1">
+      <span class="inp-label">Offset:</span>
+      <input class="inp" value="15" type="number" min="0">
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div class="calc-lot">Calculated Lot Size: 0.01</div>
+      <div class="fixed-badge">FIXED</div>
+    </div>
+
+    <div class="row-label" style="margin-top:8px;">MARKET EXECUTION</div>
+    <div class="market-row">
+      <button class="mkt-sell" onclick="flash(this)">SELL | 46428.6</button>
+      <button class="mkt-buy" onclick="flash(this)">BUY | 46430.9</button>
+      <button class="straddle-btn" onclick="flash(this)">⚡ QUICK STRADDLE</button>
+    </div>
+
+    <div class="row-label" style="margin-top:6px;">PENDING ORDERS</div>
+    <div class="pend-row">
+      <button class="pend-btn" onclick="flash(this)">Buy Stop</button>
+      <button class="pend-btn" onclick="flash(this)">Sell Stop</button>
+      <button class="pend-btn" onclick="flash(this)">Buy Lmt</button>
+      <button class="pend-btn" onclick="flash(this)">Sell Lmt</button>
+    </div>
+
+    <div class="no-draft">NO ACTIVE DRAFT
+      <p>Click a pending type above to create a visual draft on chart.</p>
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+      <div class="bb-row1">
+        <span class="bb-label">ONE-CLICK CLOSE</span>
+        <button class="bb-seg" onclick="toggleSeg(this)">THIS SYMBOL</button>
+        <input class="bb-num-inp" value="25" type="number" min="1" max="100">
+        <button class="bb-close" onclick="flash(this)">Close</button>
+      </div>
+      <div class="bb-row2">
+        <button class="bb-seg" onclick="toggleSeg(this)">Buys</button>
+        <button class="bb-seg" onclick="toggleSeg(this)">Sells</button>
+        <button class="bb-seg" onclick="toggleSeg(this)">Profit</button>
+        <button class="bb-seg" onclick="toggleSeg(this)">Loss</button>
+        <button class="bb-seg" onclick="toggleSeg(this)">50%</button>
+        <button class="bb-all" onclick="flash(this)">ALL</button>
+      </div>
+      <div class="bb-trail-row">
+        <span class="bb-trail-lbl">TRAIL:</span>
+        <button class="trail-mode act" onclick="openTrail('Pt')">Pt</button>
+        <button class="trail-mode" onclick="openTrail('ATR')">ATR</button>
+        <button class="trail-mode" onclick="openTrail('MA')">MA</button>
+        <button class="trail-mode" onclick="openTrail('Swg')">Swg</button>
+        <button class="trail-mode" onclick="openTrail('Stp')">Stp</button>
+        <button class="trail-mode" onclick="openTrail('Cha')">Cha</button>
+        <button class="trail-set" onclick="openTrail('Pt')">SET</button>
+        <button class="trail-off">OFF</button>
+      </div>
+      <div class="bb-row4">
+        <button class="bb-hotkey">HOTKEYS</button>
+        <button class="bb-real">REAL</button>
+        <button class="bb-vis">VISUALS</button>
+        <button class="bb-vps">VPS</button>
+        <button class="bb-leg">1-LEG</button>
+      </div>
+    </div>
+  </div><!-- /tab-trade -->
+
+  <!-- ═══════ TAB: NEWS ═══════ -->
+  <div class="tab-content" id="tab-news">
+    <div class="row-label">IMPACT FILTER</div>
+    <div class="btn-group">
+      <button class="grp-btn active-teal" onclick="toggle(this,'active-teal')">ALL</button>
+      <button class="grp-btn" onclick="toggle(this,'active-teal')">HIGH</button>
+      <button class="grp-btn" onclick="toggle(this,'active-teal')">MED</button>
+      <button class="bb-close" style="margin-left:auto;font-size:9px;" onclick="flash(this)">Reload</button>
+    </div>
+
+    <div class="currency-row">
+      <button class="ccy-btn active-teal" onclick="toggleCcy(this)">ALL</button>
+      <button class="ccy-btn" onclick="toggleCcy(this)">USD</button>
+      <button class="ccy-btn" onclick="toggleCcy(this)">EUR</button>
+      <button class="ccy-btn" onclick="toggleCcy(this)">GBP</button>
+      <button class="ccy-btn" onclick="toggleCcy(this)">JPY</button>
+      <button class="ccy-btn" onclick="toggleCcy(this)">AUD</button>
+      <button class="ccy-btn" onclick="toggleCcy(this)">CAD</button>
+      <button class="ccy-btn" onclick="toggleCcy(this)">CHF</button>
+    </div>
+
+    <div class="input-row">
+      <span class="inp-label" style="color:#3d5060;">Before (m:s):</span>
+      <input class="inp" value="05" style="width:40px;">
+      <input class="inp" value="00" style="width:40px;">
+      <button class="disarm-btn" onclick="setArmed(false)">DISARM</button>
+      <button class="arm-btn" onclick="setArmed(true)">ARM</button>
+    </div>
+
+    <div class="events-empty">No events armed</div>
+
+    <div class="divider"></div>
+    <div class="news-footer">
+      <span>Offset:15pt &nbsp;SL:30pt &nbsp;TP:30pt &nbsp;Lot:0.01</span>
+      <button class="grp-btn active-magenta" onclick="flash(this)" style="font-size:9px;padding:4px 10px;">SETUP</button>
+    </div>
+
+    <div class="bottom-bar" style="margin-top:8px;">
+      <div class="bb-row1">
+        <span class="bb-label">ONE-CLICK CLOSE</span>
+        <button class="bb-seg">THIS SYMBOL</button>
+        <input class="bb-num-inp" value="25">
+        <button class="bb-close">Close</button>
+      </div>
+      <div class="bb-row2">
+        <button class="bb-seg">Buys</button><button class="bb-seg">Sells</button>
+        <button class="bb-seg">Profit</button><button class="bb-seg">Loss</button>
+        <button class="bb-seg">50%</button>
+        <button class="bb-all">ALL</button>
+      </div>
+      <div class="bb-trail-row">
+        <span class="bb-trail-lbl">TRAIL:</span>
+        <button class="trail-mode act" onclick="openTrail('Pt')">Pt</button>
+        <button class="trail-mode" onclick="openTrail('ATR')">ATR</button>
+        <button class="trail-mode" onclick="openTrail('MA')">MA</button>
+        <button class="trail-mode" onclick="openTrail('Swg')">Swg</button>
+        <button class="trail-mode" onclick="openTrail('Stp')">Stp</button>
+        <button class="trail-mode" onclick="openTrail('Cha')">Cha</button>
+        <button class="trail-set" onclick="openTrail('Pt')">SET</button>
+        <button class="trail-off">OFF</button>
+      </div>
+      <div class="bb-row4">
+        <button class="bb-hotkey">HOTKEYS</button>
+        <button class="bb-real">REAL</button>
+        <button class="bb-vis">VISUALS</button>
+        <button class="bb-vps">VPS</button>
+        <button class="bb-leg">1-LEG</button>
+      </div>
+    </div>
+  </div><!-- /tab-news -->
+
+  <!-- ═══════ TAB: SESSION ═══════ -->
+  <div class="tab-content" id="tab-session">
+    <div class="session-grid">
+      <div class="sess-card" onclick="toggleSession(this,'London')">
+        <div class="sess-name">London</div>
+        <div class="sess-time">08:00 UTC</div>
+      </div>
+      <div class="sess-card" onclick="toggleSession(this,'New York')">
+        <div class="sess-name">New York</div>
+        <div class="sess-time">13:00 UTC</div>
+      </div>
+      <div class="sess-card" onclick="toggleSession(this,'Tokyo')">
+        <div class="sess-name">Tokyo</div>
+        <div class="sess-time">00:00 UTC</div>
+      </div>
+      <div class="sess-card" onclick="toggleSession(this,'Sydney')">
+        <div class="sess-name">Sydney</div>
+        <div class="sess-time">22:00 UTC</div>
+      </div>
+    </div>
+
+    <div class="sess-actions">
+      <button class="sess-arm-all" onclick="armAllSessions()">ARM ALL</button>
+      <button class="sess-disarm-all" onclick="disarmAllSessions()">DISARM ALL</button>
+      <button class="sess-repeat" onclick="toggleRepeat(this)">REPEAT:OFF</button>
+    </div>
+
+    <div class="mins-row">
+      <span class="inp-label" style="color:#3d5060;">Mins after open:</span>
+      <input class="inp" value="10" style="width:48px;margin-left:4px;">
+      <button class="sess-arm" onclick="flash(this)">ARM</button>
+      <button class="sess-now" onclick="flash(this)">NOW</button>
+    </div>
+
+    <div class="divider"></div>
+    <div class="armed-label">ARMED SESSION ITEMS</div>
+    <div class="no-armed" id="sessionArmedList">No sessions or slots armed yet.</div>
+
+    <div class="notice" style="margin-top:8px;">Offset:15pt &nbsp;SL:30pt &nbsp;TP:30pt &nbsp;Lot:0.01</div>
+    <button class="schedule-btn" onclick="switchTab('schedule',null)">▶ SCHEDULE &nbsp;&nbsp; Timed straddle slots</button>
+
+    <div class="bottom-bar" style="margin-top:8px;">
+      <div class="bb-row1">
+        <span class="bb-label">ONE-CLICK CLOSE</span>
+        <button class="bb-seg">THIS SYMBOL</button>
+        <input class="bb-num-inp" value="25">
+        <button class="bb-close">Close</button>
+      </div>
+      <div class="bb-row2">
+        <button class="bb-seg">Buys</button><button class="bb-seg">Sells</button>
+        <button class="bb-seg">Profit</button><button class="bb-seg">Loss</button>
+        <button class="bb-seg">50%</button>
+        <button class="bb-all">ALL</button>
+      </div>
+      <div class="bb-trail-row">
+        <span class="bb-trail-lbl">TRAIL:</span>
+        <button class="trail-mode act" onclick="openTrail('Pt')">Pt</button>
+        <button class="trail-mode" onclick="openTrail('ATR')">ATR</button>
+        <button class="trail-mode" onclick="openTrail('MA')">MA</button>
+        <button class="trail-mode" onclick="openTrail('Swg')">Swg</button>
+        <button class="trail-mode" onclick="openTrail('Stp')">Stp</button>
+        <button class="trail-mode" onclick="openTrail('Cha')">Cha</button>
+        <button class="trail-set" onclick="openTrail('Pt')">SET</button>
+        <button class="trail-off">OFF</button>
+      </div>
+      <div class="bb-row4">
+        <button class="bb-hotkey">HOTKEYS</button><button class="bb-real">REAL</button>
+        <button class="bb-vis">VISUALS</button><button class="bb-vps">VPS</button>
+        <button class="bb-leg">1-LEG</button>
+      </div>
+    </div>
+  </div><!-- /tab-session -->
+
+  <!-- ═══════ TAB: RANGE ═══════ -->
+  <div class="tab-content" id="tab-range">
+    <div class="row-label">RANGE WINDOW</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+      <span class="inp-label">Start:</span>
+      <input class="inp" value="00:00" style="width:60px;">
+      <span class="inp-label">End:</span>
+      <input class="inp" value="06:00" style="width:60px;">
+      <span class="inp-label">TZ -</span>
+      <input class="inp" value="GMT+0" style="width:58px;">
+      <button class="grp-btn">+</button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div class="row-label" style="margin:0;">PRICE LEVELS</div>
+      <button class="grp-btn active-teal" onclick="toggle(this,'active-teal')">AUTO</button>
+    </div>
+
+    <div class="notice">Set window times and press ARM</div>
+
+    <div class="row-label">Mode:</div>
+    <div class="range-mode-row">
+      <button class="mode-btn active-teal" onclick="toggleMode(this)">BREAKOUT</button>
+      <button class="mode-btn" onclick="toggleMode(this)">REVERSAL</button>
+    </div>
+
+    <div class="notice">SL:30pt &nbsp;TP:30pt &nbsp;Offset:15pt &nbsp;Lot:0.01</div>
+
+    <div class="range-actions">
+      <button class="range-repeat" onclick="toggleRepeat(this)">REPEAT OFF</button>
+      <button class="range-fire" onclick="flash(this)">FIRE NOW</button>
+      <button class="range-arm" onclick="flash(this)">ARM</button>
+    </div>
+
+    <div class="range-recent-label">RECENT RANGE ORDERS</div>
+    <div class="range-empty">No range orders placed yet.</div>
+
+    <div class="bottom-bar" style="margin-top:8px;">
+      <div class="bb-row1">
+        <span class="bb-label">ONE-CLICK CLOSE</span>
+        <button class="bb-seg">THIS SYMBOL</button>
+        <input class="bb-num-inp" value="25">
+        <button class="bb-close">Close</button>
+      </div>
+      <div class="bb-row2">
+        <button class="bb-seg">Buys</button><button class="bb-seg">Sells</button>
+        <button class="bb-seg">Profit</button><button class="bb-seg">Loss</button>
+        <button class="bb-seg">50%</button>
+        <button class="bb-all">ALL</button>
+      </div>
+      <div class="bb-trail-row">
+        <span class="bb-trail-lbl">TRAIL:</span>
+        <button class="trail-mode act" onclick="openTrail('Pt')">Pt</button>
+        <button class="trail-mode" onclick="openTrail('ATR')">ATR</button>
+        <button class="trail-mode" onclick="openTrail('MA')">MA</button>
+        <button class="trail-mode" onclick="openTrail('Swg')">Swg</button>
+        <button class="trail-mode" onclick="openTrail('Stp')">Stp</button>
+        <button class="trail-mode" onclick="openTrail('Cha')">Cha</button>
+        <button class="trail-set" onclick="openTrail('Pt')">SET</button>
+        <button class="trail-off">OFF</button>
+      </div>
+      <div class="bb-row4">
+        <button class="bb-hotkey">HOTKEYS</button><button class="bb-real">REAL</button>
+        <button class="bb-vis">VISUALS</button><button class="bb-vps">VPS</button>
+        <button class="bb-leg">1-LEG</button>
+      </div>
+    </div>
+  </div><!-- /tab-range -->
+
+  <!-- ═══════ TAB: S/R ═══════ -->
+  <div class="tab-content" id="tab-sr">
+    <div class="sr-grid">
+      <button class="sr-btn active-teal" onclick="toggleSR(this)">Daily</button>
+      <button class="sr-btn active-teal" onclick="toggleSR(this)">Prev</button>
+      <button class="sr-btn" onclick="toggleSR(this)">Weekly</button>
+      <button class="sr-btn active-teal" onclick="toggleSR(this)">Swing</button>
+    </div>
+    <div class="sr-grid">
+      <button class="sr-btn" onclick="toggleSR(this)">Round</button>
+      <button class="sr-btn" onclick="toggleSR(this)">Cluster</button>
+      <button class="sr-btn" style="grid-column:3/5;" onclick="toggleSR(this)"></button>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
+      <button class="sr-scan" onclick="flash(this)">SCAN</button>
+    </div>
+    <div class="sr-grid">
+      <button class="sr-btn" onclick="toggleSR(this)">PinBar</button>
+      <button class="sr-btn" onclick="toggleSR(this)">Engulf</button>
+      <button class="sr-btn" onclick="toggleSR(this)">FVG</button>
+      <button class="sr-btn" onclick="toggleSR(this)">InsBar</button>
+    </div>
+
+    <div class="sr-lookback">
+      <span>Lookback:</span>
+      <input class="inp" value="100" style="width:52px;">
+      <span>Swing:</span>
+      <input class="inp" value="5" style="width:42px;">
+      <button class="sr-setup" onclick="flash(this)">SETUP</button>
+    </div>
+
+    <div class="sr-prompt">Press SCAN to detect levels.</div>
+
+    <div class="bottom-bar">
+      <div class="bb-row1">
+        <span class="bb-label">ONE-CLICK CLOSE</span>
+        <button class="bb-seg">THIS SYMBOL</button>
+        <input class="bb-num-inp" value="25">
+        <button class="bb-close">Close</button>
+      </div>
+      <div class="bb-row2">
+        <button class="bb-seg">Buys</button><button class="bb-seg">Sells</button>
+        <button class="bb-seg">Profit</button><button class="bb-seg">Loss</button>
+        <button class="bb-seg">50%</button>
+        <button class="bb-all">ALL</button>
+      </div>
+      <div class="bb-trail-row">
+        <span class="bb-trail-lbl">TRAIL:</span>
+        <button class="trail-mode act" onclick="openTrail('Pt')">Pt</button>
+        <button class="trail-mode" onclick="openTrail('ATR')">ATR</button>
+        <button class="trail-mode" onclick="openTrail('MA')">MA</button>
+        <button class="trail-mode" onclick="openTrail('Swg')">Swg</button>
+        <button class="trail-mode" onclick="openTrail('Stp')">Stp</button>
+        <button class="trail-mode" onclick="openTrail('Cha')">Cha</button>
+        <button class="trail-set" onclick="openTrail('Pt')">SET</button>
+        <button class="trail-off">OFF</button>
+      </div>
+      <div class="bb-row4">
+        <button class="bb-hotkey">HOTKEYS</button><button class="bb-real">REAL</button>
+        <button class="bb-vis">VISUALS</button><button class="bb-vps">VPS</button>
+        <button class="bb-leg">1-LEG</button>
+      </div>
+    </div>
+  </div><!-- /tab-sr -->
+
+  <!-- ═══════ TAB: PATTERN ═══════ -->
+  <div class="tab-content" id="tab-pattern">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+      <button class="grp-btn active-magenta" onclick="flash(this)" style="font-size:9px;padding:4px 10px;">SETUP</button>
+      <button class="pat-disabled">DISABLED</button>
+    </div>
+    <div class="pat-status-row">
+      <button class="pat-arm" id="patArmBtn" onclick="togglePatArm()">◉ ARM</button>
+      <span>Last: <span style="color:#c8d4e0;">None</span> &nbsp; Act: <span style="color:#c8d4e0;">Idle</span></span>
+    </div>
+
+    <div class="pat-types">
+      <button class="pat-type active-teal" onclick="togglePat(this)">Pin Bar</button>
+      <button class="pat-type active-teal" onclick="togglePat(this)">Engulfing</button>
+      <button class="pat-type active-teal" onclick="togglePat(this)">Inside Bar</button>
+    </div>
+
+    <div class="pat-signal-row">
+      <span>Signal:</span>
+      <button class="grp-btn" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:4px 10px;">Directional</button>
+      <button class="grp-btn active-teal" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:4px 10px;">Straddle</button>
+      <button class="grp-btn" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:4px 10px;">1-LEG</button>
+    </div>
+
+    <div style="display:flex;gap:4px;margin-bottom:6px;">
+      <button class="grp-btn" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:4px 10px;">S/R: OFF</button>
+      <button class="grp-btn active-teal" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:4px 10px;flex:1;text-align:center;">MATCH DIRECTION</button>
+    </div>
+
+    <div class="pat-sub">PATTERN SETTINGS</div>
+    <div class="pat-detail-row">
+      <span>MaxDist</span><input class="inp" value="200" style="width:48px;">
+      <span>Buffer</span><input class="inp" value="30" style="width:48px;">
+      <span>Expiry</span><input class="inp" value="3" style="width:36px;">
+      <span style="color:#2a3a4a;">bars</span>
+    </div>
+    <div class="pat-detail-row">
+      <span>MinRange</span><input class="inp" value="100" style="width:48px;">
+      <span>TF</span>
+      <button class="grp-btn active-teal" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:3px 8px;">CURRENT</button>
+      <button class="grp-btn" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:3px 8px;">1/BAR</button>
+      <button class="grp-btn" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:3px 8px;">1 SETUP</button>
+    </div>
+
+    <div class="pat-sub">INSIDE BAR</div>
+    <div class="pat-2col">
+      <button class="pat-opt active-gold" onclick="togglePat2(this,'active-gold')">MOTHER RANGE</button>
+      <button class="pat-opt active-teal" onclick="togglePat2(this,'active-teal')">STRICT</button>
+    </div>
+
+    <div class="pat-sub">PIN / ENGULF FILTERS</div>
+    <div class="pat-detail-row">
+      <span>Wick</span><span class="pat-val">2.0</span>
+      <span>Opp</span><span class="pat-val">0.5</span>
+      <span>Close%</span><span class="pat-val">65</span>
+      <span>Eng</span><span class="pat-val">1.0</span>
+    </div>
+    <div class="pat-detail-row">
+      <span>Body</span>
+      <button class="grp-btn active-teal" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:3px 8px;">FULL</button>
+      <span>Preset</span><span class="pat-val">STANDARD</span>
+      <button class="grp-btn active-gold" onclick="toggle(this,'active-gold')" style="font-size:9px;padding:3px 8px;margin-left:auto;">AUTO</button>
+    </div>
+
+    <div class="bottom-bar" style="margin-top:8px;">
+      <div class="bb-row1">
+        <span class="bb-label">ONE-CLICK CLOSE</span>
+        <button class="bb-seg">THIS SYMBOL</button>
+        <input class="bb-num-inp" value="25">
+        <button class="bb-close">Close</button>
+      </div>
+      <div class="bb-row2">
+        <button class="bb-seg">Buys</button><button class="bb-seg">Sells</button>
+        <button class="bb-seg">Profit</button><button class="bb-seg">Loss</button>
+        <button class="bb-seg">50%</button>
+        <button class="bb-all">ALL</button>
+      </div>
+      <div class="bb-trail-row">
+        <span class="bb-trail-lbl">TRAIL:</span>
+        <button class="trail-mode act" onclick="openTrail('Pt')">Pt</button>
+        <button class="trail-mode" onclick="openTrail('ATR')">ATR</button>
+        <button class="trail-mode" onclick="openTrail('MA')">MA</button>
+        <button class="trail-mode" onclick="openTrail('Swg')">Swg</button>
+        <button class="trail-mode" onclick="openTrail('Stp')">Stp</button>
+        <button class="trail-mode" onclick="openTrail('Cha')">Cha</button>
+        <button class="trail-set" onclick="openTrail('Pt')">SET</button>
+        <button class="trail-off">OFF</button>
+      </div>
+      <div class="bb-row4">
+        <button class="bb-hotkey">HOTKEYS</button><button class="bb-real">REAL</button>
+        <button class="bb-vis">VISUALS</button><button class="bb-vps">VPS</button>
+        <button class="bb-leg">1-LEG</button>
+      </div>
+    </div>
+  </div><!-- /tab-pattern -->
+
+  <!-- ═══════ TAB: RISK ═══════ -->
+  <div class="tab-content" id="tab-risk">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div class="row-label" style="margin:0;">RISK CONTROLS</div>
+      <div style="display:flex;gap:3px;">
+        <button class="grp-btn active-teal" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:3px 10px;">ALL</button>
+        <button class="grp-btn" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:3px 10px;">OFF</button>
+      </div>
+    </div>
+
+    <div class="risk-grid">
+      <div class="risk-field"><span>Daily Loss:</span><input class="risk-inp" value="3.0"><span class="risk-unit">%</span></div>
+      <div class="risk-field"><span>Profit Tgt:</span><input class="risk-inp" value="0.0"><span class="risk-unit">%</span></div>
+      <div class="risk-field"><span>Max Trades:</span><input class="risk-inp" value="0"><span class="risk-unit">/day</span></div>
+      <div class="risk-field"><span>Max Spread:</span><input class="risk-inp" value="50"><span class="risk-unit">p</span></div>
+      <div class="risk-field"><span>Consec.Loss:</span><input class="risk-inp" value="0"><span class="risk-unit">stops</span></div>
+      <div class="risk-field"><span>Eq.Floor $:</span><input class="risk-inp" value="0.00"></div>
+    </div>
+
+    <div class="auto-close-row">
+      <span>Auto-Close:</span>
+      <input class="inp" value="23" style="width:40px;">
+      <input class="inp" value="55" style="width:40px;">
+      <span>GMT</span>
+      <button class="grp-btn" onclick="toggle(this,'active-teal')" style="font-size:9px;padding:3px 10px;margin-left:auto;">OFF</button>
+    </div>
+
+    <div class="risk-actions">
+      <button class="risk-close-all" onclick="flash(this)">Close All</button>
+      <button class="risk-action-btn" onclick="flash(this)">Close Loss</button>
+      <button class="risk-action-btn" onclick="flash(this)">Block Only</button>
+    </div>
+
+    <button class="risk-apply" onclick="flash(this)">APPLY RISK SETTINGS</button>
+
+    <div class="stats-box">
+      <div class="stats-title">TODAY'S STATS</div>
+      <div class="stats-row"><span>P&amp;L:</span><span class="stats-val-green">+0.00 (0.00%)</span></div>
+      <div class="stats-row"><span>Trades:</span><span class="stats-val">0/99</span><span style="margin-left:20px;">W/R:</span><span class="stats-val" style="color:#cc2222;">0%</span></div>
+      <div class="stats-row"><span>Wins:</span><span class="stats-val">0</span><span style="margin-left:12px;">Loss:</span><span class="stats-val">0</span><span style="margin-left:12px;">Streak:</span><span class="stats-val">+0</span></div>
+      <div class="divider"></div>
+      <div class="stats-row"><span>Bal:</span><span class="stats-val">$288804.42</span><span style="margin-left:auto;">Eq:</span><span class="stats-val">$288804.42</span></div>
+    </div>
+
+    <div class="bottom-bar" style="margin-top:8px;">
+      <div class="bb-row1">
+        <span class="bb-label">ONE-CLICK CLOSE</span>
+        <button class="bb-seg">THIS SYMBOL</button>
+        <input class="bb-num-inp" value="25">
+        <button class="bb-close">Close</button>
+      </div>
+      <div class="bb-row2">
+        <button class="bb-seg">Buys</button><button class="bb-seg">Sells</button>
+        <button class="bb-seg">Profit</button><button class="bb-seg">Loss</button>
+        <button class="bb-seg">50%</button>
+        <button class="bb-all">ALL</button>
+      </div>
+      <div class="bb-trail-row">
+        <span class="bb-trail-lbl">TRAIL:</span>
+        <button class="trail-mode act" onclick="openTrail('Pt')">Pt</button>
+        <button class="trail-mode" onclick="openTrail('ATR')">ATR</button>
+        <button class="trail-mode" onclick="openTrail('MA')">MA</button>
+        <button class="trail-mode" onclick="openTrail('Swg')">Swg</button>
+        <button class="trail-mode" onclick="openTrail('Stp')">Stp</button>
+        <button class="trail-mode" onclick="openTrail('Cha')">Cha</button>
+        <button class="trail-set" onclick="openTrail('Pt')">SET</button>
+        <button class="trail-off">OFF</button>
+      </div>
+      <div class="bb-row4">
+        <button class="bb-hotkey">HOTKEYS</button><button class="bb-real">REAL</button>
+        <button class="bb-vis">VISUALS</button><button class="bb-vps">VPS</button>
+        <button class="bb-leg">1-LEG</button>
+      </div>
+    </div>
+  </div><!-- /tab-risk -->
+
+</div><!-- /panel -->
+
+<!-- ═══════════════════════ TRAILING STOP POPUP ═══════════════════════ -->
+<div class="popup-overlay" id="trailPopup" onclick="closeTrailOutside(event)">
+  <div class="trail-popup">
+    <div class="trail-popup-header">
+      <span class="trail-popup-title">TRAILING STOP</span>
+      <span class="trail-popup-state" id="trailState">OFF</span>
+      <span class="trail-popup-close" onclick="closeTrail()">×</span>
+    </div>
+    <div class="trail-popup-tabs" id="trailTabs">
+      <div class="trail-popup-tab active" onclick="switchTrailMode(this,'Pt')">Pt</div>
+      <div class="trail-popup-tab" onclick="switchTrailMode(this,'ATR')">ATR</div>
+      <div class="trail-popup-tab" onclick="switchTrailMode(this,'MA')">MA</div>
+      <div class="trail-popup-tab" onclick="switchTrailMode(this,'Swg')">Swg</div>
+      <div class="trail-popup-tab" onclick="switchTrailMode(this,'Stp')">Stp</div>
+      <div class="trail-popup-tab" onclick="switchTrailMode(this,'Cha')">Cha</div>
+    </div>
+    <div class="trail-popup-body">
+      <div class="trail-popup-mode-title" id="trailModeTitle">POINT TRAILING</div>
+      <div class="trail-field">
+        <span id="trailField1Label">Start After (points):</span>
+        <input class="trail-inp" id="trailField1" value="30">
+      </div>
+      <div class="trail-field" id="trailField2Row">
+        <span id="trailField2Label">Trail Distance (points):</span>
+        <input class="trail-inp" id="trailField2" value="15">
+      </div>
+      <button class="trail-apply-btn" onclick="applyTrail()">APPLY</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── TAB SWITCHER ──
+function switchTab(id,el){
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const content = document.getElementById('tab-'+id);
+  if(content) content.classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+// ── TOGGLE helpers ──
+function toggle(btn,cls){
+  const active = btn.classList.contains(cls);
+  // for single-select groups, remove from siblings
+  const group = btn.closest('.btn-group,.pat-signal-row,.pat-2col');
+  if(group){
+    group.querySelectorAll('[class*="active-"]').forEach(b=>{
+      ['active-teal','active-magenta','active-blue','active-gold','active-red','active-green'].forEach(c=>b.classList.remove(c));
+    });
+  }
+  if(!active) btn.classList.add(cls);
+}
+
+function toggleSeg(btn){ btn.classList.toggle('active-teal'); }
+function toggleCcy(btn){
+  document.querySelectorAll('.ccy-btn').forEach(b=>b.classList.remove('active-teal'));
+  btn.classList.add('active-teal');
+}
+function toggleSR(btn){ btn.classList.toggle('active-teal'); }
+function togglePat(btn){ btn.classList.toggle('active-teal'); }
+function togglePat2(btn,cls){
+  btn.parentElement.querySelectorAll('[class*="active-"]').forEach(b=>{
+    ['active-teal','active-gold'].forEach(c=>b.classList.remove(c));
+  });
+  btn.classList.add(cls);
+}
+function toggleMode(btn){
+  btn.parentElement.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active-teal'));
+  btn.classList.add('active-teal');
+}
+
+// ── SESSION ──
+function toggleSession(card,name){
+  card.classList.toggle('armed');
+  updateSessionArmed();
+}
+function armAllSessions(){
+  document.querySelectorAll('.sess-card').forEach(c=>c.classList.add('armed'));
+  updateSessionArmed();
+  setArmed(true);
+}
+function disarmAllSessions(){
+  document.querySelectorAll('.sess-card').forEach(c=>c.classList.remove('armed'));
+  updateSessionArmed();
+  setArmed(false);
+}
+function updateSessionArmed(){
+  const armed = [...document.querySelectorAll('.sess-card.armed')].map(c=>c.querySelector('.sess-name').textContent);
+  const el = document.getElementById('sessionArmedList');
+  el.textContent = armed.length ? armed.join(', ') : 'No sessions or slots armed yet.';
+  if(armed.length) setArmed(true);
+}
+function toggleRepeat(btn){
+  if(btn.textContent.includes('OFF')){btn.textContent='REPEAT:ON';btn.style.color='#00d4c8';}
+  else{btn.textContent='REPEAT:OFF';btn.style.color='';}
+}
+
+// ── ARMED STATE ──
+function setArmed(on){
+  const lbl = document.getElementById('armedLabel');
+  if(on){lbl.textContent='ARMED';lbl.style.color='#00d4c8';}
+  else{lbl.textContent='IDLE';lbl.style.color='';}
+}
+
+// ── PATTERN ARM ──
+function togglePatArm(){
+  const btn = document.getElementById('patArmBtn');
+  btn.classList.toggle('armed');
+  const on = btn.classList.contains('armed');
+  btn.textContent = on ? '◉ ARMED' : '◉ ARM';
+  setArmed(on);
+}
+
+// ── FLASH feedback ──
+function flash(el){
+  const orig = el.style.opacity||'1';
+  el.style.opacity='0.4';
+  setTimeout(()=>el.style.opacity=orig,120);
+}
+
+// ── TRAILING POPUP ──
+const trailModes = {
+  Pt:  {title:'POINT TRAILING',   f1:'Start After (points):',  f2:'Trail Distance (points):'},
+  ATR: {title:'ATR TRAILING',     f1:'ATR Period:',             f2:'ATR Multiplier:'},
+  MA:  {title:'MA TRAILING',      f1:'MA Period:',              f2:'MA Offset (points):'},
+  Swg: {title:'SWING TRAILING',   f1:'Swing Lookback (bars):',  f2:'Buffer (points):'},
+  Stp: {title:'STEP TRAILING',    f1:'Step Size (points):',     f2:'Min Move (points):'},
+  Cha: {title:'CHANDELIER TRAIL', f1:'Period (bars):',          f2:'Multiplier:'},
+};
+function openTrail(mode){
+  const cfg = trailModes[mode]||trailModes.Pt;
+  document.getElementById('trailModeTitle').textContent = cfg.title;
+  document.getElementById('trailField1Label').textContent = cfg.f1;
+  document.getElementById('trailField2Label').textContent = cfg.f2;
+  // highlight tab
+  document.querySelectorAll('.trail-popup-tab').forEach(t=>{
+    t.classList.toggle('active', t.textContent===mode);
+  });
+  document.getElementById('trailPopup').classList.add('show');
+}
+function closeTrail(){
+  document.getElementById('trailPopup').classList.remove('show');
+}
+function closeTrailOutside(e){
+  if(e.target===document.getElementById('trailPopup')) closeTrail();
+}
+function switchTrailMode(tab,mode){
+  document.querySelectorAll('.trail-popup-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  const cfg = trailModes[mode]||trailModes.Pt;
+  document.getElementById('trailModeTitle').textContent = cfg.title;
+  document.getElementById('trailField1Label').textContent = cfg.f1;
+  document.getElementById('trailField2Label').textContent = cfg.f2;
+}
+function applyTrail(){
+  const state = document.getElementById('trailState');
+  state.textContent = state.textContent==='OFF' ? 'ON' : 'OFF';
+  state.style.background = state.textContent==='ON' ? '#00b85a' : '#cc2222';
+  flash(document.querySelector('.trail-apply-btn'));
+  setTimeout(closeTrail, 300);
+}
+
+// ── COMPACT TOGGLE (narrow/wide) ──
+function toggleCompact(){
+  const p = document.querySelector('.panel');
+  p.style.width = p.style.width==='316px' ? '370px' : '316px';
+}
+
+const isEmbedded = window.self !== window.top;
+
+function notifyParentHeight(){
+  if(!isEmbedded) return;
+
+  const panel = document.querySelector('.panel');
+  const height = panel ? Math.ceil(panel.getBoundingClientRect().height) : Math.ceil(document.body.scrollHeight);
+
+  window.parent.postMessage({
+    type: 'trigger-pro-demo-height',
+    height: height
+  }, '*');
+}
+
+if(isEmbedded){
+  document.body.classList.add('embedded');
+  window.addEventListener('load', notifyParentHeight);
+  window.addEventListener('resize', notifyParentHeight);
+
+  if('ResizeObserver' in window){
+    const resizeObserver = new ResizeObserver(function(){
+      notifyParentHeight();
+    });
+
+    resizeObserver.observe(document.body);
+    const panel = document.querySelector('.panel');
+    if(panel) resizeObserver.observe(panel);
+  }
+
+  setTimeout(notifyParentHeight, 150);
+}
+</script>
+</body>
+</html>
