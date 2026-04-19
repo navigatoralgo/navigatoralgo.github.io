@@ -15,13 +15,13 @@
 //      Firebase Auth → Settings → Authorized domains.
 
 export const firebaseConfig = {
-  apiKey:            "__REPLACE_API_KEY__",
-  authDomain:        "__REPLACE_PROJECT_ID__.firebaseapp.com",
-  databaseURL:       "https://__REPLACE_PROJECT_ID__-default-rtdb.firebaseio.com",
-  projectId:         "__REPLACE_PROJECT_ID__",
-  storageBucket:     "__REPLACE_PROJECT_ID__.appspot.com",
-  messagingSenderId: "__REPLACE_SENDER_ID__",
-  appId:             "__REPLACE_APP_ID__"
+  apiKey:            "AIzaSyC3D1gXNSZwsvkwYENkzQ6W9GMZuo6-mmM",
+  authDomain:        "signal-provider-pro.firebaseapp.com",
+  databaseURL:       "https://signal-provider-pro-default-rtdb.firebaseio.com",
+  projectId:         "signal-provider-pro",
+  storageBucket:     "signal-provider-pro.firebasestorage.app",
+  messagingSenderId: "718234956552",
+  appId:             "1:718234956552:web:94ad391036749f981172bd"
 };
 
 // Root paths used by the EA + dashboard. Keep in sync with
