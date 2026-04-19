@@ -55,6 +55,7 @@
             "state":       { ".validate": "newData.val() === 'unused' || newData.val() === 'active' || newData.val() === 'revoked' || newData.val() === 'expired'" },
             "bound_account":{ ".validate": "newData.isString() || newData.val() == null" },
             "bound_broker":{ ".validate": "newData.isString() || newData.val() == null" },
+            "created_at":  { ".validate": "newData.isNumber() || newData.val() == null" },
             "activated_at":{ ".validate": "newData.isNumber() || newData.val() == null" },
             "last_seen_at": { ".validate": "newData.isNumber() || newData.val() == null" },
             "expires_at":  { ".validate": "newData.isNumber() || newData.val() == null" }
