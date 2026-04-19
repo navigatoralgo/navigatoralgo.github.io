@@ -56,6 +56,7 @@
             "bound_account":{ ".validate": "newData.isString() || newData.val() == null" },
             "bound_broker":{ ".validate": "newData.isString() || newData.val() == null" },
             "activated_at":{ ".validate": "newData.isNumber() || newData.val() == null" },
+            "last_seen_at": { ".validate": "newData.isNumber() || newData.val() == null" },
             "expires_at":  { ".validate": "newData.isNumber() || newData.val() == null" }
           }
         },
@@ -63,27 +64,40 @@
         "receivers": {
           ".indexOn": ["activated_at"],
           "$acct": {
-            "state":       { ".validate": "newData.val() === 'active' || newData.val() === 'inactive'" },
-            "bound_broker":{ ".validate": "newData.isString()" },
-            "activated_at":{ ".validate": "newData.isNumber()" }
+            "state":        { ".validate": "newData.val() === 'active' || newData.val() === 'inactive'" },
+            "bound_broker": { ".validate": "newData.isString() || newData.val() == null" },
+            "license_code": { ".validate": "newData.isString()" },
+            "activated_at": { ".validate": "newData.isNumber()" },
+            "last_seen_at": { ".validate": "newData.isNumber()" }
           }
         },
 
         "signals": {
-          "_comment": "Receivers need to read signals; providers write them. Individual signal validation lives on the writer (service account).",
+          "_comment": "Receivers need to read signals; providers write them. Individual signal validation lives on the writer (Cloud Functions).",
           ".read":  "auth != null",
           ".indexOn": ["seq"]
         },
 
         "stats": {
-          "_comment": "Aggregated counters for dashboard; written by Cloud Functions or the EA's service account.",
-          "total_signals": { ".validate": "newData.isNumber()" },
-          "active_copiers":{ ".validate": "newData.isNumber()" },
-          "last_signal_at":{ ".validate": "newData.isNumber()" }
+          "_comment": "Aggregated counters for dashboard; written by Cloud Functions.",
+          "total_signals":  { ".validate": "newData.isNumber()" },
+          "active_copiers": { ".validate": "newData.isNumber()" },
+          "last_signal_at": { ".validate": "newData.isNumber()" },
+          "next_seq":       { ".validate": "newData.isNumber()" },
+          "updated_at":     { ".validate": "newData.isNumber()" },
+          "win_rate":       { ".validate": "newData.isNumber()" },
+          "balance":        { ".validate": "newData.isNumber()" },
+          "equity":         { ".validate": "newData.isNumber()" },
+          "drawdown_pct":   { ".validate": "newData.isNumber()" }
         },
 
         "heartbeat": {
           ".validate": "newData.isNumber()"
+        },
+
+        "heartbeat_meta": {
+          "ea_version": { ".validate": "newData.isString() && newData.val().length <= 32" },
+          "mt5_build":  { ".validate": "newData.isNumber()" }
         }
       }
     },
