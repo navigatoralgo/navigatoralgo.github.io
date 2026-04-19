@@ -269,12 +269,18 @@
             <button type="button" class="copy-btn" data-copy-target="mintedToken">Copy</button>
           </div>
           <div class="minted-row">
-            <span class="minted-key">Both (one-line)</span>
+            <span class="minted-key">EA key</span>
+            <span class="minted-val" id="mintedEaKey">—</span>
+            <button type="button" class="copy-btn" data-copy-target="mintedEaKey">Copy</button>
+          </div>
+          <div class="minted-row">
+            <span class="minted-key">All three (one-line)</span>
             <span class="minted-val" id="mintedCombo" style="font-size:12px;">—</span>
             <button type="button" class="copy-btn" data-copy-target="mintedCombo">Copy</button>
           </div>
           <p style="font-size:11px;color:var(--muted);margin-top:12px;margin-bottom:0;">
-            This token is shown once. If you lose it before the buyer claims it, mint a new pair.
+            <strong style="color:var(--text);">Activation token</strong> = one-shot, pasted once into <code class="mono-code">dashboard.html</code> to bind a Firebase account.<br>
+            <strong style="color:var(--text);">EA key</strong> = long-lived secret, pasted into the MT5 EA's inputs (<code class="mono-code">ProviderKey</code>). Authenticates every trade push via the Cloud Function proxy. Provider can regenerate it any time from their dashboard.
           </p>
         </div>
       </div>
@@ -388,6 +394,7 @@
             <tr>
               <th>Provider ID</th>
               <th>Activation token</th>
+              <th>EA key</th>
               <th>Status</th>
               <th>Owner</th>
               <th>Created</th>
@@ -404,10 +411,12 @@
                 ? (d.owner_email || d.owner_uid || "—")
                 : "—";
               const tokenTxt = claimed ? "—" : (d.claim_token || "—");
+              const eaKeyTxt = d.ea_key || "—";
               return `
                 <tr>
                   <td><span class="prov-id">${escapeHtml(pid)}</span></td>
                   <td><span class="prov-token">${escapeHtml(tokenTxt)}</span></td>
+                  <td><span class="prov-token">${escapeHtml(eaKeyTxt)}</span></td>
                   <td><span class="prov-status ${statusCls}">${statusTxt}</span></td>
                   <td><span class="prov-owner">${escapeHtml(ownerTxt)}</span></td>
                   <td><span class="prov-owner">${escapeHtml(fmtTimestamp(d.created_at))}</span></td>
@@ -438,11 +447,12 @@
 
       try {
         const name = (nameInput.value || "").trim() || null;
-        const { providerId, claimToken } = await mintProvider(currentUser, { display_name: name });
+        const { providerId, claimToken, eaKey } = await mintProvider(currentUser, { display_name: name });
 
         $("mintedId").textContent = providerId;
         $("mintedToken").textContent = claimToken;
-        $("mintedCombo").textContent = `${providerId} / ${claimToken}`;
+        $("mintedEaKey").textContent = eaKey;
+        $("mintedCombo").textContent = `${providerId} / ${claimToken} / ${eaKey}`;
         mintedCard.classList.remove("hidden");
 
         status.className = "mint-status success";

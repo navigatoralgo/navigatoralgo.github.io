@@ -175,6 +175,8 @@ function randomProviderId() {
 }
 
 // Claim token: 12 hex chars in three groups of 4, e.g. "9F3A-1C77-B204".
+// One-shot secret used by a human to bind their Firebase account to a provider
+// node. Cleared after claim.
 function randomClaimToken() {
   const bytes = new Uint8Array(6);
   crypto.getRandomValues(bytes);
@@ -182,29 +184,59 @@ function randomClaimToken() {
   return `${hex.slice(0, 4)}-${hex.slice(4, 8)}-${hex.slice(8, 12)}`;
 }
 
-// Admin-only: mints a new (provider_id, claim_token) pair and writes it to
-// /providers/{pid} with no owner_uid. Retries up to 5 times on provider_id
-// collision (astronomically unlikely with 31^5 ≈ 28M combinations).
-// Returns { providerId, claimToken }.
+// EA key: 16 hex chars in four groups of 4, e.g. "4F72-91A0-BC33-8E12".
+// Long-lived machine secret — pasted into the EA's inputs on the provider's
+// MT5 terminal. Authenticates every eaWrite/eaRead Cloud Function call. Does
+// NOT grant Firebase Auth session — the function validates this key server-
+// side and uses admin SDK to write.
+export function randomEaKey() {
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0").toUpperCase()).join("");
+  return `${hex.slice(0, 4)}-${hex.slice(4, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}`;
+}
+
+// Admin-only: mints a new (provider_id, claim_token, ea_key) triple and writes
+// it to /providers/{pid} with no owner_uid. Retries up to 5 times on
+// provider_id collision (astronomically unlikely with 31^5 ≈ 28M combinations).
+// Returns { providerId, claimToken, eaKey }.
 export async function mintProvider(adminUser, opts = {}) {
   const { display_name = null, license = "navigator-algo" } = opts;
 
   for (let attempt = 0; attempt < 5; attempt++) {
     const providerId  = randomProviderId();
     const claimToken  = randomClaimToken();
+    const eaKey       = randomEaKey();
     const existing = await get(providerRef(providerId));
     if (existing.exists()) continue;
 
     await set(providerRef(providerId), {
       claim_token:    claimToken,
+      ea_key:         eaKey,
       license:        license,
       display_name:   display_name,
       created_at:     Date.now(),
       created_by_uid: adminUser.uid
     });
-    return { providerId, claimToken };
+    return { providerId, claimToken, eaKey };
   }
   throw new Error("Could not mint a unique provider ID after 5 attempts. Try again.");
+}
+
+// Provider-owner or admin: rotate ea_key on an existing provider. Old key
+// stops working immediately; EA on the provider's MT5 must be reconfigured.
+// Returns the new eaKey string.
+export async function regenerateEaKey(user, providerId) {
+  const snap = await get(providerRef(providerId));
+  if (!snap.exists()) throw new Error("Provider not found.");
+  const data = snap.val();
+  const isOwner = data.owner_uid === user.uid;
+  const admin = await isAdmin(user.uid);
+  if (!isOwner && !admin) throw new Error("Only the provider's owner (or an admin) can rotate the EA key.");
+
+  const eaKey = randomEaKey();
+  await update(providerRef(providerId), { ea_key: eaKey, ea_key_rotated_at: Date.now() });
+  return eaKey;
 }
 
 // Admin-only: list all providers (for the admin page table).
