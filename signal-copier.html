@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Copier — Navigator Algo</title>
+<meta name="description" content="Broadcast your MT5 trades to unlimited followers, or copy a top provider in real time. $100/yr provider plan includes 10 free subscriber slots.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+/* Hero flourish */
+.sc-hero {
+  padding: 178px 48px 40px;
+  text-align: center;
+  position: relative; z-index: 1;
+  max-width: 1000px; margin: 0 auto;
+}
+.sc-hero .page-hero-h1 { font-size: clamp(36px, 6vw, 72px); }
+.sc-hero-ctas {
+  margin-top: 40px;
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+}
+
+/* Pricing cards */
+.pricing-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+}
+.pricing-card {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 28px;
+  padding: 40px 34px;
+  position: relative;
+  display: flex; flex-direction: column;
+}
+.pricing-card.featured {
+  border-color: rgba(0,212,200,0.28);
+  box-shadow: 0 24px 48px rgba(0,212,200,0.08);
+}
+.pricing-card.featured::before {
+  content: 'POPULAR';
+  position: absolute;
+  top: -12px; left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #12ddd2, #00c8d1);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.2em;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 999px;
+}
+.pricing-tier {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.16em;
+  color: var(--teal); text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.pricing-name {
+  font-family: var(--font-head);
+  font-size: 26px; font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.pricing-tag {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+.pricing-price {
+  font-family: var(--font-head);
+  font-size: 54px; font-weight: 900;
+  color: var(--white);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin-bottom: 6px;
+}
+.pricing-price .unit {
+  font-size: 14px; font-weight: 500;
+  color: var(--muted); letter-spacing: 0;
+  margin-left: 4px;
+}
+.pricing-sub {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.pricing-features {
+  list-style: none; padding: 0;
+  margin: 0 0 32px 0;
+  display: flex; flex-direction: column; gap: 10px;
+  flex: 1;
+}
+.pricing-features li {
+  font-size: 13.5px;
+  color: var(--text);
+  padding-left: 26px;
+  position: relative;
+  line-height: 1.5;
+}
+.pricing-features li::before {
+  content: '›';
+  position: absolute; left: 0; top: -2px;
+  color: var(--teal);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+}
+.pricing-features .muted { color: var(--muted); }
+
+/* Feature grid */
+.feat-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.feat-card {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 22px;
+  padding: 28px 26px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.feat-card:hover {
+  border-color: rgba(0,212,200,0.18);
+  transform: translateY(-2px);
+}
+.feat-num {
+  font-family: var(--font-head);
+  font-size: 36px; font-weight: 900;
+  color: rgba(0,212,200,0.08);
+  position: absolute; top: 10px; right: 18px;
+}
+.feat-title {
+  font-family: var(--font-cond);
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--white); margin-bottom: 10px;
+}
+.feat-text { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.6; }
+
+/* Flow diagram */
+.flow {
+  display: grid; grid-template-columns: 1fr auto 1fr auto 1fr;
+  gap: 20px; align-items: stretch;
+  margin-top: 24px;
+}
+.flow-step {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+}
+.flow-step .emoji {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 10px;
+}
+.flow-step .label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em;
+  color: var(--teal); text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.flow-step .title {
+  font-family: var(--font-head);
+  font-size: 16px; font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.flow-step .desc {
+  font-size: 12px; color: var(--muted); line-height: 1.5;
+}
+.flow-arrow {
+  display: flex; align-items: center; justify-content: center;
+  color: var(--teal);
+  font-family: var(--font-mono);
+  font-size: 20px;
+  opacity: 0.6;
+}
+
+/* FAQ */
+.faq-item {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 10px;
+}
+.faq-item summary {
+  font-family: var(--font-head);
+  font-size: 15px; font-weight: 700;
+  color: var(--white);
+  cursor: pointer;
+  list-style: none;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+';
+  font-family: var(--font-mono);
+  font-size: 22px; font-weight: 400;
+  color: var(--teal);
+  transition: transform 0.2s;
+}
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item .answer {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 14px; line-height: 1.7;
+}
+
+@media (max-width: 1024px) {
+  .pricing-grid { grid-template-columns: 1fr; }
+  .feat-grid { grid-template-columns: 1fr 1fr; }
+  .flow { grid-template-columns: 1fr; }
+  .flow-arrow { transform: rotate(90deg); padding: 8px 0; }
+}
+@media (max-width: 640px) {
+  .feat-grid { grid-template-columns: 1fr; }
+  .sc-hero { padding: 154px 20px 30px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="signal-copier.html" class="current">Signal Copier</a></li>
+    <li><a href="receiver-download.html">Free Receiver</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
+  </ul>
+</nav>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">NEW RELEASE</span></div>
+  <div class="status-item">BIDIRECTIONAL COPIER</div>
+  <div class="status-item">REALTIME SYNC</div>
+  <div class="status-item">PROVIDER + RECEIVER</div>
+  <div class="status-item">10 FREE SLOTS INCLUDED</div>
+  <div class="status-item">FIREBASE TRANSPORT</div>
+</div>
+
+<!-- HERO -->
+<header class="sc-hero">
+  <div class="page-hero-eyebrow">Signal Copier · v1.0</div>
+  <h1 class="page-hero-h1 anim-up">Broadcast your trades.<br><em>Let your followers auto-copy.</em></h1>
+  <p class="page-hero-desc anim-up">
+    Run the Signal Copier EA in Provider mode and your MT5 trades broadcast in real time over Firebase. Your subscribers run the Partner Receiver EA and their accounts mirror yours — instant entries, stop-losses, and exits. Ship a real signal service in minutes, no VPS bridge or MT5 ↔ MT5 pairing required.
+  </p>
+  <div class="sc-hero-ctas anim-up">
+    <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="btn btn-primary">Buy on MQL5 · $100 / year →</a>
+    <a href="receiver-download.html" class="btn btn-ghost">Get the free Receiver EA</a>
+  </div>
+</header>
+
+<!-- WHY IT'S DIFFERENT -->
+<section class="section">
+  <div class="sec-header">
+    <span class="sec-tag">// Why Signal Copier</span>
+    <h2 class="sec-title">Not just a copier. <em>A signal business in a box.</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-num">01</div>
+      <div class="feat-title">Sub-license slots built in</div>
+      <div class="feat-text">
+        Your $100 purchase comes with <strong>10 free sub-licenses</strong>. Hand them to subscribers, your Telegram group, or friends — they install the free Partner Receiver EA and get your trades live. No MQL5 Market purchase required for them.
+      </div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">02</div>
+      <div class="feat-title">Real-time, cursor-based</div>
+      <div class="feat-text">
+        Signals are delivered as cursor-based updates over Firebase Realtime Database. Receivers poll adaptively (2–10s based on activity), never miss a fill, never replay duplicates. Works across continents.
+      </div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">03</div>
+      <div class="feat-title">4-layer symbol resolver</div>
+      <div class="feat-text">
+        Your broker uses <code style="color:var(--teal);">EURUSDm</code>, your subscriber's uses <code style="color:var(--teal);">EURUSD.pro</code>. The Receiver EA's 4-layer resolver (suffix / alias / scan / manual map) handles it automatically.
+      </div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">04</div>
+      <div class="feat-title">Live provider dashboard</div>
+      <div class="feat-text">
+        Sign in at <a href="dashboard.html" style="color:var(--teal);text-decoration:none;">navigatoralgo.com/dashboard</a>. See active copiers, slot status, signal counts, heartbeat, and revoke/reissue sub-licenses in one click.
+      </div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">05</div>
+      <div class="feat-title">Hedging + netting safe</div>
+      <div class="feat-text">
+        Every signal carries a <code style="color:var(--teal);">magic</code> + <code style="color:var(--teal);">ticket_ref</code>. Close, modify, and partial-close operations map cleanly to both hedging and netting accounts.
+      </div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">06</div>
+      <div class="feat-title">Prop-firm friendly</div>
+      <div class="feat-text">
+        Skip by symbol, skip by magic, per-receiver risk cap, fixed-lot override, disable trailing. Subscribers on FTMO/MFF can run the receiver without breaking their rules.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section">
+  <div class="sec-header">
+    <span class="sec-tag">// Pricing</span>
+    <h2 class="sec-title">Simple and <em>fair</em>.</h2>
+    <div class="sec-rule"></div>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card featured">
+      <div class="pricing-tier">For signal providers</div>
+      <div class="pricing-name">Signal Copier · Provider</div>
+      <div class="pricing-tag">Broadcast your MT5 trades to unlimited followers.</div>
+      <div class="pricing-price">$100<span class="unit">/ year</span></div>
+      <div class="pricing-sub">One MT5 account · renewable annually</div>
+      <ul class="pricing-features">
+        <li>Unlimited subscribers — no per-user cap on your side.</li>
+        <li><strong>10 free Partner Receiver sub-licenses</strong> bundled in.</li>
+        <li>Live dashboard — active copiers, signal count, license health.</li>
+        <li>Revoke &amp; reissue sub-licenses from dashboard.</li>
+        <li>Heartbeat + status so subscribers know when you're live.</li>
+        <li>Future extra slot packs (+10 slots) planned — existing customers upgrade at discount.</li>
+      </ul>
+      <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="btn btn-primary" style="width:100%;justify-content:center;">Buy on MQL5 →</a>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-tier">For subscribers</div>
+      <div class="pricing-name">Signal Copier · Receiver</div>
+      <div class="pricing-tag">Copy any Navigator Algo provider. Paid tier, no slot needed.</div>
+      <div class="pricing-price">$30<span class="unit">/ 3 months</span></div>
+      <div class="pricing-sub">One MT5 account · renewable quarterly</div>
+      <ul class="pricing-features">
+        <li>Follow any provider using just their Provider ID.</li>
+        <li>No sub-license slot from the provider needed.</li>
+        <li>Same 4-layer symbol resolver + risk controls as Partner Receiver.</li>
+        <li>Per-symbol skip, per-magic skip, fixed-lot override.</li>
+        <li class="muted">For subscribers who don't have a sub-license from a provider.</li>
+      </ul>
+      <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="btn btn-ghost" style="width:100%;justify-content:center;">Buy on MQL5 →</a>
+      <div style="margin-top: 16px; padding: 14px; background: rgba(0,230,118,0.04); border: 1px solid rgba(0,230,118,0.15); border-radius: 12px; font-size: 12px; color: var(--text); line-height: 1.6;">
+        <strong style="color: var(--green);">Free alternative:</strong> If your provider gave you a <span class="mono-code">SUB-</span> code, use the <a href="receiver-download.html" style="color: var(--teal); text-decoration: none;">free Partner Receiver</a> instead. $0 for you — your provider's slot covers it.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+  <div class="sec-header">
+    <span class="sec-tag">// How it works</span>
+    <h2 class="sec-title">Three steps. <em>Live in minutes.</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <span class="emoji">🛒</span>
+      <div class="label">Step 01</div>
+      <div class="title">Buy on MQL5</div>
+      <div class="desc">$100/yr on MQL5 Market. Automatic purchase verification — no manual approval needed.</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <span class="emoji">📡</span>
+      <div class="label">Step 02</div>
+      <div class="title">Install &amp; link</div>
+      <div class="desc">Load the EA on any MT5 chart in Provider mode. Paste the activation token into <a href="dashboard.html" style="color: var(--teal); text-decoration: none;">navigatoralgo.com/dashboard</a> once. Done.</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <span class="emoji">📣</span>
+      <div class="label">Step 03</div>
+      <div class="title">Share your slots</div>
+      <div class="desc">Hand out your 10 free <span class="mono-code">SUB-</span> codes to subscribers. They install the free Receiver EA. Trades mirror live.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-narrow">
+  <div class="sec-header">
+    <span class="sec-tag">// FAQ</span>
+    <h2 class="sec-title">Questions? <em>Answered.</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+
+  <details class="faq-item">
+    <summary>Does the $100 include a receiver EA for my subscribers?</summary>
+    <div class="answer">
+      Yes. Your purchase generates 10 free <span class="mono-code">SUB-</span> license codes. Your subscribers download the free Partner Receiver EA from <a href="receiver-download.html" style="color: var(--teal); text-decoration: none;">this page</a> and paste one of your codes in — it binds to their MT5 account on first activation. No MQL5 Market purchase required for them.
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>What happens when I run out of 10 slots?</summary>
+    <div class="answer">
+      You can revoke inactive slots from the dashboard and reissue them to new subscribers. Additional subscribers beyond 10 can buy the paid Receiver EA on MQL5 ($30/3mo) and follow you directly — no slot needed on your side. Extra slot packs (+10 at $20) are on the roadmap.
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>How fast do trades copy?</summary>
+    <div class="answer">
+      Typically 1–3 seconds end-to-end. Receivers use adaptive polling — 2 seconds when signals are flowing, 10 seconds when quiet. Firebase Realtime Database is our transport; it's designed for this.
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>Will my broker's symbol names work on my subscriber's broker?</summary>
+    <div class="answer">
+      The Receiver EA includes a 4-layer resolver: exact match → suffix scan (<span class="mono-code">m</span>, <span class="mono-code">.pro</span>, <span class="mono-code">#</span>, etc) → alias map → manual override. In practice it works across 95%+ of broker pairs out of the box.
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>Can my subscribers run this on a prop firm account?</summary>
+    <div class="answer">
+      Yes — the Receiver EA has per-symbol skip lists, per-magic skip lists, max-risk-per-trade, fixed-lot override, and a "no trailing" switch. Subscribers can tune it to fit FTMO, MyForexFunds, FundedNext, etc. rules before their evaluation starts.
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>Is my Firebase data private?</summary>
+    <div class="answer">
+      Yes. Each provider node is locked by Firebase security rules — only the authenticated owner can read their own sub-licenses, copier list, and stats. Receivers can only read the signals stream, never anything else.
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>What if I stop paying the $100/yr?</summary>
+    <div class="answer">
+      Your provider license goes inactive, broadcasting stops, and your sub-license codes stop working. Subscribers on the paid Receiver plan are unaffected structurally but have nothing to copy until you renew.
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>Can I run multiple MT5 accounts from one provider license?</summary>
+    <div class="answer">
+      One license binds to one MT5 account number on activation. If you trade on multiple accounts and want to broadcast each, you can buy additional licenses. Most providers run one master account and that's it.
+    </div>
+  </details>
+</section>
+
+<!-- CTA -->
+<section class="cta-strip">
+  <h2>Ready to <em>broadcast your edge?</em></h2>
+  <p>// One-time setup · Unlimited followers · 10 slots included</p>
+  <div class="cta-btns">
+    <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="btn btn-primary">Buy Provider on MQL5 → $100/yr</a>
+    <a href="receiver-download.html" class="btn btn-ghost">Get the free Receiver EA</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+      </div>
+      <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
+      <div class="footer-brand-desc">
+        Institution-grade automation for retail traders and prop-firm challenges. Published on MQL5 Market since 2024.
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Signal Copier</h4>
+      <a href="signal-copier.html">Product page</a>
+      <a href="dashboard.html">Provider dashboard</a>
+      <a href="receiver-download.html">Partner Receiver EA</a>
+      <a href="signin.html">Sign in</a>
+    </div>
+    <div class="footer-col">
+      <h4>Flagship</h4>
+      <a href="https://www.mql5.com/en/market/product/170008" target="_blank">Trigger Pro</a>
+      <a href="https://www.mql5.com/en/market/product/164907" target="_blank">Trade Copier Ultimate</a>
+      <a href="https://www.mql5.com/en/market/product/163674" target="_blank">Prop Firm Protector</a>
+    </div>
+    <div class="footer-col">
+      <h4>Links</h4>
+      <a href="index.html">Home</a>
+      <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank">MQL5 Store</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Navigator Trading Systems · All rights reserved</div>
+    <div class="footer-sys">
+      <span class="status-dot"></span> ALL SYSTEMS OPERATIONAL
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
