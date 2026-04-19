@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Navigator Algo — MT5 Signal Marketplace &amp; Copy Trading</title>
-<meta name="description" content="Broadcast your MT5 trades to unlimited paid followers, or auto-copy verified providers in real time. Navigator Algo is the MT5 signal marketplace — $100/yr provider plan with 10 free sub-slots, free Partner Receiver for followers.">
+<title>Trigger Pro — MT5 Straddle & Trade Manager | Navigator Algo</title>
+<meta name="description" content="Trigger Pro for MT5: seven execution modules — trade, news, session, range, S/R, pattern, schedule — with six trailing modes, virtual SL/TP, and full risk controls. $45 one-time on MQL5 Market.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/shared.css">
@@ -670,93 +670,6 @@ body::after { content: none; }
 }
 .mql5-link:hover { color: var(--gold); border-color: rgba(240,165,0,0.4); }
 
-/* ── AUDIENCES (DUAL) ── */
-.audiences-inner {
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: stretch;
-}
-.audience-card {
-  display: flex; flex-direction: column;
-  padding: 40px 36px;
-  background: rgba(8,11,14,0.6);
-  border: 1px solid rgba(36,48,64,0.72);
-  border-radius: 28px;
-  position: relative;
-  overflow: hidden;
-}
-.audience-card::before {
-  content: '';
-  position: absolute; top: 0; left: 36px; right: 36px; height: 3px;
-  border-radius: 999px;
-}
-.audience-provider::before { background: var(--teal); }
-.audience-follower::before { background: var(--gold); }
-.flagship-label.audience-gold {
-  color: var(--gold);
-  background: rgba(240,165,0,0.08);
-  border-color: rgba(240,165,0,0.22);
-}
-.audience-follower-title span { color: var(--gold); }
-.audience-list {
-  list-style: none;
-  border-top: 1px solid rgba(36,48,64,0.72);
-  padding-top: 18px;
-  margin-bottom: 28px;
-  flex: 1;
-}
-.audience-list li {
-  font-family: var(--font-mono);
-  font-size: 11.5px; color: var(--text);
-  padding: 8px 0 8px 16px;
-  position: relative;
-  border-bottom: 1px solid rgba(255,255,255,0.025);
-  letter-spacing: 0.01em;
-}
-.audience-list li::before {
-  content: '›'; position: absolute; left: 0;
-  color: var(--teal);
-}
-.audience-list-gold li::before { color: var(--gold); }
-.audience-cta {
-  display: flex; align-items: center; gap: 18px;
-  flex-wrap: wrap;
-  margin-top: auto;
-}
-
-/* ── HOW IT WORKS ── */
-.how-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-.how-card {
-  background: var(--panel);
-  padding: 32px 26px;
-  position: relative; overflow: hidden;
-  border: 1px solid rgba(36,48,64,0.72);
-  border-radius: 24px;
-  box-shadow: 0 18px 34px rgba(0,0,0,0.14);
-}
-.how-card::after {
-  content: '';
-  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, var(--teal), transparent);
-  opacity: 0.14;
-}
-.how-num {
-  font-family: var(--font-head);
-  font-size: 36px; font-weight: 900;
-  color: rgba(0,212,200,0.10);
-  position: absolute; top: 12px; right: 18px;
-}
-.how-title {
-  font-family: var(--font-cond);
-  font-size: 15px; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--white); margin-bottom: 10px;
-}
-.how-text { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.6; }
-
 /* ── FOOTER ── */
 footer {
   position: relative; z-index: 1;
@@ -842,8 +755,6 @@ footer {
 @media (max-width: 1024px) {
   .products-grid { grid-template-columns: repeat(2, 1fr); }
   .flagship-inner { grid-template-columns: 1fr; gap: 48px; }
-  .audiences-inner { grid-template-columns: 1fr; gap: 28px; }
-  .how-grid { grid-template-columns: 1fr; }
   .why-grid { grid-template-columns: repeat(2, 1fr); }
   .footer-main { grid-template-columns: 1fr 1fr; }
 }
@@ -946,9 +857,9 @@ footer {
     <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
   </a>
   <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
     <li><a href="signal-copier.html">Signal Copier</a></li>
-    <li><a href="trigger-pro.html">Trigger Pro</a></li>
-    <li><a href="#toolkit">MT5 Tools</a></li>
+    <li><a href="trigger-pro.html" class="current">Trigger Pro</a></li>
     <li><a href="dashboard.html">Dashboard</a></li>
     <li id="nav-auth-slot"><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
     <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
@@ -957,12 +868,12 @@ footer {
 
 <!-- STATUS BAR -->
 <div class="status-bar">
-  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">SIGNAL NETWORK LIVE</span></div>
-  <div class="status-item">MT5 NATIVE</div>
-  <div class="status-item">FIREBASE REALTIME</div>
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">ALL SYSTEMS ONLINE</span></div>
+  <div class="status-item">MT5 COMPATIBLE</div>
+  <div class="status-item">9 PRODUCTS PUBLISHED</div>
+  <div class="status-item">VPS OPTIMISED</div>
   <div class="status-item">HEDGING &amp; NETTING</div>
-  <div class="status-item">INSTANT ACTIVATION</div>
-  <div class="status-item">MQL5 VERIFIED BUILDS</div>
+  <div class="status-item">PROP FIRM READY</div>
 </div>
 
 <!-- HERO -->
@@ -970,365 +881,169 @@ footer {
   <div class="hero-glow-l"></div>
   <div class="hero-glow-r"></div>
 
-  <div class="hero-eyebrow">Navigator Algo · MT5 Signal Marketplace</div>
+  <div class="hero-eyebrow">MQL5 Marketplace · Flagship Product</div>
 
-  <h1 class="hero-h1">TURN YOUR<br>TRADES INTO A<br><em>SIGNAL BUSINESS</em></h1>
-  <div class="hero-h2">Broadcast MT5 trades · Paid followers · Live dashboard</div>
+  <h1 class="hero-h1">TRIGGER<br><em>PRO</em></h1>
+  <div class="hero-h2">Straddle &amp; Trade Manager for MT5</div>
 
   <p class="hero-desc">
-    Publish your trades in real time from MetaTrader 5 to unlimited copiers worldwide.
-    Every signal carries a magic, ticket, and price — so closes, partials, and stops
-    map cleanly to every follower's account. Or follow a verified provider and auto-copy
-    their edge. All on MT5, all on Firebase, live in minutes.
+    Seven execution modules, six trailing stop modes, virtual SL/TP,
+    session triggers, news straddles, and pattern detection — all in one
+    compact on-chart panel. The last trade management tool you'll ever need.
   </p>
 
   <div class="hero-btns">
-    <a href="signal-copier.html#pricing" class="btn btn-primary">Become a Signal Provider</a>
-    <a href="signal-copier.html" class="btn btn-ghost">How it works →</a>
+    <a href="https://www.mql5.com/en/market/product/170008" target="_blank" class="btn btn-primary">Buy on MQL5 — $45</a>
+    <a href="#flagship" class="btn btn-ghost">See how it works ↓</a>
   </div>
 
   <div class="hero-stats">
     <div class="hero-stat">
-      <span class="hero-stat-num">MT5</span>
-      <span class="hero-stat-label">Native platform</span>
+      <span class="hero-stat-num">7</span>
+      <span class="hero-stat-label">Execution Modules</span>
     </div>
     <div class="hero-stat">
-      <span class="hero-stat-num">1–3s</span>
-      <span class="hero-stat-label">Signal-to-copy</span>
+      <span class="hero-stat-num">6</span>
+      <span class="hero-stat-label">Trailing Modes</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">$45</span>
+      <span class="hero-stat-label">One-Time License</span>
     </div>
     <div class="hero-stat">
       <span class="hero-stat-num">10</span>
-      <span class="hero-stat-label">Free sub slots</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-num">$100/yr</span>
-      <span class="hero-stat-label">Provider license</span>
+      <span class="hero-stat-label">Activations</span>
     </div>
   </div>
 </section>
 
-<!-- DUAL AUDIENCE -->
-<div id="audiences" class="flagship">
-  <div class="flagship-inner audiences-inner">
-    <div class="audience-card audience-provider">
-      <span class="flagship-label">For traders with an edge</span>
-      <h2 class="flagship-title">BROADCAST.<span>Earn from your trades.</span></h2>
-      <p class="flagship-desc">Run the Navigator Provider EA on your master MT5. Every trade broadcasts over Firebase in under a second. Price your subscription, mint sub-license codes, and every paying follower's account mirrors yours — hedging or netting, any broker.</p>
-      <ul class="audience-list">
-        <li>Unlimited concurrent copiers on a single license</li>
-        <li>10 free sub-license slots on the provider plan</li>
-        <li>Live dashboard — signals, heartbeats, active copiers</li>
-        <li>Followers copy free with your sub-license code</li>
-        <li>$100/yr — cancel any time</li>
-      </ul>
-      <div class="audience-cta">
-        <a href="signal-copier.html#pricing" class="btn btn-primary">Become a Provider</a>
-        <a href="signal-copier.html" class="mql5-link">How it works →</a>
+<!-- FLAGSHIP: TRIGGER PRO -->
+<div id="flagship" class="flagship">
+  <div class="flagship-inner">
+    <div>
+      <span class="flagship-label">Flagship Product</span>
+      <h2 class="flagship-title">TRIGGER PRO<span>Straddle &amp; Trade Manager</span></h2>
+      <p class="flagship-desc">Seven execution modules, six trailing stop modes, virtual SL/TP, session triggers, news straddles, and pattern detection — all in one compact on-chart panel. The last trade management tool you'll ever need.</p>
+      <div class="flagship-modules">
+        <div class="flagship-module">
+          <div class="flagship-module-name">TRADE</div>
+          <div class="flagship-module-desc">Manual execution with on-chart SL/TP lines and risk-based sizing</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">NEWS</div>
+          <div class="flagship-module-desc">OCO straddle orders tied to MT5 economic calendar events</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">SESSION</div>
+          <div class="flagship-module-desc">London, New York, Tokyo, Sydney time-based setups</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">S/R</div>
+          <div class="flagship-module-desc">Auto-detected support &amp; resistance: daily, weekly, swing, round</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">RANGE</div>
+          <div class="flagship-module-desc">Breakout &amp; reversal trades from defined price ranges</div>
+        </div>
+        <div class="flagship-module">
+          <div class="flagship-module-name">PATTERN</div>
+          <div class="flagship-module-desc">Pin Bar, Engulfing, Inside Bar detection with auto-execution</div>
+        </div>
+      </div>
+      <div class="flagship-price">
+        <div class="flagship-price-num">$45</div>
+        <div class="flagship-price-info">
+          ONE-TIME LICENSE<br>
+          6-MONTH RENTAL: $30<br>
+          10 ACTIVATIONS
+        </div>
+        <a href="https://www.mql5.com/en/market/product/170008" target="_blank" class="btn btn-primary" style="margin-left:auto">Buy on MQL5 →</a>
       </div>
     </div>
 
-    <div class="audience-card audience-follower">
-      <span class="flagship-label audience-gold">For traders who want to copy</span>
-      <h2 class="flagship-title audience-follower-title">FOLLOW.<span>Auto-copy pro traders.</span></h2>
-      <p class="flagship-desc">Got a sub-license code from your provider? Drop the free Partner Receiver EA on any MT5 chart, paste the code, and your trades copy instantly. No subscription — your provider's plan already covers your slot.</p>
-      <ul class="audience-list audience-list-gold">
-        <li>1–3 second signal-to-copy latency</li>
-        <li>Works on every major MT5 broker</li>
-        <li>Hedging &amp; netting accounts supported</li>
-        <li>Adaptive polling — fast when live, quiet when idle</li>
-        <li>Free for anyone with a provider sub-license</li>
-      </ul>
-      <div class="audience-cta">
-        <a href="receiver-download.html" class="btn btn-ghost">Download Free Receiver →</a>
+    <div class="flagship-demo">
+      <div class="flagship-demo-shell">
+        <div class="flagship-demo-kicker">
+          <span>Live Trigger Pro Demo</span>
+        </div>
+        <iframe
+          id="triggerProDemoFrame"
+          class="flagship-demo-frame"
+          src="trigger-pro-demo.html"
+          title="Trigger Pro interactive demo"
+          loading="lazy"></iframe>
+      </div>
+    </div>
+
+    <!-- Mockup Panel -->
+    <div class="flagship-mockup">
+      <div class="flagship-mockup-frame">
+        <div class="mockup-titlebar">
+          <div class="mockup-dot" style="background:#ff5555"></div>
+          <div class="mockup-dot" style="background:#f0a500;margin-left:4px"></div>
+          <div class="mockup-dot" style="background:#00e676;margin-left:4px"></div>
+          <span class="mockup-title">TRIGGER PRO v2.0 · XAUUSD</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-tab-row">
+            <div class="mockup-tab active">TRADE</div>
+            <div class="mockup-tab">NEWS</div>
+            <div class="mockup-tab">SESSION</div>
+            <div class="mockup-tab">S/R</div>
+            <div class="mockup-tab">RANGE</div>
+          </div>
+          <div class="mockup-row"><span class="mockup-label">SYMBOL</span><span class="mockup-val teal">XAUUSD</span></div>
+          <div class="mockup-row"><span class="mockup-label">SPREAD</span><span class="mockup-val">18 pts</span></div>
+          <div class="mockup-row"><span class="mockup-label">LOT SIZE</span><span class="mockup-val">0.10</span></div>
+          <div class="mockup-row"><span class="mockup-label">RISK %</span><span class="mockup-val gold">1.0%</span></div>
+          <div class="mockup-row"><span class="mockup-label">SL DISTANCE</span><span class="mockup-val">200 pts</span></div>
+          <div class="mockup-row"><span class="mockup-label">TP DISTANCE</span><span class="mockup-val">400 pts</span></div>
+          <div class="mockup-row"><span class="mockup-label">EQUITY</span><span class="mockup-val green">$10,248.50</span></div>
+          <div class="mockup-row"><span class="mockup-label">DAILY P/L</span><span class="mockup-val green">+$142.30</span></div>
+          <div class="mockup-row"><span class="mockup-label">TRAILING</span><span class="mockup-val teal">ATR · ARMED</span></div>
+          <div class="mockup-btn-row">
+            <div class="mockup-btn mockup-btn-buy">BUY STOP</div>
+            <div class="mockup-btn mockup-btn-sell">SELL STOP</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- HOW IT WORKS -->
-<div id="how" class="section">
-  <div class="sec-header">
-    <span class="sec-tag">// Three steps</span>
-    <h2 class="sec-title">LIVE IN <em>MINUTES</em></h2>
-    <div class="sec-rule"></div>
-  </div>
-  <div class="how-grid">
-    <div class="how-card">
-      <div class="how-num">01</div>
-      <div class="how-title">Sign in</div>
-      <p class="how-text">Create a Navigator Algo account with Google or email. Free — no card required until you activate a provider license.</p>
-    </div>
-    <div class="how-card">
-      <div class="how-num">02</div>
-      <div class="how-title">Provider or follower</div>
-      <p class="how-text">Providers: activate a $100/yr license and get a provider ID + 10 sub-license slots. Followers: paste a sub-license code from any provider into the free Partner Receiver.</p>
-    </div>
-    <div class="how-card">
-      <div class="how-num">03</div>
-      <div class="how-title">Trade &amp; copy</div>
-      <p class="how-text">Provider trades on MT5 → signals broadcast live → every follower's account mirrors in 1–3 seconds. Closes, partials, and stop moves all sync cleanly.</p>
-    </div>
-  </div>
-</div>
-
-<!-- TOOLKIT -->
-<div id="toolkit">
-  <div class="section">
-    <div class="sec-header">
-      <span class="sec-tag">// Also from Navigator Algo</span>
-      <h2 class="sec-title">MT5 <em>TOOLKIT</em></h2>
-      <div class="sec-rule"></div>
-      <p style="margin-top:18px;max-width:680px;color:var(--muted);font-size:14px;line-height:1.7;">
-        The signal marketplace is our main focus — but the same team builds a suite of
-        standalone MT5 Expert Advisors on MQL5 Market. Trade management, risk controls,
-        copy trading, analytics. Use them alongside the signal network, or on their own.
-      </p>
-    </div>
-    <div class="products-grid">
-
-      <!-- 1. Trigger Pro -->
-      <div class="product-card accent-gold">
-        <div class="product-card-corner">01</div>
-        <span class="p-badge p-badge-paid">Paid · $45</span>
-        <div class="p-name">TRIGGER PRO<br>Straddle &amp; Trade Manager</div>
-        <div class="p-rating">★★★★★ · v2.0 · 7 demo downloads</div>
-        <div class="p-desc">Seven execution modules — trade, news, session, range, S/R, pattern, schedule — with six trailing modes, virtual SL/TP, and full risk controls. The complete trade management panel.</div>
-        <ul class="p-features">
-          <li>News OCO straddle with economic calendar</li>
-          <li>6 trailing stop modes incl. ATR &amp; chandelier</li>
-          <li>Virtual SL/TP (broker-invisible)</li>
-          <li>Compact UI + VPS mode</li>
-          <li>Daily loss &amp; profit targets</li>
-        </ul>
-        <div class="p-footer">
-          <div>
-            <div class="p-price">$45</div>
-            <span class="p-price-unit">ONE-TIME · RENT $30/6MO</span>
-          </div>
-          <a href="trigger-pro.html" class="p-cta">See details →</a>
-        </div>
-      </div>
-
-      <!-- 2. Trade Copier Ultimate -->
-      <div class="product-card accent-teal">
-        <div class="product-card-corner">02</div>
-        <span class="p-badge p-badge-paid">Paid · $48.77</span>
-        <div class="p-name">TRADE COPIER ULTIMATE<br>Multi-Source Execution Engine</div>
-        <div class="p-rating">★★★★★ · v5.12</div>
-        <div class="p-desc">Receives signals from Telegram, Discord, or a Bridge app and copies trades between local MT5 terminals. Safe-by-default: starts DISARMED with strict validation, duplicate protection, and cooldowns.</div>
-        <ul class="p-features">
-          <li>Telegram &amp; Discord signal execution</li>
-          <li>Local MT5-to-MT5 copy mode</li>
-          <li>Duplicate &amp; cooldown protection</li>
-          <li>Multiple risk filters built in</li>
-          <li>Starts disarmed — manual arm required</li>
-        </ul>
-        <div class="p-footer">
-          <div>
-            <div class="p-price">$48.77</div>
-            <span class="p-price-unit">ONE-TIME LICENSE</span>
-          </div>
-          <a href="https://www.mql5.com/en/market/product/164907" target="_blank" class="p-cta">Buy on MQL5 →</a>
-        </div>
-      </div>
-
-      <!-- 3. Prop Firm Protector -->
-      <div class="product-card accent-teal">
-        <div class="product-card-corner">03</div>
-        <span class="p-badge p-badge-paid">Paid · $30</span>
-        <div class="p-name">PROP FIRM PROTECTOR<br>Complete Risk Management Suite</div>
-        <div class="p-rating">★★★★★ · Most capable protector</div>
-        <div class="p-desc">Comprehensive risk management covering symbol whitelisting, lot enforcement, daily drawdown hard stop, max total loss, trailing equity watermark, news blocking, and Telegram alerts.</div>
-        <ul class="p-features">
-          <li>Daily drawdown hard-stop enforcement</li>
-          <li>Max total loss protection</li>
-          <li>Symbol &amp; lot whitelist monitoring</li>
-          <li>News event trade blocker</li>
-          <li>Telegram alerts on breach</li>
-        </ul>
-        <div class="p-footer">
-          <div>
-            <div class="p-price">$30</div>
-            <span class="p-price-unit">ONE-TIME LICENSE</span>
-          </div>
-          <a href="https://www.mql5.com/en/market/product/163674" target="_blank" class="p-cta">Buy on MQL5 →</a>
-        </div>
-      </div>
-
-      <!-- 4. NTS Local Copier (Free) -->
-      <div class="product-card accent-green">
-        <div class="product-card-corner">04</div>
-        <span class="p-badge p-badge-free">Free · Unlimited</span>
-        <div class="p-name">NTS LOCAL COPIER<br>Simple Local Trade Copier</div>
-        <div class="p-rating">★★★★★ (7 reviews)</div>
-        <div class="p-desc">Lightning-fast file-based trade copying between MT5 terminals — and now MT4 too — all on the same PC. No internet, no DLLs, no complex setup. Fully functional and unlimited forever.</div>
-        <ul class="p-features">
-          <li>MT5 Master → MT5 &amp; MT4 Slave</li>
-          <li>Zero-latency file-based copy</li>
-          <li>Custom symbol mapping</li>
-          <li>Fixed &amp; proportional lot modes</li>
-          <li>No installation, no configuration</li>
-        </ul>
-        <div class="p-footer">
-          <div>
-            <div class="p-price">FREE</div>
-            <span class="p-price-unit">FULLY UNLIMITED</span>
-          </div>
-          <a href="https://www.mql5.com/en/market/product/165390" target="_blank" class="p-cta">Download →</a>
-        </div>
-      </div>
-
-      <!-- 5. Trade Journal Ultimate (Free) -->
-      <div class="product-card accent-green">
-        <div class="product-card-corner">05</div>
-        <span class="p-badge p-badge-free">Free</span>
-        <div class="p-name">TRADE JOURNAL ULTIMATE<br>Analytics &amp; Performance Suite</div>
-        <div class="p-rating">★★★★★ (1 review)</div>
-        <div class="p-desc">Transforms your MT5 trade history into actionable data. Eight-tab interactive dashboard covering charts, psychology tracking, goal setting, equity curves, and session analytics — live in-terminal.</div>
-        <ul class="p-features">
-          <li>8-tab interactive dashboard</li>
-          <li>Psychology &amp; mindset tracker</li>
-          <li>Equity curve &amp; drawdown chart</li>
-          <li>Goal &amp; target monitoring</li>
-          <li>Replaces manual spreadsheets</li>
-        </ul>
-        <div class="p-footer">
-          <div>
-            <div class="p-price">FREE</div>
-            <span class="p-price-unit">FULLY UNLIMITED</span>
-          </div>
-          <a href="https://www.mql5.com/en/market/product/163764" target="_blank" class="p-cta">Download →</a>
-        </div>
-      </div>
-
-      <!-- 6. Multi Pair Scanner Ultimate (Free) -->
-      <div class="product-card accent-green">
-        <div class="product-card-corner">06</div>
-        <span class="p-badge p-badge-free">Free</span>
-        <div class="p-name">MULTI PAIR SCANNER ULTIMATE<br>28-Pair Market Dashboard</div>
-        <div class="p-rating">★★★★★ (2 reviews)</div>
-        <div class="p-desc">Monitors 28 Forex pairs + Gold simultaneously with trend, momentum, currency strength, and signals in one lightweight panel. "God Mode" view of the full market — without freezing your terminal.</div>
-        <ul class="p-features">
-          <li>28 pairs + Gold monitored live</li>
-          <li>Trend, momentum &amp; strength signals</li>
-          <li>Lightweight — never freezes MT5</li>
-          <li>Scanner only — not an auto-trader</li>
-          <li>One-glance market overview</li>
-        </ul>
-        <div class="p-footer">
-          <div>
-            <div class="p-price">FREE</div>
-            <span class="p-price-unit">FULLY UNLIMITED</span>
-          </div>
-          <a href="https://www.mql5.com/en/market/product/165793" target="_blank" class="p-cta">Download →</a>
-        </div>
-      </div>
-
-      <!-- 7. Prop Firm Protector Basic (Free) -->
-      <div class="product-card accent-green">
-        <div class="product-card-corner">07</div>
-        <span class="p-badge p-badge-free">Free</span>
-        <div class="p-name">PROP FIRM PROTECTOR BASIC<br>Essential Risk Lite</div>
-        <div class="p-rating">★★★★★ (1 review)</div>
-        <div class="p-desc">The lightweight version of Prop Firm Protector. Runs silently in the background monitoring all trades — manual, signal, or EA — against predefined symbol and lot rules. No frills, all protection.</div>
-        <ul class="p-features">
-          <li>Symbol whitelist monitoring</li>
-          <li>Lot size enforcement</li>
-          <li>Works with any EA or signal</li>
-          <li>Runs silently in background</li>
-          <li>Zero configuration needed</li>
-        </ul>
-        <div class="p-footer">
-          <div>
-            <div class="p-price">FREE</div>
-            <span class="p-price-unit">FULLY UNLIMITED</span>
-          </div>
-          <a href="https://www.mql5.com/en/market/product/163692" target="_blank" class="p-cta">Download →</a>
-        </div>
-      </div>
-
-      <!-- 8. Navigator Trade Assistant (Free) -->
-      <div class="product-card accent-green">
-        <div class="product-card-corner">08</div>
-        <span class="p-badge p-badge-free">Free</span>
-        <div class="p-name">NAVIGATOR TRADE ASSISTANT<br>Professional Trading Panel</div>
-        <div class="p-rating">New Release</div>
-        <div class="p-desc">Replaces your calculator, notepad, and manual management routine. Lot sizing, breakeven moves, and multi-position closes — all with a single click directly on the chart. Speed and precision for active traders.</div>
-        <ul class="p-features">
-          <li>One-click lot size calculator</li>
-          <li>Breakeven &amp; trail management</li>
-          <li>Close all / partial close</li>
-          <li>Clean interactive dashboard</li>
-          <li>Works on any symbol</li>
-        </ul>
-        <div class="p-footer">
-          <div>
-            <div class="p-price">FREE</div>
-            <span class="p-price-unit">FULLY UNLIMITED</span>
-          </div>
-          <a href="https://www.mql5.com/en/market/product/165896" target="_blank" class="p-cta">Download →</a>
-        </div>
-      </div>
-
-      <!-- 9. NTS Local Copier MT4 Slave -->
-      <div class="product-card accent-green">
-        <div class="product-card-corner">09</div>
-        <span class="p-badge p-badge-free">Free · MT4</span>
-        <div class="p-name">NTS LOCAL COPIER<br>MT4 Slave Plugin</div>
-        <div class="p-rating">Companion Tool</div>
-        <div class="p-desc">The official MT4 companion to Trade Copier Ultimate and NTS Local Copier (MT5). Place on any MT4 chart — it reads the MT5 master's shared file and executes trades instantly. Zero config on master side.</div>
-        <ul class="p-features">
-          <li>MT5 Master → MT4 Slave bridge</li>
-          <li>Reads shared file automatically</li>
-          <li>No DLLs, no internet required</li>
-          <li>Zero configuration on master</li>
-          <li>Instant trade execution</li>
-        </ul>
-        <div class="p-footer">
-          <div>
-            <div class="p-price">FREE</div>
-            <span class="p-price-unit">MT4 UTILITY</span>
-          </div>
-          <a href="https://www.mql5.com/en/market/product/168242" target="_blank" class="p-cta">Download →</a>
-        </div>
-      </div>
-
-    </div><!-- /grid -->
-  </div>
-</div>
 
 <!-- WHY NAVIGATOR -->
 <div id="why">
   <div class="section">
     <div class="sec-header">
-      <span class="sec-tag">// Why Navigator Algo</span>
-      <h2 class="sec-title">BUILT FOR <em>REAL</em> TRADERS</h2>
+      <span class="sec-tag">// Philosophy</span>
+      <h2 class="sec-title">WHY <em>NAVIGATOR</em></h2>
       <div class="sec-rule"></div>
     </div>
     <div class="why-grid">
       <div class="why-card">
         <span class="why-num">01</span>
         <span class="why-icon">⚡</span>
-        <div class="why-title">Low-Latency Network</div>
-        <p class="why-text">Signals ride Firebase Realtime DB + Cloud Functions — typical end-to-end latency is 1–3 seconds from provider trade to follower fill. Adaptive polling keeps costs down.</p>
+        <div class="why-title">VPS Optimised</div>
+        <p class="why-text">Every EA is engineered for VPS environments — throttled redraws, minimal CPU overhead, and instant OnTradeTransaction execution. Runs lean on any server.</p>
       </div>
       <div class="why-card">
         <span class="why-num">02</span>
-        <span class="why-icon">🔐</span>
-        <div class="why-title">Secure by Design</div>
-        <p class="why-text">Every EA authenticates with its own ea_key. Followers use time-limited sub-license codes. No raw database credentials on user machines, ever.</p>
+        <span class="why-icon">🛡</span>
+        <div class="why-title">Prop Firm Ready</div>
+        <p class="why-text">Hard drawdown enforcement, daily loss limits, news blocking, and equity watermarks built into the suite. Stay compliant on any funded account challenge.</p>
       </div>
       <div class="why-card">
         <span class="why-num">03</span>
         <span class="why-icon">🎛</span>
-        <div class="why-title">MT5 Native</div>
-        <p class="why-text">Provider and Receiver EAs are pure MQL5. No DLLs, no external bridges. Works on any MT5 broker, hedging or netting, live or demo. VPS-friendly.</p>
+        <div class="why-title">Unified UI</div>
+        <p class="why-text">All products share the same dark CCanvas panel system — consistent, fast, and genuinely enjoyable to trade with across every tool in the suite.</p>
       </div>
       <div class="why-card">
         <span class="why-num">04</span>
-        <span class="why-icon">📊</span>
-        <div class="why-title">Live Dashboard</div>
-        <p class="why-text">Providers see every signal, heartbeat, and active copier in real time. Regenerate ea_keys, mint sub-licenses, and revoke access — all from the web dashboard.</p>
+        <span class="why-icon">📦</span>
+        <div class="why-title">MQL5 Verified</div>
+        <p class="why-text">Sold and distributed exclusively through the MQL5 marketplace. Your purchase is protected, license-managed, and updates are delivered automatically.</p>
       </div>
     </div>
   </div>
@@ -1336,14 +1051,14 @@ footer {
 
 <!-- CTA STRIP -->
 <div class="cta-strip">
-  <h2>READY TO <em>BROADCAST</em> YOUR EDGE?</h2>
-  <p>// $100/yr · 10 free sub slots · Unlimited copiers · Live in minutes</p>
+  <h2>READY TO <em>TRIGGER</em> YOUR EDGE?</h2>
+  <p>// $45 one-time · 6-month rental $30 · 10 activations · lifetime updates via MQL5</p>
   <div class="hero-btns" style="opacity:1;animation:none;">
-    <a href="signal-copier.html#pricing" class="btn btn-primary">Become a Signal Provider</a>
-    <a href="signal-copier.html" class="btn btn-ghost">How it works</a>
+    <a href="https://www.mql5.com/en/market/product/170008" target="_blank" class="btn btn-primary">Buy Trigger Pro on MQL5 →</a>
+    <a href="index.html" class="btn btn-ghost">Back to Navigator Algo</a>
   </div>
   <br>
-  <a href="receiver-download.html" class="mql5-link">or download the free Partner Receiver →</a>
+  <a href="https://www.mql5.com/en/market/product/170008" target="_blank" class="mql5-link">mql5.com → Trigger Pro (v2.0)</a>
 </div>
 
 <!-- FOOTER -->
@@ -1388,6 +1103,17 @@ footer {
     </div>
   </div>
 </footer>
+
+<script>
+window.addEventListener('message', function(event) {
+  var iframe = document.getElementById('triggerProDemoFrame');
+  if (!iframe) return;
+  if (event.source !== iframe.contentWindow) return;
+  if (!event.data || event.data.type !== 'trigger-pro-demo-height') return;
+
+  iframe.style.height = Math.max(event.data.height || 0, 700) + 'px';
+});
+</script>
 
 <script type="module" src="assets/nav-auth.js"></script>
 </body>
