@@ -4,9 +4,9 @@
 
 import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getAuth, onAuthStateChanged, signOut,
+  getAuth, onAuthStateChanged, signOut, updateProfile,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
-  GoogleAuthProvider, signInWithPopup
+  GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getDatabase, ref, get, set, update, onValue, serverTimestamp
@@ -66,12 +66,82 @@ export async function completeEmailLinkSignIn() {
 
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
-  const result = await signInWithPopup(auth, provider);
-  return result.user;
+  provider.setCustomParameters({ prompt: "select_account" });
+  try {
+    const result = await signInWithPopup(auth, provider);
+    return result.user;
+  } catch (err) {
+    // Popup blocked or closed → fall back to redirect flow (more reliable on
+    // mobile + strict popup-blocker setups). Redirect navigates away from the
+    // page; getRedirectResult() on return picks it up (handled in signin.html).
+    if (err && (err.code === "auth/popup-blocked" || err.code === "auth/cancelled-popup-request")) {
+      await signInWithRedirect(auth, provider);
+      return null; // page will navigate; caller should not rely on a user being returned
+    }
+    throw err;
+  }
+}
+
+// Called on /signin.html load to complete a redirect-based Google sign-in, if any.
+export async function completeGoogleRedirect() {
+  try {
+    const result = await getRedirectResult(auth);
+    return result ? result.user : null;
+  } catch (err) {
+    console.error("[Navigator Algo] getRedirectResult failed:", err);
+    throw err;
+  }
 }
 
 export async function signOutUser() {
   await signOut(auth);
+}
+
+// ── USER PROFILE HELPERS ──
+// Stored at /users/{uid} per the Firebase security rules.
+// Schema:
+//   /users/{uid}/email        — mirror of auth email
+//   /users/{uid}/display_name — optional friendly name (user-editable)
+//   /users/{uid}/provider_id  — "NAV-XXXX" once EA is claimed
+//   /users/{uid}/created_at   — server timestamp on first sign-in
+//   /users/{uid}/last_seen_at — server timestamp refreshed each sign-in
+
+export async function getUserProfile(uid) {
+  const snap = await get(ref(db, `users/${uid}`));
+  return snap.exists() ? snap.val() : null;
+}
+
+// Idempotent — creates /users/{uid} with basic info on first sign-in,
+// refreshes last_seen_at on every subsequent load.
+export async function touchUserProfile(user) {
+  const updates = {
+    [`users/${user.uid}/email`]:        user.email || null,
+    [`users/${user.uid}/last_seen_at`]: serverTimestamp()
+  };
+  const existing = await get(ref(db, `users/${user.uid}`));
+  if (!existing.exists()) {
+    updates[`users/${user.uid}/created_at`] = serverTimestamp();
+    if (user.displayName) updates[`users/${user.uid}/display_name`] = user.displayName;
+  }
+  await update(ref(db), updates);
+}
+
+// Writes the user's editable profile fields.
+// Mirrors display_name onto the Firebase Auth user so other pages can read it
+// straight from the auth object without a DB roundtrip.
+export async function saveUserProfile(user, { display_name, phone, country, notes }) {
+  const updates = {};
+  if (display_name !== undefined) updates[`users/${user.uid}/display_name`] = display_name || null;
+  if (phone        !== undefined) updates[`users/${user.uid}/phone`]        = phone || null;
+  if (country      !== undefined) updates[`users/${user.uid}/country`]      = country || null;
+  if (notes        !== undefined) updates[`users/${user.uid}/notes`]        = notes || null;
+  updates[`users/${user.uid}/updated_at`] = serverTimestamp();
+  await update(ref(db), updates);
+
+  if (display_name !== undefined && user.displayName !== display_name) {
+    try { await updateProfile(user, { displayName: display_name || null }); }
+    catch (e) { console.warn("[Navigator Algo] updateProfile on auth user failed:", e); }
+  }
 }
 
 // ── DATABASE HELPERS ──
@@ -98,9 +168,16 @@ export async function getUserProviderId(uid) {
 }
 
 // Live-subscribe to the provider node so the dashboard updates in realtime.
-export function subscribeProvider(providerId, callback) {
+export function subscribeProvider(providerId, callback, onError) {
   const r = providerRef(providerId);
-  return onValue(r, (snap) => callback(snap.exists() ? snap.val() : null));
+  return onValue(
+    r,
+    (snap) => callback(snap.exists() ? snap.val() : null),
+    (err) => {
+      console.error("[Navigator Algo] subscribeProvider error:", err);
+      if (onError) onError(err);
+    }
+  );
 }
 
 // Claim a provider_id for the signed-in user.

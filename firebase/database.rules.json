@@ -9,8 +9,15 @@
       "$uid": {
         ".read":  "auth != null && auth.uid === $uid",
         ".write": "auth != null && auth.uid === $uid",
-        "provider_id": { ".validate": "newData.isString() && newData.val().length <= 32" },
-        "email":       { ".validate": "newData.isString() && newData.val().length <= 256" }
+        "provider_id":  { ".validate": "newData.isString() && newData.val().length <= 32" },
+        "email":        { ".validate": "newData.isString() && newData.val().length <= 256" },
+        "display_name": { ".validate": "newData.isString() && newData.val().length <= 64" },
+        "phone":        { ".validate": "newData.isString() && newData.val().length <= 32" },
+        "country":      { ".validate": "newData.isString() && newData.val().length <= 64" },
+        "notes":        { ".validate": "newData.isString() && newData.val().length <= 500" },
+        "created_at":   { ".validate": "newData.isNumber()" },
+        "last_seen_at": { ".validate": "newData.isNumber()" },
+        "updated_at":   { ".validate": "newData.isNumber()" }
       }
     },
 

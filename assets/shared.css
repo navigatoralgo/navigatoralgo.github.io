@@ -113,6 +113,114 @@ body {
   background: rgba(0,212,200,0.10);
 }
 
+/* ── NAV USER MENU (signed-in state) ── */
+.nav-user { position: relative; display: inline-block; }
+.nav-user-btn {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.08em;
+  color: var(--text);
+  text-transform: uppercase;
+  padding: 6px 12px 6px 6px;
+  background: rgba(0,212,200,0.04);
+  border: 1px solid rgba(0,212,200,0.22);
+  border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  max-width: 220px;
+}
+.nav-user-btn:hover {
+  border-color: rgba(0,212,200,0.5);
+  background: rgba(0,212,200,0.08);
+  color: var(--white);
+}
+.nav-user-avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #12ddd2 0%, #00a89e 100%);
+  color: var(--bg);
+  font-family: var(--font-head);
+  font-size: 11px; font-weight: 700;
+  object-fit: cover;
+  flex: 0 0 24px;
+}
+.nav-user-avatar-fallback { letter-spacing: 0; }
+.nav-user-name {
+  max-width: 140px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.nav-user-caret {
+  color: var(--muted);
+  flex: 0 0 10px;
+}
+.nav-user-menu {
+  position: absolute;
+  top: calc(100% + 10px); right: 0;
+  min-width: 240px;
+  background: rgba(13,17,23,0.98);
+  border: 1px solid rgba(36,48,64,0.85);
+  border-radius: 14px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+  padding: 6px;
+  display: none;
+  z-index: 600;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.nav-user-menu.open { display: block; }
+.nav-user-menu a,
+.nav-user-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.08em;
+  color: var(--text);
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-user-menu a:hover,
+.nav-user-menu button:hover {
+  background: rgba(0,212,200,0.08);
+  color: var(--teal);
+}
+.nav-user-menu #navSignOutBtn:hover {
+  background: rgba(255,85,85,0.08);
+  color: var(--red);
+}
+.nav-user-meta {
+  padding: 10px 14px 12px;
+  border-bottom: 1px solid rgba(36,48,64,0.58);
+  margin-bottom: 6px;
+}
+.nav-user-meta-name {
+  font-family: var(--font-head);
+  font-size: 13px; font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.005em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.nav-user-meta-email {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-top: 4px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .nav-user-name { display: none; }
+  .nav-user-btn { padding: 5px 8px; }
+}
+
 /* ── STATUS BAR ── */
 .status-bar {
   position: fixed; top: 104px; left: 0; right: 0; z-index: 499;
