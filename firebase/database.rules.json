@@ -5,6 +5,15 @@
     ".read":  false,
     ".write": false,
 
+    "admins": {
+      "_comment": "Admin allowlist. Set /admins/{uid} = true in Firebase console for each admin. Admins can mint new provider IDs + list all providers. Regular users can only check their own admin status (used to conditionally show the Admin nav link).",
+      "$uid": {
+        ".read":  "auth != null && auth.uid === $uid",
+        ".write": false,
+        ".validate": "newData.isBoolean()"
+      }
+    },
+
     "users": {
       "$uid": {
         ".read":  "auth != null && auth.uid === $uid",
@@ -22,16 +31,21 @@
     },
 
     "providers": {
+      "_comment": "Admins can list all providers (for the admin mint page). Regular users fall through to per-$pid rules where they can only read their own claimed provider.",
+      ".read":  "auth != null && root.child('admins').child(auth.uid).val() === true",
+
       "$pid": {
-        "_comment": "Read: only the owner of this provider node. EA writes via admin SDK / service account (not web client) — so .write stays false for web clients. Exception: owner can update claim_token once (during claim flow).",
-        ".read":  "auth != null && data.child('owner_uid').val() === auth.uid",
-        ".write": "auth != null && (!data.exists() || data.child('owner_uid').val() === auth.uid || !data.child('owner_uid').exists())",
+        ".read":  "auth != null && (data.child('owner_uid').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)",
+        ".write": "auth != null && ( (data.exists() && data.child('owner_uid').val() === auth.uid) || (data.exists() && !data.child('owner_uid').exists()) || (!data.exists() && root.child('admins').child(auth.uid).val() === true) )",
 
         "owner_uid":   { ".validate": "newData.isString() || newData.val() == null" },
         "owner_email": { ".validate": "newData.isString() || newData.val() == null" },
         "claim_token": { ".validate": "newData.isString() || newData.val() == null" },
         "license":     { ".validate": "newData.isString()" },
         "display_name":{ ".validate": "newData.isString() && newData.val().length <= 64" },
+        "created_at":  { ".validate": "newData.isNumber()" },
+        "created_by_uid":{ ".validate": "newData.isString()" },
+        "claimed_at":  { ".validate": "newData.isNumber() || newData.val() == null" },
 
         "sub_licenses": {
           "$code": {
