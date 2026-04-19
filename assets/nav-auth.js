@@ -12,6 +12,60 @@ if (!slot) {
   console.warn("[Navigator Algo] nav-auth.js loaded but #nav-auth-slot not found on page.");
 }
 
+setupMobileNav();
+
+function setupMobileNav() {
+  const nav = document.getElementById("nav");
+  const links = nav && nav.querySelector(".nav-links");
+  if (!nav || !links) return;
+  if (nav.querySelector(".nav-toggle")) return;
+
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "nav-toggle";
+  toggle.setAttribute("aria-label", "Toggle menu");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.innerHTML = `
+    <svg class="nav-toggle-open"  width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+      <path d="M2 4h14M2 9h14M2 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <svg class="nav-toggle-close" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+      <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  `;
+  nav.appendChild(toggle);
+
+  function close() {
+    nav.classList.remove("nav-open");
+    toggle.setAttribute("aria-expanded", "false");
+    document.removeEventListener("click", onDocClick, true);
+    document.removeEventListener("keydown", onKey, true);
+  }
+  function open() {
+    nav.classList.add("nav-open");
+    toggle.setAttribute("aria-expanded", "true");
+    document.addEventListener("click", onDocClick, true);
+    document.addEventListener("keydown", onKey, true);
+  }
+  function onDocClick(e) {
+    if (!nav.contains(e.target)) close();
+  }
+  function onKey(e) {
+    if (e.key === "Escape") close();
+  }
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (nav.classList.contains("nav-open")) close();
+    else open();
+  });
+  links.addEventListener("click", (e) => {
+    const a = e.target.closest("a");
+    if (a && nav.classList.contains("nav-open")) close();
+  });
+  const mq = window.matchMedia("(min-width: 769px)");
+  mq.addEventListener("change", (ev) => { if (ev.matches) close(); });
+}
+
 function initial(name) {
   return (name || "?").trim().charAt(0).toUpperCase() || "?";
 }

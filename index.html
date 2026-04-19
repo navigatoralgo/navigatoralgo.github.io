@@ -131,6 +131,28 @@ body::after { content: none; }
   box-shadow: 0 14px 30px rgba(0,212,200,0.24);
 }
 
+/* ── MOBILE NAV TOGGLE ── */
+.nav-toggle {
+  display: none;
+  width: 42px; height: 42px;
+  align-items: center; justify-content: center;
+  background: rgba(0,212,200,0.04);
+  border: 1px solid rgba(0,212,200,0.22);
+  border-radius: 10px;
+  color: var(--teal);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  padding: 0;
+}
+.nav-toggle:hover {
+  border-color: rgba(0,212,200,0.55);
+  background: rgba(0,212,200,0.10);
+}
+.nav-toggle svg { display: block; }
+.nav-toggle .nav-toggle-close { display: none; }
+#nav.nav-open .nav-toggle .nav-toggle-open  { display: none; }
+#nav.nav-open .nav-toggle .nav-toggle-close { display: block; }
+
 /* ── STATUS BAR ── */
 .status-bar {
   position: fixed; top: 104px; left: 0; right: 0; z-index: 499;
@@ -738,33 +760,91 @@ footer {
 }
 @media (max-width: 768px) {
   #nav {
-    height: 82px;
-    padding: 0 20px;
+    height: 72px;
+    padding: 0 16px;
+    gap: 10px;
   }
-  .nav-links { display: none; }
   .nav-logo-mark {
-    width: min(100%, 220px);
-    max-width: 220px;
+    width: min(100%, 180px);
+    max-width: 180px;
     height: auto;
   }
-  .status-bar {
-    top: 82px;
-    padding: 0 20px;
+  .nav-toggle { display: inline-flex; }
+
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 72px; left: 0; right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 14px 16px 22px;
+    background: rgba(8,11,14,0.98);
+    border-bottom: 1px solid rgba(36,48,64,0.72);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    max-height: calc(100vh - 72px);
+    overflow-y: auto;
+    z-index: 499;
   }
-  .section { padding: 60px 20px; }
+  #nav.nav-open .nav-links { display: flex; }
+  .nav-links li { width: 100%; }
+  .nav-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 18px;
+    font-size: 12px;
+    border: 1px solid rgba(36,48,64,0.58);
+    background: rgba(15,21,32,0.5);
+  }
+
+  .status-bar {
+    top: 72px;
+    padding: 0 16px;
+  }
+  .section { padding: 56px 16px; }
   .products-grid { grid-template-columns: 1fr; }
-  .flagship-inner { padding: 48px 20px; }
+  .flagship-inner { padding: 36px 16px; }
   .flagship-modules { grid-template-columns: 1fr; }
-  .flagship-demo-shell { padding: 14px; }
-  .flagship-demo-frame { min-height: 700px; }
+  .flagship-demo-shell { padding: 12px; }
+  .flagship-demo-frame { min-height: 620px; }
   .why-grid { grid-template-columns: 1fr; }
-  .hero-stat { padding: 18px 20px; min-width: auto; }
-  .footer-main { grid-template-columns: 1fr; padding: 40px 20px; }
-  .footer-brand-logo { width: min(100%, 360px); }
-  .footer-bottom { padding: 20px; flex-direction: column; gap: 10px; text-align: center; }
-  .cta-strip { padding: 60px 20px; }
-  #hero { padding: 154px 20px 60px; }
-  .hero-stats { flex-direction: column; }
+  .footer-main { grid-template-columns: 1fr; padding: 36px 16px; gap: 28px; }
+  .footer-brand-logo { width: min(100%, 280px); }
+  .footer-bottom { padding: 18px; flex-direction: column; gap: 10px; text-align: center; }
+  .cta-strip { padding: 56px 16px; }
+
+  #hero { padding: 104px 16px 56px; min-height: auto; }
+  .hero-h1 { font-size: clamp(38px, 9.5vw, 58px); line-height: 0.95; }
+  .hero-h2 { font-size: 14px; margin-bottom: 18px; }
+  .hero-desc { font-size: 15px; line-height: 1.7; margin-bottom: 32px; }
+  .hero-btns { gap: 10px; width: 100%; }
+  .hero-btns .btn { flex: 1 1 auto; justify-content: center; padding: 14px 18px; font-size: 10px; }
+  .hero-stats {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-top: 44px;
+  }
+  .hero-stat {
+    padding: 16px 20px;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+  }
+  .hero-stat-num { font-size: 24px; }
+  .hero-stat-label { margin-top: 0; }
+}
+@media (max-width: 480px) {
+  .nav-logo-mark { width: min(100%, 150px); max-width: 150px; }
+  #nav { padding: 0 12px; }
+  .status-bar { padding: 0 12px; }
+  .section, .cta-strip { padding-left: 14px; padding-right: 14px; }
+  .hero-btns { flex-direction: column; }
+  .hero-btns .btn { width: 100%; }
 }
 </style>
 </head>
