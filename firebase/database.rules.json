@@ -41,6 +41,8 @@
         "owner_uid":   { ".validate": "newData.isString() || newData.val() == null" },
         "owner_email": { ".validate": "newData.isString() || newData.val() == null" },
         "claim_token": { ".validate": "newData.isString() || newData.val() == null" },
+        "ea_key":      { ".validate": "newData.isString() && newData.val().length <= 64" },
+        "ea_key_rotated_at": { ".validate": "newData.isNumber() || newData.val() == null" },
         "license":     { ".validate": "newData.isString()" },
         "display_name":{ ".validate": "newData.isString() && newData.val().length <= 64" },
         "created_at":  { ".validate": "newData.isNumber()" },
