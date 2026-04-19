@@ -238,7 +238,7 @@
     <li><a href="index.html">Home</a></li>
     <li><a href="signal-copier.html">Signal Copier</a></li>
     <li><a href="dashboard.html" class="current">Dashboard</a></li>
-    <li><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
+    <li id="nav-auth-slot"><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
     <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
   </ul>
 </nav>
@@ -254,6 +254,24 @@
 
   <!-- LOADING -->
   <div id="loadingState" class="centered-loading">Loading your dashboard…</div>
+
+  <!-- ERROR STATE (auth OK but a database read failed — usually unpublished rules) -->
+  <section id="errorState" class="hidden">
+    <div class="claim-panel" style="border-color: rgba(255,85,85,0.28);">
+      <span class="p-badge" style="color: var(--red); border-color: rgba(255,85,85,0.3); background: rgba(255,85,85,0.06);">Error</span>
+      <h2>Couldn't load your account</h2>
+      <p id="errorStateMessage">Something went wrong while reading your data from Firebase.</p>
+      <p style="font-size: 12px;">
+        If this is your first sign-in, your project's database rules may not allow reads yet. Publish
+        <code class="mono-code" style="font-size:11px;">firebase/database.rules.json</code> from the repo in the
+        Firebase console → Realtime Database → Rules, then retry.
+      </p>
+      <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
+        <button id="errorRetryBtn" class="btn btn-primary" style="justify-content:center;">Retry</button>
+        <button id="errorSignOutBtn" class="btn btn-ghost" style="justify-content:center;">Sign out</button>
+      </div>
+    </div>
+  </section>
 
   <!-- EMPTY STATE (user signed in but hasn't claimed a provider ID yet) -->
   <section id="claimState" class="hidden">
@@ -410,6 +428,7 @@
 
   const $ = (id) => document.getElementById(id);
   const loadingState = $("loadingState");
+  const errorState   = $("errorState");
   const claimState   = $("claimState");
   const dashState    = $("dashState");
 
@@ -419,9 +438,19 @@
 
   function show(state) {
     loadingState.classList.add("hidden");
+    errorState.classList.add("hidden");
     claimState.classList.add("hidden");
     dashState.classList.add("hidden");
     state.classList.remove("hidden");
+  }
+
+  function showError(err) {
+    const msg = err?.code === "PERMISSION_DENIED"
+      ? "Your Firebase database rules are blocking reads from /users/" + (currentUser?.uid || "") + "."
+      : (err?.message || String(err) || "Unknown error.");
+    $("errorStateMessage").textContent = msg;
+    console.error("[Navigator Algo] Dashboard load failed:", err);
+    show(errorState);
   }
 
   function maskAccount(acct) {
@@ -567,7 +596,7 @@
       }
       show(dashState);
       renderDashboard(data);
-    });
+    }, (err) => showError(err));
   }
 
   // ── COPY SHARE URL ──
@@ -585,10 +614,19 @@
     window.location.replace("index.html");
   });
 
-  // ── BOOTSTRAP ──
-  watchAuth(
-    async (user) => {
-      currentUser = user;
+  // ── RETRY / SIGN-OUT BUTTONS IN ERROR STATE ──
+  $("errorRetryBtn").addEventListener("click", () => {
+    show(loadingState);
+    if (currentUser) loadAccount(currentUser);
+  });
+  $("errorSignOutBtn").addEventListener("click", async () => {
+    if (unsubProvider) unsubProvider();
+    await signOutUser();
+    window.location.replace("index.html");
+  });
+
+  async function loadAccount(user) {
+    try {
       const pid = await getUserProviderId(user.uid);
       if (pid) {
         currentProviderId = pid;
@@ -596,6 +634,16 @@
       } else {
         beginClaimFlow();
       }
+    } catch (err) {
+      showError(err);
+    }
+  }
+
+  // ── BOOTSTRAP ──
+  watchAuth(
+    (user) => {
+      currentUser = user;
+      loadAccount(user);
     },
     () => {
       window.location.replace("signin.html");
@@ -603,5 +651,6 @@
   );
 </script>
 
+<script type="module" src="assets/nav-auth.js"></script>
 </body>
 </html>

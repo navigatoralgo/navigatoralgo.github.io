@@ -97,7 +97,7 @@
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
     <li><a href="signal-copier.html">Signal Copier</a></li>
-    <li><a href="signin.html" class="current nav-btn-ghost">Sign in</a></li>
+    <li id="nav-auth-slot"><a href="signin.html" class="current nav-btn-ghost">Sign in</a></li>
     <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
   </ul>
 </nav>
@@ -157,7 +157,7 @@
 <script type="module">
   import {
     watchAuth, sendMagicLink, completeEmailLinkSignIn,
-    signInWithGoogle
+    signInWithGoogle, completeGoogleRedirect
   } from "./assets/app.js";
 
   const emailForm    = document.getElementById("emailForm");
@@ -187,6 +187,18 @@
       }
     } catch (e) {
       setError(e.message || "Could not complete sign-in. Please try again.");
+    }
+  })();
+
+  // If we arrived back from a Google redirect flow, finish the sign-in.
+  (async () => {
+    try {
+      const user = await completeGoogleRedirect();
+      if (user) {
+        window.location.replace("dashboard.html");
+      }
+    } catch (e) {
+      setError(friendlyGoogleError(e));
     }
   })();
 
@@ -223,20 +235,41 @@
     }
   });
 
+  function friendlyGoogleError(err) {
+    if (!err) return "Google sign-in failed. Please try again.";
+    const code = err.code || "";
+    if (code === "auth/popup-closed-by-user")       return "You closed the Google sign-in window before finishing. Please try again.";
+    if (code === "auth/cancelled-popup-request")    return "Another sign-in window is already open. Please close it and try again.";
+    if (code === "auth/popup-blocked")              return "Your browser blocked the Google pop-up. Please allow pop-ups for navigatoralgo.com and try again.";
+    if (code === "auth/unauthorized-domain")        return "This domain is not authorized for Google sign-in. Contact support.";
+    if (code === "auth/operation-not-allowed")      return "Google sign-in isn't enabled on this project yet. Contact support.";
+    if (code === "auth/account-exists-with-different-credential")
+      return "An account with this email already exists with a different sign-in method. Please use the magic-link option above.";
+    if (code === "auth/network-request-failed")     return "Network error. Check your connection and try again.";
+    return (err.message || "Google sign-in failed.") + (code ? " (" + code + ")" : "");
+  }
+
   googleBtn.addEventListener("click", async () => {
+    setError("");
     try {
       googleBtn.disabled = true;
       signingIn.classList.remove("hidden");
-      await signInWithGoogle();
-      // onAuthStateChanged handler (watchAuth) will redirect to /dashboard.html.
+      signingIn.textContent = "Opening Google sign-in…";
+      const user = await signInWithGoogle();
+      // Popup succeeded → watchAuth will redirect.
+      // Redirect fallback → page will navigate; nothing else to do here.
+      if (!user) {
+        signingIn.textContent = "Redirecting to Google…";
+      }
     } catch (err) {
-      console.error(err);
-      setError(err.message || "Google sign-in failed. Please try again.");
+      console.error("[Navigator Algo] Google sign-in failed:", err?.code, err);
+      setError(friendlyGoogleError(err));
       googleBtn.disabled = false;
       signingIn.classList.add("hidden");
     }
   });
 </script>
 
+<script type="module" src="assets/nav-auth.js"></script>
 </body>
 </html>
