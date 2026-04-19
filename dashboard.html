@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Navigator Algo</title>
+<meta name="description" content="Navigator Algo signal provider dashboard.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+.dash-shell {
+  position: relative; z-index: 1;
+  max-width: 1240px; margin: 0 auto;
+  padding: 172px 48px 80px;
+}
+.dash-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 24px; margin-bottom: 36px; flex-wrap: wrap;
+}
+.dash-header-left h1 {
+  font-family: var(--font-head);
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 800; letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.dash-header-left h1 em { color: var(--teal); font-style: normal; }
+.dash-header-sub {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+}
+.dash-header-sub .email { color: var(--text); }
+.dash-header-right {
+  display: flex; gap: 10px;
+}
+
+/* KPI row */
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 32px;
+}
+.kpi-card {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 22px;
+  padding: 22px 24px;
+  position: relative; overflow: hidden;
+}
+.kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 22px; right: 22px; height: 2px;
+  background: rgba(0,212,200,0.3); border-radius: 999px;
+}
+.kpi-label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.kpi-value {
+  font-family: var(--font-head);
+  font-size: 32px; font-weight: 800;
+  color: var(--white);
+  line-height: 1;
+}
+.kpi-value.teal  { color: var(--teal); }
+.kpi-value.gold  { color: var(--gold); }
+.kpi-value.green { color: var(--green); }
+.kpi-sub {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* Section panels */
+.section-title {
+  font-family: var(--font-head);
+  font-size: 18px; font-weight: 700;
+  color: var(--white);
+  margin-bottom: 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+}
+.section-title em { color: var(--teal); font-style: normal; }
+
+/* Sub-licenses table */
+.slot-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  font-size: 13px;
+}
+.slot-table thead th {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+  text-align: left;
+  padding: 0 14px 10px;
+  font-weight: 500;
+}
+.slot-table tbody tr {
+  background: rgba(8,11,14,0.5);
+  border: 1px solid rgba(36,48,64,0.5);
+}
+.slot-table tbody td {
+  padding: 14px;
+  border-top: 1px solid rgba(36,48,64,0.5);
+  border-bottom: 1px solid rgba(36,48,64,0.5);
+  vertical-align: middle;
+}
+.slot-table tbody td:first-child {
+  border-left: 1px solid rgba(36,48,64,0.5);
+  border-radius: 12px 0 0 12px;
+}
+.slot-table tbody td:last-child {
+  border-right: 1px solid rgba(36,48,64,0.5);
+  border-radius: 0 12px 12px 0;
+}
+.slot-code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--white);
+  letter-spacing: 0.05em;
+}
+.slot-status {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+.slot-status.unused  { color: var(--muted); background: rgba(78,96,112,0.08); border-color: rgba(78,96,112,0.3); }
+.slot-status.active  { color: var(--green); background: rgba(0,230,118,0.08); border-color: rgba(0,230,118,0.3); }
+.slot-status.expired { color: var(--red);   background: rgba(255,85,85,0.08); border-color: rgba(255,85,85,0.3); }
+.slot-status.revoked { color: var(--gold);  background: rgba(240,165,0,0.08); border-color: rgba(240,165,0,0.3); }
+.slot-action {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.1em;
+  color: var(--teal);
+  background: none;
+  border: 1px solid rgba(0,212,200,0.2);
+  padding: 6px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.slot-action:hover {
+  color: var(--white);
+  background: rgba(0,212,200,0.08);
+  border-color: rgba(0,212,200,0.4);
+}
+.slot-action.danger {
+  color: var(--red);
+  border-color: rgba(255,85,85,0.3);
+}
+.slot-action.danger:hover {
+  background: rgba(255,85,85,0.06);
+  border-color: rgba(255,85,85,0.5);
+  color: var(--red);
+}
+
+/* Claim provider modal / empty state */
+.claim-panel {
+  background: var(--panel);
+  border: 1px solid rgba(240,165,0,0.18);
+  border-radius: 24px;
+  padding: 40px 36px;
+  max-width: 560px; margin: 0 auto;
+  box-shadow: 0 20px 44px rgba(240,165,0,0.06);
+}
+.claim-panel h2 {
+  font-family: var(--font-head);
+  font-size: 22px; font-weight: 800;
+  color: var(--white); margin-bottom: 10px;
+}
+.claim-panel p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.claim-panel ol {
+  padding-left: 20px;
+  margin-bottom: 24px;
+  color: var(--text);
+}
+.claim-panel ol li { margin-bottom: 8px; line-height: 1.6; }
+
+.signout-link {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em;
+  color: var(--muted); text-transform: uppercase;
+  background: none; border: none;
+  padding: 9px 14px;
+  cursor: pointer;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.signout-link:hover { color: var(--red); border-color: rgba(255,85,85,0.22); }
+
+.hidden { display: none !important; }
+.centered-loading {
+  text-align: center;
+  padding: 120px 40px;
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+}
+
+@media (max-width: 1024px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .dash-shell { padding: 150px 20px 60px; }
+}
+@media (max-width: 768px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi-card { padding: 16px; }
+  .kpi-value { font-size: 24px; }
+  .slot-table { font-size: 11px; }
+  .slot-table tbody td { padding: 10px 8px; }
+  .slot-code { font-size: 10px; letter-spacing: 0; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="signal-copier.html">Signal Copier</a></li>
+    <li><a href="dashboard.html" class="current">Dashboard</a></li>
+    <li><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
+    <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
+  </ul>
+</nav>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal" id="liveIndicator">CONNECTED</span></div>
+  <div class="status-item" id="hbIndicator">EA HEARTBEAT —</div>
+  <div class="status-item" id="lastSignalIndicator">LAST SIGNAL —</div>
+  <div class="status-item">REALTIME SYNC</div>
+</div>
+
+<main class="dash-shell">
+
+  <!-- LOADING -->
+  <div id="loadingState" class="centered-loading">Loading your dashboard…</div>
+
+  <!-- EMPTY STATE (user signed in but hasn't claimed a provider ID yet) -->
+  <section id="claimState" class="hidden">
+    <div class="claim-panel">
+      <span class="p-badge p-badge-gold">Setup</span>
+      <h2>Link your Signal Copier EA</h2>
+      <p>
+        To see your dashboard, link your MQL5 EA to this account. This only needs to be done once.
+      </p>
+      <ol>
+        <li>Open the <strong>Signal Copier</strong> EA on MT5 in <em>Provider</em> mode.</li>
+        <li>In the EA's panel, find the <strong>Provider ID</strong> and <strong>Activation Token</strong> fields.</li>
+        <li>Paste both below and click <strong>Link</strong>.</li>
+      </ol>
+
+      <form id="claimForm">
+        <div class="form-group">
+          <label class="form-label" for="providerIdInput">Provider ID</label>
+          <input id="providerIdInput" class="form-input" placeholder="NAV-XXXXX" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="claimTokenInput">Activation Token</label>
+          <input id="claimTokenInput" class="form-input" placeholder="e.g. 9F3A-1C77-B204" required>
+        </div>
+        <div id="claimError" class="form-error"></div>
+        <button type="submit" id="claimBtn" class="btn btn-primary" style="width:100%;justify-content:center;">
+          Link dashboard
+        </button>
+      </form>
+
+      <p style="margin-top:20px;margin-bottom:0;font-size:12px;">
+        Don't have the Signal Copier EA yet? <a href="signal-copier.html" style="color:var(--teal);text-decoration:none;">See the product page →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashState" class="hidden">
+    <div class="dash-header">
+      <div class="dash-header-left">
+        <h1>Provider <em>Dashboard</em></h1>
+        <div class="dash-header-sub">Provider ID <span class="mono-code" id="providerIdDisplay">—</span> · <span class="email" id="emailDisplay">—</span></div>
+      </div>
+      <div class="dash-header-right">
+        <button id="signOutBtn" class="signout-link">Sign out</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Active copiers</div>
+        <div class="kpi-value teal" id="kpiActive">0</div>
+        <div class="kpi-sub"><span id="kpiActiveSub">0 free · 0 paid</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Slots available</div>
+        <div class="kpi-value gold" id="kpiSlots">0 / 10</div>
+        <div class="kpi-sub" id="kpiSlotsSub">Unused sub-licenses</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total signals</div>
+        <div class="kpi-value" id="kpiSignals">0</div>
+        <div class="kpi-sub" id="kpiSignalsSub">All-time</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">License expires</div>
+        <div class="kpi-value" id="kpiExpires" style="font-size: 20px;">—</div>
+        <div class="kpi-sub" id="kpiExpiresSub">Provider license</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom: 24px;">
+      <div class="section-title">
+        <span>Free sub-license <em>slots</em></span>
+        <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">
+          Share with your subscribers
+        </span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="slot-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Status</th>
+              <th>Bound account</th>
+              <th>Broker</th>
+              <th>Activated</th>
+              <th style="text-align:right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="slotsBody">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">
+        <span>Your <em>sharing page</em></span>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;line-height:1.7;">
+        Share this link with your subscribers. They'll see your public stats and where to download the free Partner Receiver EA.
+      </p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <code id="shareUrl" class="mono-code" style="font-size:13px;padding:10px 14px;">—</code>
+        <button id="copyShareBtn" class="btn btn-ghost" style="padding:10px 18px;font-size:10px;">Copy link</button>
+        <a id="previewShareBtn" href="#" target="_blank" class="btn btn-ghost" style="padding:10px 18px;font-size:10px;">Preview →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+      </div>
+      <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
+    </div>
+    <div class="footer-col">
+      <h4>Provider Tools</h4>
+      <a href="signal-copier.html">Signal Copier</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="receiver-download.html">Partner Receiver</a>
+    </div>
+    <div class="footer-col">
+      <h4>Paid Tools</h4>
+      <a href="https://www.mql5.com/en/market/product/170008" target="_blank">Trigger Pro</a>
+      <a href="https://www.mql5.com/en/market/product/164907" target="_blank">Trade Copier Ultimate</a>
+      <a href="https://www.mql5.com/en/market/product/163674" target="_blank">Prop Firm Protector</a>
+    </div>
+    <div class="footer-col">
+      <h4>Links</h4>
+      <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank">MQL5 Store</a>
+      <a href="index.html">Home</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Navigator Trading Systems · All rights reserved</div>
+    <div class="footer-sys">
+      <span class="status-dot"></span> ALL SYSTEMS OPERATIONAL
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+  import {
+    watchAuth, signOutUser,
+    getUserProviderId, subscribeProvider, claimProvider, countActiveCopiers
+  } from "./assets/app.js";
+
+  const $ = (id) => document.getElementById(id);
+  const loadingState = $("loadingState");
+  const claimState   = $("claimState");
+  const dashState    = $("dashState");
+
+  let currentUser = null;
+  let currentProviderId = null;
+  let unsubProvider = null;
+
+  function show(state) {
+    loadingState.classList.add("hidden");
+    claimState.classList.add("hidden");
+    dashState.classList.add("hidden");
+    state.classList.remove("hidden");
+  }
+
+  function maskAccount(acct) {
+    if (!acct) return "—";
+    const s = String(acct);
+    return s.length <= 4 ? "****" : "****" + s.slice(-4);
+  }
+
+  function fmtDate(ts) {
+    if (!ts) return "—";
+    try { return new Date(Number(ts)).toISOString().slice(0, 10); }
+    catch { return "—"; }
+  }
+
+  function relTime(ts) {
+    if (!ts) return "—";
+    const ms = Date.now() - Number(ts);
+    if (ms < 60000)       return Math.floor(ms/1000) + "s ago";
+    if (ms < 3600000)     return Math.floor(ms/60000) + "m ago";
+    if (ms < 86400000)    return Math.floor(ms/3600000) + "h ago";
+    return Math.floor(ms/86400000) + "d ago";
+  }
+
+  function daysUntil(ts) {
+    if (!ts) return null;
+    const d = Math.floor((Number(ts) - Date.now()) / 86400000);
+    return d;
+  }
+
+  function renderDashboard(data) {
+    // Header
+    $("providerIdDisplay").textContent = currentProviderId;
+    $("emailDisplay").textContent = currentUser.email || "—";
+
+    // KPI: active copiers
+    const counts = countActiveCopiers(data);
+    $("kpiActive").textContent = counts.total;
+    $("kpiActiveSub").textContent = counts.sub + " free · " + counts.paid + " paid";
+
+    // KPI: slots
+    const subs = data.sub_licenses || {};
+    const subCodes = Object.keys(subs);
+    const unused = subCodes.filter(c => subs[c]?.state === "unused").length;
+    $("kpiSlots").textContent = unused + " / " + (subCodes.length || 10);
+    $("kpiSlotsSub").textContent = (subCodes.length - unused) + " in use";
+
+    // KPI: signals total
+    const stats = data.stats || {};
+    $("kpiSignals").textContent = (stats.total_signals || 0).toLocaleString();
+
+    // KPI: expires
+    const expiresTs = data.license_expires_at || null;
+    const d = daysUntil(expiresTs);
+    if (d === null) {
+      $("kpiExpires").textContent = "—";
+    } else if (d < 0) {
+      $("kpiExpires").textContent = "Expired";
+      $("kpiExpires").style.color = "var(--red)";
+    } else {
+      $("kpiExpires").textContent = d + "d";
+      $("kpiExpiresSub").textContent = fmtDate(expiresTs);
+    }
+
+    // Heartbeat / last signal indicators
+    $("hbIndicator").textContent = "EA HEARTBEAT " + relTime(data.heartbeat);
+    $("lastSignalIndicator").textContent = "LAST SIGNAL " + relTime(stats.last_signal_at);
+
+    // Slots table
+    const body = $("slotsBody");
+    body.innerHTML = "";
+    if (!subCodes.length) {
+      body.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">No sub-licenses generated yet. Your 10 free slots will appear here after your EA's first connection to Firebase.</td></tr>`;
+    } else {
+      for (const code of subCodes.sort()) {
+        const s = subs[code] || {};
+        const state = s.state || "unused";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="slot-code">${code}</span></td>
+          <td><span class="slot-status ${state}">${state}</span></td>
+          <td>${maskAccount(s.bound_account)}</td>
+          <td>${s.bound_broker ? String(s.bound_broker).slice(0, 20) : "—"}</td>
+          <td>${fmtDate(s.activated_at)}</td>
+          <td style="text-align:right;">
+            ${state === "unused"
+              ? `<button class="slot-action" data-copy="${code}">Copy</button>`
+              : state === "active"
+                ? `<button class="slot-action danger" data-revoke="${code}">Revoke</button>`
+                : `—`}
+          </td>
+        `;
+        body.appendChild(tr);
+      }
+
+      body.querySelectorAll("[data-copy]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          navigator.clipboard.writeText(btn.dataset.copy);
+          btn.textContent = "Copied";
+          setTimeout(() => btn.textContent = "Copy", 1200);
+        });
+      });
+      // "Revoke" wiring intentionally left as a no-op for v1 — needs an admin
+      // SDK call on Firebase. Dashboard currently surfaces the intent only.
+    }
+
+    // Share URL
+    const shareUrl = window.location.origin + "/p/" + currentProviderId;
+    $("shareUrl").textContent = shareUrl;
+    $("previewShareBtn").href = shareUrl;
+  }
+
+  async function beginClaimFlow() {
+    show(claimState);
+    const form = $("claimForm");
+    const errEl = $("claimError");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errEl.textContent = "";
+      const pid = $("providerIdInput").value.trim().toUpperCase();
+      const tok = $("claimTokenInput").value.trim();
+      if (!pid || !tok) { errEl.textContent = "Both fields required."; return; }
+      $("claimBtn").disabled = true;
+      $("claimBtn").textContent = "Linking…";
+      try {
+        await claimProvider(currentUser, pid, tok);
+        // Re-resolve and render.
+        currentProviderId = pid;
+        bindProviderUpdates(pid);
+      } catch (e) {
+        errEl.textContent = e.message || "Could not link your EA. Check the values and try again.";
+        $("claimBtn").disabled = false;
+        $("claimBtn").textContent = "Link dashboard";
+      }
+    }, { once: true });
+  }
+
+  function bindProviderUpdates(pid) {
+    if (unsubProvider) unsubProvider();
+    unsubProvider = subscribeProvider(pid, (data) => {
+      if (!data) {
+        beginClaimFlow();
+        return;
+      }
+      show(dashState);
+      renderDashboard(data);
+    });
+  }
+
+  // ── COPY SHARE URL ──
+  $("copyShareBtn").addEventListener("click", () => {
+    const t = $("shareUrl").textContent;
+    navigator.clipboard.writeText(t);
+    $("copyShareBtn").textContent = "Copied";
+    setTimeout(() => $("copyShareBtn").textContent = "Copy link", 1200);
+  });
+
+  // ── SIGN OUT ──
+  $("signOutBtn").addEventListener("click", async () => {
+    if (unsubProvider) unsubProvider();
+    await signOutUser();
+    window.location.replace("index.html");
+  });
+
+  // ── BOOTSTRAP ──
+  watchAuth(
+    async (user) => {
+      currentUser = user;
+      const pid = await getUserProviderId(user.uid);
+      if (pid) {
+        currentProviderId = pid;
+        bindProviderUpdates(pid);
+      } else {
+        beginClaimFlow();
+      }
+    },
+    () => {
+      window.location.replace("signin.html");
+    }
+  );
+</script>
+
+</body>
+</html>

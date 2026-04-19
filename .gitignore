@@ -1,0 +1,22 @@
+# Local Firebase emulator / tooling
+.firebase/
+firebase-debug.log
+
+# Secrets and local overrides — if you ever add admin credentials,
+# keep them out of git. Client-side Firebase config (apiKey etc) is
+# NOT secret and is committed in assets/firebase-config.js.
+.env
+.env.local
+service-account*.json
+
+# Editor / OS junk
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
+
+# Build artefacts (none today, future-proof)
+dist/
+build/
+node_modules/
