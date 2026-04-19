@@ -102,6 +102,16 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 14px 30px rgba(0,212,200,0.24);
 }
+.nav-links .nav-btn-ghost {
+  color: var(--teal) !important;
+  border-color: rgba(0,212,200,0.35) !important;
+  background: rgba(0,212,200,0.04);
+}
+.nav-links .nav-btn-ghost:hover {
+  color: var(--teal) !important;
+  border-color: rgba(0,212,200,0.6) !important;
+  background: rgba(0,212,200,0.10);
+}
 
 /* ── STATUS BAR ── */
 .status-bar {
