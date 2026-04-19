@@ -9,7 +9,7 @@ import {
   GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getDatabase, ref, get, set, update, onValue, serverTimestamp
+  getDatabase, ref, get, set, update, onValue, runTransaction, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 import { firebaseConfig, DB_PATHS, LICENSE_PREFIXES, SUB_LICENSES_PER_PROVIDER } from "./firebase-config.js";
@@ -237,6 +237,53 @@ export async function regenerateEaKey(user, providerId) {
   const eaKey = randomEaKey();
   await update(providerRef(providerId), { ea_key: eaKey, ea_key_rotated_at: Date.now() });
   return eaKey;
+}
+
+// Random SUB- sub-license code, 8 chars from an unambiguous alphabet
+// (no 0/O/1/I/L). 32^8 ≈ 1.1T combinations so in-batch collisions are
+// astronomically rare; we de-dup within the batch anyway. Same format the
+// Cloud Function's auto-mint path produces on first heartbeat.
+function randomSubLicenseCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  let out = LICENSE_PREFIXES.subLicense;
+  for (let i = 0; i < 8; i++) out += alphabet[bytes[i] % alphabet.length];
+  return out;
+}
+
+// Provider-owner: generate the batch of free sub-license slots on demand
+// (via the dashboard, before the EA first connects). Idempotent — aborts if
+// sub_licenses already contains any codes. Returns the number of codes minted
+// (0 if already populated).
+export async function generateSubLicenseSlots(user, providerId) {
+  const snap = await get(providerRef(providerId));
+  if (!snap.exists()) throw new Error("Provider not found.");
+  const data = snap.val();
+  const isOwner = data.owner_uid === user.uid;
+  const admin = await isAdmin(user.uid);
+  if (!isOwner && !admin) throw new Error("Only the provider's owner (or an admin) can generate sub-license slots.");
+
+  const slotsRef = ref(db, `${DB_PATHS.providers}/${providerId}/sub_licenses`);
+  const result = await runTransaction(slotsRef, (current) => {
+    if (current && typeof current === "object" && Object.keys(current).length > 0) {
+      return; // abort — already populated
+    }
+    const now = Date.now();
+    const out = {};
+    const seen = new Set();
+    while (Object.keys(out).length < SUB_LICENSES_PER_PROVIDER) {
+      const code = randomSubLicenseCode();
+      if (seen.has(code)) continue;
+      seen.add(code);
+      out[code] = { state: "unused", created_at: now };
+    }
+    return out;
+  });
+
+  if (!result.committed) return 0;
+  const written = result.snapshot.val() || {};
+  return Object.keys(written).length;
 }
 
 // Admin-only: list all providers (for the admin page table).

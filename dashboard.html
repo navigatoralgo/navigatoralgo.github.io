@@ -367,6 +367,7 @@
           </tbody>
         </table>
       </div>
+      <p id="slotsStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-top:14px;letter-spacing:0.05em;"></p>
     </div>
 
     <div class="panel">
@@ -448,7 +449,7 @@
   import {
     watchAuth, signOutUser,
     getUserProviderId, subscribeProvider, claimProvider, countActiveCopiers,
-    regenerateEaKey
+    regenerateEaKey, generateSubLicenseSlots
   } from "./assets/app.js";
 
   const $ = (id) => document.getElementById(id);
@@ -576,7 +577,34 @@
     const body = $("slotsBody");
     body.innerHTML = "";
     if (!subCodes.length) {
-      body.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">No sub-licenses generated yet. Your 10 free slots will appear here after your EA's first connection to Firebase.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">
+        No sub-licenses generated yet. Your Provider EA's first connection will mint them automatically —
+        or you can <button id="generateSlotsBtn" class="btn btn-primary" style="padding:8px 16px;font-size:11px;margin-left:6px;">Generate 10 slots now</button>
+      </td></tr>`;
+      const genBtn = $("generateSlotsBtn");
+      if (genBtn) {
+        genBtn.addEventListener("click", async () => {
+          genBtn.disabled = true;
+          const status = $("slotsStatus");
+          status.textContent = "Minting 10 sub-license codes…";
+          status.style.color = "var(--muted)";
+          try {
+            const n = await generateSubLicenseSlots(currentUser, currentProviderId);
+            if (n > 0) {
+              status.textContent = `✓ Minted ${n} codes. They’re in the table below — copy one to share with a tester.`;
+              status.style.color = "var(--teal)";
+            } else {
+              status.textContent = "Codes already existed — nothing to do.";
+              status.style.color = "var(--muted)";
+            }
+          } catch (e) {
+            console.error("[Navigator Algo] generateSubLicenseSlots failed:", e);
+            status.textContent = "Failed: " + (e?.message || String(e));
+            status.style.color = "var(--red)";
+            genBtn.disabled = false;
+          }
+        });
+      }
     } else {
       for (const code of subCodes.sort()) {
         const s = subs[code] || {};

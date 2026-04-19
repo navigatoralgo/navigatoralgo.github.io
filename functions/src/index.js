@@ -29,6 +29,9 @@ const db = getDatabase();
 
 const REGION = "us-central1";
 const FREE_LICENSE_CAP = 10;           // 10 active sub-licenses per provider for the free tier.
+const AUTO_MINT_COUNT = 10;            // number of sub-license codes auto-generated on first heartbeat.
+const SUB_LICENSE_PREFIX = "SUB-";     // matches LICENSE_PREFIXES.subLicense in firebase-config.js.
+const SUB_LICENSE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I/L — unambiguous when spoken.
 const SIGNAL_READ_LIMIT = 50;          // max signals returned per eaRead call.
 const MAX_BODY_BYTES = 16 * 1024;      // 16 KB cap on request body (EA payloads are ~1 KB).
 const RATE_LIMIT_WINDOW_MS = 10_000;   // 10 s window …
@@ -164,7 +167,44 @@ async function writeHeartbeat(pid, payload) {
       await db.ref(`/providers/${pid}/heartbeat_meta`).update(meta);
     }
   }
+  // First heartbeat auto-mints the 10 free sub-license slots. Idempotent via
+  // transaction: if sub_licenses already exists (any state), we abort and noop.
+  // Also safely racy across parallel heartbeats — transaction guarantees a
+  // single writer.
+  await ensureSubLicensesMinted(pid);
   return { ok: true };
+}
+
+// Generates a SUB-XXXXXXXX code from an unambiguous alphabet. Per-code collision
+// probability within one 10-code batch is ~negligible (32^8 ≈ 1.1 trillion
+// combinations). We de-dup within the batch regardless.
+function generateSubLicenseCode() {
+  const bytes = new Uint8Array(8);
+  (globalThis.crypto || require("crypto").webcrypto).getRandomValues(bytes);
+  let out = SUB_LICENSE_PREFIX;
+  for (let i = 0; i < 8; i++) out += SUB_LICENSE_ALPHABET[bytes[i] % SUB_LICENSE_ALPHABET.length];
+  return out;
+}
+
+async function ensureSubLicensesMinted(pid) {
+  const ref = db.ref(`/providers/${pid}/sub_licenses`);
+  const txn = await ref.transaction((current) => {
+    if (current && typeof current === "object" && Object.keys(current).length > 0) {
+      // Already minted (or partially populated by some other path). Abort.
+      return;
+    }
+    const now = Date.now();
+    const out = {};
+    const seen = new Set();
+    while (Object.keys(out).length < AUTO_MINT_COUNT) {
+      const code = generateSubLicenseCode();
+      if (seen.has(code)) continue;
+      seen.add(code);
+      out[code] = { state: "unused", created_at: now };
+    }
+    return out;
+  });
+  return txn.committed;
 }
 
 async function writeStat(pid, payload) {
