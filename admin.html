@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Navigator Algo</title>
+<meta name="description" content="Navigator Algo admin console — mint new provider IDs and activation tokens.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+.admin-shell {
+  position: relative; z-index: 1;
+  max-width: 1240px; margin: 0 auto;
+  padding: 172px 48px 80px;
+}
+.admin-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 24px; margin-bottom: 36px; flex-wrap: wrap;
+}
+.admin-header h1 {
+  font-family: var(--font-head);
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 800; letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.admin-header h1 em { color: var(--teal); font-style: normal; }
+.admin-header-sub {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.section-title {
+  font-family: var(--font-head);
+  font-size: 18px; font-weight: 700;
+  color: var(--white);
+  margin-bottom: 18px;
+}
+.section-title em { color: var(--teal); font-style: normal; }
+
+.mint-row {
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+}
+.mint-row .form-input { max-width: 320px; }
+.mint-status {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.05em;
+}
+.mint-status.success { color: var(--green); }
+.mint-status.error   { color: var(--red); }
+
+.minted-card {
+  margin-top: 18px;
+  background: rgba(0,212,200,0.05);
+  border: 1px solid rgba(0,212,200,0.28);
+  border-radius: 16px;
+  padding: 20px 22px;
+}
+.minted-card .section-title { font-size: 14px; margin-bottom: 12px; }
+.minted-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; flex-wrap: wrap;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(36,48,64,0.5);
+}
+.minted-row:last-child { border-bottom: none; }
+.minted-key {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em;
+  color: var(--muted); text-transform: uppercase;
+}
+.minted-val {
+  font-family: var(--font-mono);
+  font-size: 15px; font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.04em;
+}
+.copy-btn {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em;
+  padding: 6px 12px;
+  color: var(--teal);
+  background: rgba(0,212,200,0.06);
+  border: 1px solid rgba(0,212,200,0.3);
+  border-radius: 999px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.copy-btn:hover { background: rgba(0,212,200,0.14); }
+.copy-btn.copied { color: var(--green); border-color: rgba(0,214,150,0.5); }
+
+/* Providers table */
+.prov-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  font-size: 13px;
+}
+.prov-table thead th {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+  text-align: left;
+  padding: 0 14px 10px;
+}
+.prov-table tbody td {
+  background: rgba(22,29,42,0.55);
+  padding: 14px;
+  vertical-align: middle;
+}
+.prov-table tbody tr td:first-child { border-radius: 12px 0 0 12px; }
+.prov-table tbody tr td:last-child  { border-radius: 0 12px 12px 0; }
+.prov-id {
+  font-family: var(--font-mono);
+  font-size: 13px; font-weight: 600;
+  color: var(--white);
+}
+.prov-token {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+.prov-status {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+.prov-status.unclaimed { color: var(--gold); background: rgba(255,196,48,0.06); border-color: rgba(255,196,48,0.3); }
+.prov-status.claimed   { color: var(--green); background: rgba(0,214,150,0.06); border-color: rgba(0,214,150,0.3); }
+.prov-owner {
+  font-size: 11px; color: var(--muted);
+  font-family: var(--font-mono);
+}
+.prov-empty {
+  text-align: center;
+  padding: 40px 20px;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.1em;
+  color: var(--muted); text-transform: uppercase;
+}
+
+.hidden { display: none !important; }
+.centered-loading {
+  text-align: center;
+  padding: 120px 40px;
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+}
+.centered-error {
+  text-align: center;
+  padding: 120px 40px;
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.06em;
+  max-width: 640px; margin: 0 auto;
+}
+.centered-error h2 {
+  font-family: var(--font-head);
+  font-size: 22px; color: var(--red);
+  margin-bottom: 12px; letter-spacing: -0.01em; text-transform: none;
+}
+.centered-error p { text-transform: none; letter-spacing: 0; font-size: 13px; }
+.centered-error code { font-size: 11px; }
+
+@media (max-width: 860px) {
+  .admin-shell { padding: 150px 20px 60px; }
+  .prov-table thead { display: none; }
+  .prov-table tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; padding: 10px; }
+  .prov-table tbody td { padding: 6px 4px; background: transparent; }
+  .prov-table tbody tr td:first-child { border-radius: 12px 12px 0 0; background: rgba(22,29,42,0.55); grid-column: 1 / -1; }
+  .prov-table tbody tr td:last-child  { border-radius: 0 0 12px 12px; background: rgba(22,29,42,0.55); grid-column: 1 / -1; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="signal-copier.html">Signal Copier</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li id="nav-auth-slot"><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
+    <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
+  </ul>
+</nav>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">ADMIN CONSOLE</span></div>
+  <div class="status-item">PROVIDER MINTING</div>
+  <div class="status-item">RESTRICTED</div>
+  <div class="status-item">SECURE</div>
+</div>
+
+<main class="admin-shell">
+
+  <div id="loadingState" class="centered-loading">Checking admin access…</div>
+
+  <section id="forbiddenState" class="centered-error hidden">
+    <h2>Admin access required</h2>
+    <p>This console is restricted to accounts on the <code class="mono-code">/admins</code> allowlist in Firebase. Your current sign-in doesn't have admin privileges.</p>
+    <p>If you're the project owner, open the Firebase console → Realtime Database → Data → add a node:</p>
+    <p><code class="mono-code">/admins/&lt;your-uid&gt; = true</code></p>
+    <p>Your UID is shown on your <a href="profile.html" style="color:var(--teal);">profile page</a>.</p>
+    <p style="margin-top:24px;">
+      <a href="index.html" class="btn btn-ghost" style="justify-content:center;">Back to home</a>
+    </p>
+  </section>
+
+  <section id="errorState" class="centered-error hidden"></section>
+
+  <section id="adminState" class="hidden">
+    <div class="admin-header">
+      <div>
+        <h1>Admin <em>console</em></h1>
+        <div class="admin-header-sub">
+          Signed in as <span id="adminEmail" style="color:var(--text);">—</span> · Mint and manage provider credentials
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+
+      <!-- MINT PANEL -->
+      <div class="panel">
+        <div class="section-title">Mint new <em>provider</em></div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">
+          Generates a one-time (Provider&nbsp;ID, Activation&nbsp;Token) pair. Send both to the buyer — they
+          paste them into their dashboard on navigatoralgo.com to claim the provider. Once claimed, only
+          their Firebase account can read or write that provider's data.
+        </p>
+        <form id="mintForm">
+          <div class="mint-row">
+            <input id="mintNameInput" class="form-input" type="text" placeholder="Optional display name (e.g. Buyer's EA name)" maxlength="64">
+            <button type="submit" id="mintBtn" class="btn btn-primary">Mint new pair</button>
+            <span id="mintStatus" class="mint-status"></span>
+          </div>
+        </form>
+
+        <div id="mintedCard" class="minted-card hidden">
+          <div class="section-title">Send these to the <em>buyer</em></div>
+          <div class="minted-row">
+            <span class="minted-key">Provider ID</span>
+            <span class="minted-val" id="mintedId">—</span>
+            <button type="button" class="copy-btn" data-copy-target="mintedId">Copy</button>
+          </div>
+          <div class="minted-row">
+            <span class="minted-key">Activation token</span>
+            <span class="minted-val" id="mintedToken">—</span>
+            <button type="button" class="copy-btn" data-copy-target="mintedToken">Copy</button>
+          </div>
+          <div class="minted-row">
+            <span class="minted-key">Both (one-line)</span>
+            <span class="minted-val" id="mintedCombo" style="font-size:12px;">—</span>
+            <button type="button" class="copy-btn" data-copy-target="mintedCombo">Copy</button>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:12px;margin-bottom:0;">
+            This token is shown once. If you lose it before the buyer claims it, mint a new pair.
+          </p>
+        </div>
+      </div>
+
+      <!-- PROVIDERS LIST -->
+      <div class="panel">
+        <div class="section-title">
+          All <em>providers</em>
+          <button id="refreshBtn" type="button" class="btn btn-ghost" style="font-size:11px;padding:8px 14px;">Refresh</button>
+        </div>
+        <div id="providersList">
+          <div class="prov-empty">Loading providers…</div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+</main>
+
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+      </div>
+      <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
+    </div>
+    <div class="footer-col">
+      <h4>Provider Tools</h4>
+      <a href="signal-copier.html">Signal Copier</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="receiver-download.html">Partner Receiver</a>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <a href="profile.html">Profile</a>
+      <a href="signin.html">Sign in</a>
+    </div>
+    <div class="footer-col">
+      <h4>Links</h4>
+      <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank">MQL5 Store</a>
+      <a href="index.html">Home</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Navigator Trading Systems · All rights reserved</div>
+    <div class="footer-sys">
+      <span class="status-dot"></span> ALL SYSTEMS OPERATIONAL
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+  import {
+    watchAuth, isAdmin, mintProvider, listAllProviders
+  } from "./assets/app.js";
+
+  const $ = (id) => document.getElementById(id);
+  const loadingState   = $("loadingState");
+  const forbiddenState = $("forbiddenState");
+  const errorState     = $("errorState");
+  const adminState     = $("adminState");
+
+  let currentUser = null;
+
+  function show(el) {
+    for (const s of [loadingState, forbiddenState, errorState, adminState]) {
+      s.classList.add("hidden");
+    }
+    el.classList.remove("hidden");
+  }
+
+  function showError(err) {
+    console.error("[Navigator Algo admin]", err);
+    const msg = err?.code === "PERMISSION_DENIED"
+      ? "Firebase rejected the read. Make sure firebase/database.rules.json is published and /admins/" + (currentUser ? currentUser.uid : "<your-uid>") + " is set to true."
+      : (err?.message || String(err));
+    errorState.innerHTML = `<h2>Couldn't load admin console</h2><p>${escapeHtml(msg)}</p>`;
+    show(errorState);
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  function fmtTimestamp(ts) {
+    if (!ts) return "—";
+    try {
+      const n = typeof ts === "number" ? ts : Number(ts);
+      if (!Number.isFinite(n)) return "—";
+      return new Date(n).toLocaleString();
+    } catch { return "—"; }
+  }
+
+  async function refreshProvidersList() {
+    const listEl = $("providersList");
+    listEl.innerHTML = `<div class="prov-empty">Loading providers…</div>`;
+    try {
+      const rows = await listAllProviders();
+      if (!rows.length) {
+        listEl.innerHTML = `<div class="prov-empty">No providers minted yet. Use the button above to create your first pair.</div>`;
+        return;
+      }
+      const html = `
+        <table class="prov-table">
+          <thead>
+            <tr>
+              <th>Provider ID</th>
+              <th>Activation token</th>
+              <th>Status</th>
+              <th>Owner</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((r) => {
+              const pid = r.providerId;
+              const d = r.data || {};
+              const claimed = !!d.owner_uid;
+              const statusCls = claimed ? "claimed" : "unclaimed";
+              const statusTxt = claimed ? "Claimed" : "Unclaimed";
+              const ownerTxt = claimed
+                ? (d.owner_email || d.owner_uid || "—")
+                : "—";
+              const tokenTxt = claimed ? "—" : (d.claim_token || "—");
+              return `
+                <tr>
+                  <td><span class="prov-id">${escapeHtml(pid)}</span></td>
+                  <td><span class="prov-token">${escapeHtml(tokenTxt)}</span></td>
+                  <td><span class="prov-status ${statusCls}">${statusTxt}</span></td>
+                  <td><span class="prov-owner">${escapeHtml(ownerTxt)}</span></td>
+                  <td><span class="prov-owner">${escapeHtml(fmtTimestamp(d.created_at))}</span></td>
+                </tr>`;
+            }).join("")}
+          </tbody>
+        </table>`;
+      listEl.innerHTML = html;
+    } catch (err) {
+      listEl.innerHTML = `<div class="prov-empty" style="color:var(--red);">Failed to load: ${escapeHtml(err?.message || String(err))}</div>`;
+    }
+  }
+
+  function wireMintForm() {
+    const form = $("mintForm");
+    const btn = $("mintBtn");
+    const status = $("mintStatus");
+    const nameInput = $("mintNameInput");
+    const mintedCard = $("mintedCard");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      status.className = "mint-status";
+      status.textContent = "";
+      btn.disabled = true;
+      const prevLabel = btn.textContent;
+      btn.textContent = "Minting…";
+
+      try {
+        const name = (nameInput.value || "").trim() || null;
+        const { providerId, claimToken } = await mintProvider(currentUser, { display_name: name });
+
+        $("mintedId").textContent = providerId;
+        $("mintedToken").textContent = claimToken;
+        $("mintedCombo").textContent = `${providerId} / ${claimToken}`;
+        mintedCard.classList.remove("hidden");
+
+        status.className = "mint-status success";
+        status.textContent = "Minted.";
+        nameInput.value = "";
+
+        // Refresh list in background
+        refreshProvidersList().catch(() => {});
+      } catch (err) {
+        console.error("[Navigator Algo admin] mint failed:", err);
+        status.className = "mint-status error";
+        status.textContent = err?.code === "PERMISSION_DENIED"
+          ? "Firebase rejected the write — check admin rules + allowlist."
+          : (err?.message || String(err));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = prevLabel;
+      }
+    });
+  }
+
+  // Copy-to-clipboard for .copy-btn buttons.
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".copy-btn");
+    if (!btn) return;
+    const targetId = btn.getAttribute("data-copy-target");
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    const value = target.textContent.trim();
+    try {
+      await navigator.clipboard.writeText(value);
+      const prev = btn.textContent;
+      btn.textContent = "Copied";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = prev;
+        btn.classList.remove("copied");
+      }, 1500);
+    } catch (err) {
+      console.warn("[Navigator Algo admin] clipboard copy failed:", err);
+    }
+  });
+
+  $("refreshBtn").addEventListener("click", () => {
+    refreshProvidersList().catch(() => {});
+  });
+
+  watchAuth(
+    async (user) => {
+      currentUser = user;
+      try {
+        const admin = await isAdmin(user.uid);
+        if (!admin) { show(forbiddenState); return; }
+        $("adminEmail").textContent = user.email || user.uid;
+        show(adminState);
+        wireMintForm();
+        refreshProvidersList().catch(showError);
+      } catch (err) {
+        showError(err);
+      }
+    },
+    () => {
+      // Signed out → bounce to sign-in. Sign-in redirects to /dashboard.html on
+      // success; admins navigate to /admin.html from the nav dropdown.
+      window.location.replace("signin.html");
+    }
+  );
+</script>
+</body>
+</html>

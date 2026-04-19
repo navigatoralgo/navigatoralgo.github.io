@@ -5,7 +5,7 @@
 // Imported by: index.html, signal-copier.html, receiver-download.html,
 //              dashboard.html, signin.html, profile.html
 
-import { watchAuth, signOutUser, touchUserProfile } from "./app.js";
+import { watchAuth, signOutUser, touchUserProfile, isAdmin } from "./app.js";
 
 const slot = document.getElementById("nav-auth-slot");
 if (!slot) {
@@ -51,6 +51,7 @@ function renderSignedIn(user) {
         </div>
         <a href="dashboard.html" role="menuitem">Dashboard</a>
         <a href="profile.html"   role="menuitem">Profile</a>
+        <a href="admin.html"     role="menuitem" id="navAdminLink" style="display:none;">Admin</a>
         <button type="button" id="navSignOutBtn" role="menuitem">Sign out</button>
       </div>
     </div>
@@ -108,6 +109,13 @@ watchAuth(
     // Fire-and-forget refresh of /users/{uid}; errors are non-fatal for nav display.
     touchUserProfile(user).catch((e) => {
       console.warn("[Navigator Algo] touchUserProfile failed:", e?.code || e?.message || e);
+    });
+    // Reveal the "Admin" menu item only for users whose UID is on the
+    // /admins allowlist in Firebase. Non-admins never see the link.
+    isAdmin(user.uid).then((admin) => {
+      if (!admin) return;
+      const link = slot && slot.querySelector("#navAdminLink");
+      if (link) link.style.display = "";
     });
   },
   () => {
