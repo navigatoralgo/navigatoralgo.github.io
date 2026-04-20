@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Provider Detail — Navigator Algo Admin</title>
+<meta name="description" content="Navigator Algo admin console — provider detail view.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+.admin-shell {
+  position: relative; z-index: 1;
+  max-width: 1240px; margin: 0 auto;
+  padding: 172px 48px 80px;
+}
+
+.prov-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.1em;
+  color: var(--muted); text-transform: uppercase;
+  text-decoration: none;
+  margin-bottom: 18px;
+}
+.prov-back:hover { color: var(--teal); }
+
+.prov-hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: flex-end;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.prov-hero h1 {
+  font-family: var(--font-head);
+  font-size: clamp(28px, 3.6vw, 44px);
+  font-weight: 800; letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.prov-hero h1 em { color: var(--teal); font-style: normal; }
+.prov-hero-sub {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.prov-hero-sub .pid-mono {
+  color: var(--white);
+  font-weight: 600;
+}
+.prov-hero-meta {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.status-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.12em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+.status-pill.claimed   { color: var(--green); background: rgba(0,214,150,0.06); border-color: rgba(0,214,150,0.3); }
+.status-pill.unclaimed { color: var(--gold);  background: rgba(255,196,48,0.06); border-color: rgba(255,196,48,0.3); }
+
+/* Panels grid */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.section-title {
+  font-family: var(--font-head);
+  font-size: 18px; font-weight: 700;
+  color: var(--white);
+  margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+}
+.section-title em { color: var(--teal); font-style: normal; }
+
+/* Stats strip inside the detail header */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+.stat-cell {
+  background: rgba(22,29,42,0.55);
+  border: 1px solid rgba(36,48,64,0.5);
+  border-radius: 14px;
+  padding: 14px 18px;
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.14em;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.stat-value {
+  font-family: var(--font-head);
+  font-size: 24px; font-weight: 700;
+  color: var(--white);
+  line-height: 1.1;
+}
+.stat-sub {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Key-value rows for credentials / meta */
+.kv-grid {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  gap: 8px 16px;
+  align-items: center;
+}
+.kv-key {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em;
+  color: var(--muted); text-transform: uppercase;
+}
+.kv-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  word-break: break-all;
+}
+.kv-val.mono-code {
+  background: rgba(22,29,42,0.55);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(36,48,64,0.5);
+}
+.kv-empty { color: var(--muted); font-style: italic; }
+
+.copy-btn {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.1em;
+  padding: 6px 11px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,212,200,0.35);
+  background: rgba(0,212,200,0.06);
+  color: var(--teal);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.copy-btn:hover { background: rgba(0,212,200,0.14); }
+.copy-btn.copied { color: var(--green); border-color: rgba(0,214,150,0.5); }
+
+/* Tables (subs / receivers / signals) */
+.t-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  font-size: 12px;
+}
+.t-table thead th {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+  text-align: left;
+  padding: 0 12px 8px;
+}
+.t-table tbody td {
+  background: rgba(22,29,42,0.55);
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+.t-table tbody tr td:first-child { border-radius: 10px 0 0 10px; }
+.t-table tbody tr td:last-child  { border-radius: 0 10px 10px 0; }
+.t-table tbody td.mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+.t-muted { color: var(--muted); }
+
+.state-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.1em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+.state-pill.active   { color: var(--green); background: rgba(0,214,150,0.06); border-color: rgba(0,214,150,0.3); }
+.state-pill.unused   { color: var(--teal);  background: rgba(0,212,200,0.06); border-color: rgba(0,212,200,0.3); }
+.state-pill.revoked  { color: var(--red);   background: rgba(255,85,85,0.06); border-color: rgba(255,85,85,0.3); }
+.state-pill.expired  { color: var(--gold);  background: rgba(255,196,48,0.06); border-color: rgba(255,196,48,0.3); }
+.state-pill.inactive { color: var(--muted); background: rgba(150,160,175,0.06); border-color: rgba(150,160,175,0.3); }
+.state-pill.free     { color: var(--teal);  background: rgba(0,212,200,0.06); border-color: rgba(0,212,200,0.3); }
+.state-pill.paid     { color: var(--gold);  background: rgba(255,196,48,0.06); border-color: rgba(255,196,48,0.3); }
+
+.empty-row {
+  text-align: center;
+  padding: 24px;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.1em;
+  color: var(--muted); text-transform: uppercase;
+}
+
+/* Raw JSON dump */
+details.raw-json {
+  background: rgba(22,29,42,0.55);
+  border: 1px solid rgba(36,48,64,0.5);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+details.raw-json summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.1em;
+  color: var(--muted); text-transform: uppercase;
+  list-style: none;
+}
+details.raw-json summary::-webkit-details-marker { display: none; }
+details.raw-json pre {
+  margin: 12px 0 0; padding: 12px;
+  background: rgba(10,14,22,0.7);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px; line-height: 1.55;
+  color: var(--text);
+  overflow-x: auto;
+  max-height: 420px; overflow-y: auto;
+}
+
+/* Destructive action (delete button, inline confirm) */
+.row-action {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.08em;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(150,160,175,0.25);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.row-action:hover { color: var(--white); border-color: rgba(150,160,175,0.5); }
+.row-action.danger {
+  color: var(--red);
+  border-color: rgba(255,85,85,0.3);
+}
+.row-action.danger:hover {
+  background: rgba(255,85,85,0.06);
+  border-color: rgba(255,85,85,0.5);
+}
+.row-action.armed {
+  background: rgba(255,85,85,0.14);
+  border-color: rgba(255,85,85,0.6);
+  color: var(--red);
+  box-shadow: 0 0 0 1px rgba(255,85,85,0.15) inset;
+}
+.row-action.armed:hover { background: rgba(255,85,85,0.22); color: var(--white); }
+.row-action.cancel {
+  color: var(--muted);
+  border-color: rgba(150,160,175,0.25);
+  padding: 8px 11px;
+  margin-left: 6px;
+}
+.row-action.cancel:hover {
+  color: var(--white);
+  background: rgba(150,160,175,0.08);
+  border-color: rgba(150,160,175,0.5);
+}
+
+.status-line {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.05em;
+  margin-top: 12px;
+}
+.status-line.success { color: var(--green); }
+.status-line.error   { color: var(--red); }
+
+.hidden { display: none !important; }
+
+.centered-loading {
+  text-align: center;
+  padding: 120px 40px;
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.12em;
+  color: var(--muted); text-transform: uppercase;
+}
+.centered-error {
+  text-align: center;
+  padding: 120px 40px;
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.06em;
+  max-width: 640px; margin: 0 auto;
+}
+.centered-error h2 {
+  font-family: var(--font-head);
+  font-size: 22px; color: var(--red);
+  margin-bottom: 12px; letter-spacing: -0.01em; text-transform: none;
+}
+.centered-error p { text-transform: none; letter-spacing: 0; font-size: 13px; }
+
+@media (max-width: 860px) {
+  .admin-shell { padding: 150px 20px 60px; }
+  .kv-grid { grid-template-columns: 1fr; }
+  .kv-key { margin-top: 8px; }
+  .t-table thead { display: none; }
+  .t-table tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; padding: 10px; }
+  .t-table tbody td { padding: 4px; background: transparent; }
+  .t-table tbody tr td:first-child,
+  .t-table tbody tr td:last-child { background: rgba(22,29,42,0.55); grid-column: 1 / -1; border-radius: 10px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="signal-copier.html">Signal Copier</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li id="nav-auth-slot"><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
+    <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
+  </ul>
+</nav>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">ADMIN CONSOLE</span></div>
+  <div class="status-item">PROVIDER DETAIL</div>
+  <div class="status-item">RESTRICTED</div>
+  <div class="status-item">SECURE</div>
+</div>
+
+<main class="admin-shell">
+
+  <div id="loadingState" class="centered-loading">Checking admin access…</div>
+
+  <section id="forbiddenState" class="centered-error hidden">
+    <h2>Admin access required</h2>
+    <p>This view is restricted to accounts on the <code class="mono-code">/admins</code> allowlist in Firebase.</p>
+    <p style="margin-top:24px;">
+      <a href="admin.html" class="btn btn-ghost" style="justify-content:center;">Back to admin</a>
+    </p>
+  </section>
+
+  <section id="errorState" class="centered-error hidden"></section>
+
+  <section id="detailState" class="hidden">
+
+    <a href="admin.html" class="prov-back">← Back to providers</a>
+
+    <div class="prov-hero">
+      <div>
+        <h1>Provider <em id="heroPid">—</em></h1>
+        <div class="prov-hero-sub">
+          <span id="heroName">—</span>
+          <span id="heroStatus"></span>
+        </div>
+        <div class="prov-hero-meta" id="heroMeta">—</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button id="deleteBtn" type="button" class="row-action danger">Delete provider</button>
+      </div>
+    </div>
+    <div id="deleteStatus" class="status-line"></div>
+
+    <div class="detail-grid">
+
+      <!-- STATS STRIP -->
+      <div class="panel">
+        <div class="section-title">Live <em>stats</em></div>
+        <div id="statStrip" class="stat-grid"></div>
+      </div>
+
+      <!-- CREDENTIALS -->
+      <div class="panel">
+        <div class="section-title">Credentials <em>&amp; identity</em></div>
+        <div id="credGrid" class="kv-grid"></div>
+      </div>
+
+      <!-- SUB-LICENSES -->
+      <div class="panel">
+        <div class="section-title">Sub-<em>licenses</em> <span id="subsCount" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:0.08em;">—</span></div>
+        <div id="subsList"></div>
+      </div>
+
+      <!-- RECEIVERS -->
+      <div class="panel">
+        <div class="section-title">Receivers <em>(bound accounts)</em> <span id="receiversCount" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:0.08em;">—</span></div>
+        <div id="receiversList"></div>
+      </div>
+
+      <!-- SIGNALS -->
+      <div class="panel">
+        <div class="section-title">Recent <em>signals</em> <span id="signalsCount" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:0.08em;">—</span></div>
+        <div id="signalsList"></div>
+      </div>
+
+      <!-- RAW JSON -->
+      <details class="raw-json">
+        <summary>Raw JSON (debug view)</summary>
+        <pre id="rawJson">—</pre>
+      </details>
+
+    </div>
+
+  </section>
+</main>
+
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+      </div>
+      <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
+    </div>
+    <div class="footer-col">
+      <h4>Provider Tools</h4>
+      <a href="signal-copier.html">Signal Copier</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="receiver-download.html">Partner Receiver</a>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <a href="profile.html">Profile</a>
+      <a href="signin.html">Sign in</a>
+    </div>
+    <div class="footer-col">
+      <h4>Links</h4>
+      <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank">MQL5 Store</a>
+      <a href="index.html">Home</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Navigator Trading Systems · All rights reserved</div>
+    <div class="footer-sys">
+      <span class="status-dot"></span> ALL SYSTEMS OPERATIONAL
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="assets/nav-auth.js"></script>
+<script type="module">
+  import {
+    watchAuth, isAdmin, getProvider, deleteProvider
+  } from "./assets/app.js";
+
+  const $ = (id) => document.getElementById(id);
+  const loadingState   = $("loadingState");
+  const forbiddenState = $("forbiddenState");
+  const errorState     = $("errorState");
+  const detailState    = $("detailState");
+
+  let currentUser = null;
+  let providerId = null;
+
+  function show(el) {
+    for (const s of [loadingState, forbiddenState, errorState, detailState]) {
+      s.classList.add("hidden");
+    }
+    el.classList.remove("hidden");
+  }
+
+  function showError(err) {
+    console.error("[Navigator Algo admin-provider]", err);
+    const msg = err?.code === "PERMISSION_DENIED"
+      ? "Firebase rejected the read. Make sure /admins/" + (currentUser ? currentUser.uid : "<your-uid>") + " is set to true."
+      : (err?.message || String(err));
+    errorState.innerHTML = `<h2>Couldn't load provider</h2><p>${escapeHtml(msg)}</p>
+      <p style="margin-top:24px;"><a href="admin.html" class="btn btn-ghost" style="justify-content:center;">Back to admin</a></p>`;
+    show(errorState);
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  function fmtTs(ts) {
+    if (!ts) return "—";
+    const n = typeof ts === "number" ? ts : Number(ts);
+    if (!Number.isFinite(n)) return "—";
+    return new Date(n).toLocaleString();
+  }
+
+  function fmtAgo(ts) {
+    if (!ts) return "—";
+    const n = typeof ts === "number" ? ts : Number(ts);
+    if (!Number.isFinite(n)) return "—";
+    const diff = Date.now() - n;
+    if (diff < 0) return "in the future";
+    const s = Math.floor(diff / 1000);
+    if (s < 60)    return `${s}s ago`;
+    const m = Math.floor(s / 60);
+    if (m < 60)    return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 48)    return `${h}h ago`;
+    const dd = Math.floor(h / 24);
+    return `${dd}d ago`;
+  }
+
+  // ── Inline two-step confirm (shared pattern across admin surfaces). ─────
+  let pendingRevert = null;
+  const ARM_TIMEOUT_MS = 4000;
+  function armInlineConfirm(btn, onConfirm) {
+    const originalText  = btn.textContent;
+    const originalClass = btn.className;
+    let cancelBtn = null;
+    let timer = null;
+    let armed = false;
+    function revert() {
+      if (!armed) return;
+      armed = false;
+      btn.textContent = originalText;
+      btn.className = originalClass;
+      if (cancelBtn) cancelBtn.remove();
+      cancelBtn = null;
+      if (timer) { clearTimeout(timer); timer = null; }
+      if (pendingRevert === revert) pendingRevert = null;
+    }
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      if (armed) {
+        armed = false;
+        if (cancelBtn) cancelBtn.remove();
+        cancelBtn = null;
+        if (timer) { clearTimeout(timer); timer = null; }
+        if (pendingRevert === revert) pendingRevert = null;
+        btn.className = originalClass;
+        await onConfirm();
+        return;
+      }
+      if (pendingRevert && pendingRevert !== revert) pendingRevert();
+      armed = true;
+      pendingRevert = revert;
+      btn.textContent = "Confirm delete?";
+      btn.className = "row-action danger armed";
+      cancelBtn = document.createElement("button");
+      cancelBtn.type = "button";
+      cancelBtn.className = "row-action cancel";
+      cancelBtn.setAttribute("aria-label", "Cancel");
+      cancelBtn.textContent = "✕";
+      cancelBtn.addEventListener("click", (ev) => { ev.stopPropagation(); revert(); });
+      btn.insertAdjacentElement("afterend", cancelBtn);
+      timer = setTimeout(revert, ARM_TIMEOUT_MS);
+    });
+  }
+
+  function wireCopyButtons(root) {
+    root.querySelectorAll("[data-copy]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const text = btn.dataset.copy || "";
+        try {
+          await navigator.clipboard.writeText(text);
+          const orig = btn.textContent;
+          btn.textContent = "Copied";
+          btn.classList.add("copied");
+          setTimeout(() => { btn.textContent = orig; btn.classList.remove("copied"); }, 1400);
+        } catch (e) {
+          console.warn("clipboard failed", e);
+        }
+      });
+    });
+  }
+
+  // ── Rendering ──────────────────────────────────────────────────────────
+  function renderHero(d) {
+    const claimed = !!d.owner_uid;
+    $("heroPid").textContent = providerId;
+    $("heroName").textContent = d.display_name || (claimed ? "(no display name)" : "Awaiting claim");
+    $("heroStatus").innerHTML = claimed
+      ? `<span class="status-pill claimed">Claimed</span>`
+      : `<span class="status-pill unclaimed">Unclaimed</span>`;
+    const owner = claimed ? (d.owner_email || d.owner_uid) : "—";
+    $("heroMeta").innerHTML = `Owner: <span style="color:var(--text);">${escapeHtml(owner)}</span> · Created ${escapeHtml(fmtTs(d.created_at))}`;
+  }
+
+  function renderStats(d) {
+    const stats     = d.stats || {};
+    const signals   = Number(stats.total_signals) || 0;
+    const heartbeat = d.heartbeat || null;
+    const subs      = d.sub_licenses || {};
+    const activeSubs  = Object.values(subs).filter(s => s?.state === "active").length;
+    const unusedSubs  = Object.values(subs).filter(s => s?.state === "unused" || !s?.state).length;
+    const revokedSubs = Object.values(subs).filter(s => s?.state === "revoked").length;
+    const receivers   = d.receivers || {};
+    let freeR = 0, paidR = 0, activeR = 0;
+    for (const a in receivers) {
+      const r = receivers[a] || {};
+      if (r.state !== "active") continue;
+      activeR++;
+      if (r.tier === "paid") paidR++; else freeR++;
+    }
+
+    $("statStrip").innerHTML = `
+      <div class="stat-cell">
+        <div class="stat-label">Signals sent</div>
+        <div class="stat-value">${signals.toLocaleString()}</div>
+        <div class="stat-sub">Last: ${escapeHtml(fmtAgo(stats.last_signal_at))}</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">Sub-licenses</div>
+        <div class="stat-value">${activeSubs} <span style="font-size:14px;color:var(--muted);">/ ${Object.keys(subs).length}</span></div>
+        <div class="stat-sub">${unusedSubs} unused · ${revokedSubs} revoked</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">Active receivers</div>
+        <div class="stat-value">${activeR}</div>
+        <div class="stat-sub">${freeR} free · ${paidR} paid</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">Last heartbeat</div>
+        <div class="stat-value" style="font-size:16px;">${escapeHtml(fmtAgo(heartbeat))}</div>
+        <div class="stat-sub">${escapeHtml(fmtTs(heartbeat))}</div>
+      </div>
+    `;
+  }
+
+  function kvRow(key, val, { copy = false, mono = true } = {}) {
+    const safe = val === null || val === undefined || val === "" ? null : String(val);
+    const valHtml = safe
+      ? `<div class="kv-val ${mono ? "mono-code" : ""}">${escapeHtml(safe)}</div>`
+      : `<div class="kv-val kv-empty">—</div>`;
+    const copyHtml = copy && safe
+      ? `<button type="button" class="copy-btn" data-copy="${escapeHtml(safe)}">Copy</button>`
+      : `<span></span>`;
+    return `<div class="kv-key">${escapeHtml(key)}</div>${valHtml}${copyHtml}`;
+  }
+
+  function renderCredentials(d) {
+    const claimed = !!d.owner_uid;
+    const rows = [
+      kvRow("Provider ID", providerId, { copy: true }),
+      kvRow("Display name", d.display_name, { copy: false, mono: false }),
+      kvRow("Activation token", claimed ? null : d.claim_token, { copy: !claimed }),
+      kvRow("EA key", d.ea_key, { copy: true }),
+      kvRow("EA key rotated", fmtTs(d.ea_key_rotated_at), { mono: true }),
+      kvRow("Owner UID", d.owner_uid, { copy: true }),
+      kvRow("Owner email", d.owner_email, { copy: true }),
+      kvRow("Claimed at", fmtTs(d.claimed_at), { mono: true }),
+      kvRow("Sub-licenses generated", d.sub_licenses_generated_at ? fmtTs(d.sub_licenses_generated_at) : "No", { mono: true })
+    ];
+    const grid = $("credGrid");
+    grid.innerHTML = rows.join("");
+    wireCopyButtons(grid);
+  }
+
+  function renderSubs(d) {
+    const subs = d.sub_licenses || {};
+    const entries = Object.entries(subs).sort((a, b) => {
+      const av = a[1]?.state === "active" ? 0 : a[1]?.state === "unused" ? 1 : 2;
+      const bv = b[1]?.state === "active" ? 0 : b[1]?.state === "unused" ? 1 : 2;
+      if (av !== bv) return av - bv;
+      return a[0].localeCompare(b[0]);
+    });
+    $("subsCount").textContent = `· ${entries.length} total`;
+    const list = $("subsList");
+    if (!entries.length) {
+      list.innerHTML = `<div class="empty-row">No sub-licenses minted yet.</div>`;
+      return;
+    }
+    list.innerHTML = `
+      <table class="t-table">
+        <thead>
+          <tr><th>Code</th><th>State</th><th>Bound account</th><th>Broker</th><th>Activated</th><th>Expires</th></tr>
+        </thead>
+        <tbody>
+          ${entries.map(([code, s]) => {
+            const state = s?.state || "unused";
+            return `<tr>
+              <td class="mono">${escapeHtml(code)}</td>
+              <td><span class="state-pill ${state}">${escapeHtml(state)}</span></td>
+              <td class="mono">${escapeHtml(s?.bound_account || "—")}</td>
+              <td class="mono">${escapeHtml(s?.bound_broker || "—")}</td>
+              <td class="mono t-muted">${escapeHtml(fmtTs(s?.activated_at))}</td>
+              <td class="mono t-muted">${escapeHtml(fmtTs(s?.expires_at))}</td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table>`;
+  }
+
+  function renderReceivers(d) {
+    const rec = d.receivers || {};
+    const entries = Object.entries(rec).sort((a, b) => (b[1]?.last_seen_at || 0) - (a[1]?.last_seen_at || 0));
+    $("receiversCount").textContent = `· ${entries.length} total`;
+    const list = $("receiversList");
+    if (!entries.length) {
+      list.innerHTML = `<div class="empty-row">No receivers have activated yet.</div>`;
+      return;
+    }
+    list.innerHTML = `
+      <table class="t-table">
+        <thead>
+          <tr><th>Account</th><th>Tier</th><th>State</th><th>Broker</th><th>License</th><th>EA</th><th>Last seen</th></tr>
+        </thead>
+        <tbody>
+          ${entries.map(([acct, r]) => {
+            const tier  = r?.tier === "paid" ? "paid" : "free";
+            const state = r?.state || "inactive";
+            return `<tr>
+              <td class="mono">${escapeHtml(acct)}</td>
+              <td><span class="state-pill ${tier}">${tier}</span></td>
+              <td><span class="state-pill ${state}">${escapeHtml(state)}</span></td>
+              <td class="mono">${escapeHtml(r?.bound_broker || "—")}</td>
+              <td class="mono">${escapeHtml(r?.license_code || "—")}</td>
+              <td class="mono">${escapeHtml(r?.ea || "—")}</td>
+              <td class="mono t-muted">${escapeHtml(fmtAgo(r?.last_seen_at))}</td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table>`;
+  }
+
+  function renderSignals(d) {
+    const sig = d.signals || {};
+    // push() keys are lexicographically sortable by timestamp — newest last.
+    const entries = Object.entries(sig).sort((a, b) => b[0].localeCompare(a[0])).slice(0, 50);
+    $("signalsCount").textContent = `· showing ${entries.length} most recent of ${Object.keys(sig).length}`;
+    const list = $("signalsList");
+    if (!entries.length) {
+      list.innerHTML = `<div class="empty-row">No signals sent yet.</div>`;
+      return;
+    }
+    list.innerHTML = `
+      <table class="t-table">
+        <thead>
+          <tr><th>#</th><th>Symbol</th><th>Dir</th><th>Price</th><th>SL</th><th>TP</th><th>Vol</th><th>Sent</th></tr>
+        </thead>
+        <tbody>
+          ${entries.map(([key, s]) => {
+            const seq = s?.seq ?? "—";
+            const dir = (s?.dir || s?.side || "—").toString().toUpperCase();
+            const dirCls = dir === "BUY" ? "active" : dir === "SELL" ? "revoked" : "inactive";
+            return `<tr>
+              <td class="mono t-muted">${escapeHtml(String(seq))}</td>
+              <td class="mono">${escapeHtml(s?.symbol || "—")}</td>
+              <td><span class="state-pill ${dirCls}">${escapeHtml(dir)}</span></td>
+              <td class="mono">${escapeHtml(s?.price ?? "—")}</td>
+              <td class="mono t-muted">${escapeHtml(s?.sl ?? "—")}</td>
+              <td class="mono t-muted">${escapeHtml(s?.tp ?? "—")}</td>
+              <td class="mono">${escapeHtml(s?.volume ?? s?.lots ?? "—")}</td>
+              <td class="mono t-muted">${escapeHtml(fmtAgo(s?.server_ts || s?.ts))}</td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table>`;
+  }
+
+  function renderRaw(d) {
+    $("rawJson").textContent = JSON.stringify(d, null, 2);
+  }
+
+  function renderAll(d) {
+    renderHero(d);
+    renderStats(d);
+    renderCredentials(d);
+    renderSubs(d);
+    renderReceivers(d);
+    renderSignals(d);
+    renderRaw(d);
+  }
+
+  function setDeleteStatus(msg, isError = false) {
+    const el = $("deleteStatus");
+    if (!msg) { el.textContent = ""; el.className = "status-line"; return; }
+    el.textContent = msg;
+    el.className = "status-line " + (isError ? "error" : "success");
+  }
+
+  async function load() {
+    try {
+      const d = await getProvider(providerId);
+      if (!d) {
+        errorState.innerHTML = `<h2>Provider not found</h2>
+          <p><code class="mono-code">${escapeHtml(providerId)}</code> doesn't exist in the database.</p>
+          <p style="margin-top:24px;"><a href="admin.html" class="btn btn-ghost" style="justify-content:center;">Back to admin</a></p>`;
+        show(errorState);
+        return;
+      }
+      renderAll(d);
+      show(detailState);
+    } catch (err) {
+      showError(err);
+    }
+  }
+
+  function wireDelete() {
+    const btn = $("deleteBtn");
+    armInlineConfirm(btn, async () => {
+      btn.disabled = true;
+      btn.textContent = "Deleting…";
+      setDeleteStatus("");
+      try {
+        await deleteProvider(currentUser, providerId);
+        setDeleteStatus(`Deleted ${providerId}. Archived to /deleted_providers/${providerId} — restorable for ~30 days. Redirecting…`);
+        setTimeout(() => { window.location.href = "admin.html"; }, 1500);
+      } catch (e) {
+        console.error(e);
+        setDeleteStatus(`Delete failed: ${e?.message || e}`, true);
+        btn.disabled = false;
+        btn.textContent = "Delete provider";
+      }
+    });
+  }
+
+  // ── Boot ───────────────────────────────────────────────────────────────
+  const params = new URLSearchParams(window.location.search);
+  providerId = (params.get("pid") || "").trim().toUpperCase();
+  if (!providerId) {
+    errorState.innerHTML = `<h2>Missing provider ID</h2>
+      <p>Open this page via the admin providers list.</p>
+      <p style="margin-top:24px;"><a href="admin.html" class="btn btn-ghost" style="justify-content:center;">Back to admin</a></p>`;
+    show(errorState);
+  } else {
+    watchAuth(async (user) => {
+      currentUser = user;
+      try {
+        const admin = await isAdmin(user.uid);
+        if (!admin) { show(forbiddenState); return; }
+        wireDelete();
+        await load();
+      } catch (err) { showError(err); }
+    }, () => {
+      window.location.href = `signin.html?next=${encodeURIComponent("admin-provider.html?pid=" + providerId)}`;
+    });
+  }
+</script>
+</body>
+</html>

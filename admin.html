@@ -99,27 +99,93 @@
 .copy-btn:hover { background: rgba(0,212,200,0.14); }
 .copy-btn.copied { color: var(--green); border-color: rgba(0,214,150,0.5); }
 
-/* Providers table */
-.prov-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 8px;
-  font-size: 13px;
+/* Providers list — card layout. Each row is a clickable card that opens
+   admin-provider.html?pid=… for full detail. Stats are packaged into a
+   small grid so scanning across is natural. */
+.prov-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-.prov-table thead th {
-  font-family: var(--font-mono);
-  font-size: 9px; letter-spacing: 0.12em;
-  color: var(--muted); text-transform: uppercase;
-  text-align: left;
-  padding: 0 14px 10px;
-}
-.prov-table tbody td {
+.prov-card {
+  display: grid;
+  grid-template-columns: 1.2fr 1.8fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 22px;
   background: rgba(22,29,42,0.55);
-  padding: 14px;
-  vertical-align: middle;
+  border: 1px solid rgba(36,48,64,0.5);
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  cursor: pointer;
 }
-.prov-table tbody tr td:first-child { border-radius: 12px 0 0 12px; }
-.prov-table tbody tr td:last-child  { border-radius: 0 12px 12px 0; }
+.prov-card:hover {
+  border-color: rgba(0,212,200,0.4);
+  background: rgba(22,29,42,0.75);
+}
+.prov-card:active { transform: translateY(1px); }
+.prov-card-head {
+  min-width: 0;
+}
+.prov-card-pid {
+  font-family: var(--font-mono);
+  font-size: 15px; font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+.prov-card-name {
+  font-family: var(--font-head);
+  font-size: 13px; color: var(--text);
+  margin-bottom: 6px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.prov-card-owner {
+  font-family: var(--font-mono);
+  font-size: 11px; color: var(--muted);
+  letter-spacing: 0.03em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.prov-card-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.prov-stat-label {
+  font-family: var(--font-mono);
+  font-size: 8px; letter-spacing: 0.14em;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.prov-stat-value {
+  font-family: var(--font-head);
+  font-size: 18px; font-weight: 700;
+  color: var(--white);
+  line-height: 1.1;
+}
+.prov-stat-sub {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.prov-stat-sub .k-teal  { color: var(--teal); }
+.prov-stat-sub .k-green { color: var(--green); }
+.prov-stat-sub .k-gold  { color: var(--gold); }
+.prov-card-side {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+  min-width: 120px;
+}
+.prov-card-meta {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.05em;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* Legacy table styles retained in case any other admin view re-uses them. */
 .prov-id {
   font-family: var(--font-mono);
   font-size: 13px; font-weight: 600;
@@ -280,11 +346,9 @@
 
 @media (max-width: 860px) {
   .admin-shell { padding: 150px 20px 60px; }
-  .prov-table thead { display: none; }
-  .prov-table tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; padding: 10px; }
-  .prov-table tbody td { padding: 6px 4px; background: transparent; }
-  .prov-table tbody tr td:first-child { border-radius: 12px 12px 0 0; background: rgba(22,29,42,0.55); grid-column: 1 / -1; }
-  .prov-table tbody tr td:last-child  { border-radius: 0 0 12px 12px; background: rgba(22,29,42,0.55); grid-column: 1 / -1; }
+  .prov-card { grid-template-columns: 1fr; gap: 14px; padding: 16px; }
+  .prov-card-stats { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .prov-card-side { align-items: flex-start; }
 }
 </style>
 </head>
@@ -584,66 +648,70 @@
         return;
       }
       const html = `
-        <table class="prov-table">
-          <thead>
-            <tr>
-              <th>Provider</th>
-              <th>Credentials</th>
-              <th>Status</th>
-              <th>Signals</th>
-              <th>Subs</th>
-              <th>Receivers</th>
-              <th>Last beat</th>
-              <th>Created</th>
-              <th style="text-align:right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map((r) => {
-              const pid = r.providerId;
-              const d = r.data || {};
-              const claimed = !!d.owner_uid;
-              const statusCls = claimed ? "claimed" : "unclaimed";
-              const statusTxt = claimed ? "Claimed" : "Unclaimed";
-              const ownerTxt = claimed
-                ? (d.owner_email || d.owner_uid || "—")
-                : "—";
-              const tokenTxt = claimed ? "—" : (d.claim_token || "—");
-              const eaKeyTxt = d.ea_key || "—";
-              const displayName = d.display_name || "—";
-              const c = perProviderCounts(d);
-              return `
-                <tr>
-                  <td>
-                    <div class="prov-id">${escapeHtml(pid)}</div>
-                    <div class="prov-owner" style="margin-top:4px;">${escapeHtml(displayName)}</div>
-                  </td>
-                  <td>
-                    <div class="prov-token">Token: ${escapeHtml(tokenTxt)}</div>
-                    <div class="prov-token" style="margin-top:2px;">EA: ${escapeHtml(eaKeyTxt)}</div>
-                    <div class="prov-owner" style="margin-top:4px;">${escapeHtml(ownerTxt)}</div>
-                  </td>
-                  <td><span class="prov-status ${statusCls}">${statusTxt}</span></td>
-                  <td><span class="chip ${c.signals > 0 ? 'teal' : 'muted'}">${c.signals.toLocaleString()}</span></td>
-                  <td>
-                    <span class="chip green">${c.subs_active}A</span>
-                    <span class="chip muted" style="margin-left:4px;">${c.subs_unused}U</span>
-                  </td>
-                  <td>
-                    <span class="chip teal">${c.receivers_free}F</span>
-                    <span class="chip gold" style="margin-left:4px;">${c.receivers_paid}P</span>
-                  </td>
-                  <td><span class="prov-owner">${escapeHtml(fmtTimestamp(c.last_heartbeat))}</span></td>
-                  <td><span class="prov-owner">${escapeHtml(fmtTimestamp(d.created_at))}</span></td>
-                  <td style="text-align:right;">
-                    <span class="row-actions"><button type="button" class="row-action danger" data-delete="${escapeHtml(pid)}">Delete</button></span>
-                  </td>
-                </tr>`;
-            }).join("")}
-          </tbody>
-        </table>`;
+        <div class="prov-list">
+          ${rows.map((r) => {
+            const pid = r.providerId;
+            const d = r.data || {};
+            const claimed = !!d.owner_uid;
+            const statusCls = claimed ? "claimed" : "unclaimed";
+            const statusTxt = claimed ? "Claimed" : "Unclaimed";
+            const ownerTxt = claimed ? (d.owner_email || d.owner_uid || "—") : "Unclaimed";
+            const displayName = d.display_name || (claimed ? "—" : "Awaiting claim");
+            const c = perProviderCounts(d);
+            const detailUrl = `admin-provider.html?pid=${encodeURIComponent(pid)}`;
+            return `
+              <div class="prov-card" role="link" tabindex="0" data-href="${detailUrl}" data-pid="${escapeHtml(pid)}">
+                <div class="prov-card-head">
+                  <div class="prov-card-pid">${escapeHtml(pid)}</div>
+                  <div class="prov-card-name">${escapeHtml(displayName)}</div>
+                  <div class="prov-card-owner">${escapeHtml(ownerTxt)}</div>
+                  <div style="margin-top:8px;"><span class="prov-status ${statusCls}">${statusTxt}</span></div>
+                </div>
+                <div class="prov-card-stats">
+                  <div>
+                    <div class="prov-stat-label">Signals</div>
+                    <div class="prov-stat-value">${c.signals.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div class="prov-stat-label">Active subs</div>
+                    <div class="prov-stat-value">${c.subs_active}</div>
+                    <div class="prov-stat-sub"><span class="k-teal">${c.subs_unused} unused</span></div>
+                  </div>
+                  <div>
+                    <div class="prov-stat-label">Receivers</div>
+                    <div class="prov-stat-value">${c.receivers_free + c.receivers_paid}</div>
+                    <div class="prov-stat-sub"><span class="k-teal">${c.receivers_free}F</span> · <span class="k-gold">${c.receivers_paid}P</span></div>
+                  </div>
+                  <div>
+                    <div class="prov-stat-label">Last beat</div>
+                    <div class="prov-stat-value" style="font-size:12px;font-weight:600;">${escapeHtml(fmtTimestamp(c.last_heartbeat))}</div>
+                  </div>
+                </div>
+                <div class="prov-card-side" data-noclick>
+                  <div class="prov-card-meta">Created<br>${escapeHtml(fmtTimestamp(d.created_at))}</div>
+                  <span class="row-actions"><button type="button" class="row-action danger" data-delete="${escapeHtml(pid)}">Delete</button></span>
+                </div>
+              </div>`;
+          }).join("")}
+        </div>`;
       listEl.innerHTML = html;
 
+      // Make each card open the detail page on click — but ignore clicks that
+      // land inside the [data-noclick] action zone (delete button + its confirm
+      // + cancel siblings) so destructive actions don't accidentally navigate.
+      listEl.querySelectorAll(".prov-card").forEach(card => {
+        const go = () => { const href = card.dataset.href; if (href) window.location.href = href; };
+        card.addEventListener("click", (e) => {
+          if (e.target.closest("[data-noclick]")) return;
+          go();
+        });
+        card.addEventListener("keydown", (e) => {
+          if ((e.key === "Enter" || e.key === " ") && !e.target.closest("[data-noclick]")) {
+            e.preventDefault();
+            go();
+          }
+        });
+      });
       listEl.querySelectorAll("[data-delete]").forEach(btn => {
         armInlineConfirm(btn, async () => {
           const pid = btn.dataset.delete;
