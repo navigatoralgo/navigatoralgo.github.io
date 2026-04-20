@@ -114,6 +114,28 @@
       }
     },
 
+    "rec_licenses": {
+      "_comment": "Paid Pro-Receiver licenses (REC-XXXXXXXX). One node per purchased Pro Receiver on MQL5 Market. Unlike SUB- codes (which live under /providers/{pid}/sub_licenses and consume a provider's free slot), REC- codes are user-owned, time-limited, and independent of any provider's 10-slot cap. The receiver chooses which provider to follow at activation (following_pid). Admins mint / revoke / expire from /admin.html. Cloud Functions read here when an EA presents a REC- prefixed code.",
+      ".read":  "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+
+      "$code": {
+        ".validate": "newData.hasChildren(['state','created_at'])",
+        "state":          { ".validate": "newData.val() === 'unused' || newData.val() === 'active' || newData.val() === 'revoked' || newData.val() === 'expired'" },
+        "created_at":     { ".validate": "newData.isNumber()" },
+        "created_by_uid": { ".validate": "newData.isString()" },
+        "owner_email":    { ".validate": "newData.isString() && newData.val().length <= 256 || newData.val() == null" },
+        "mql5_order_id":  { ".validate": "newData.isString() && newData.val().length <= 64 || newData.val() == null" },
+        "note":           { ".validate": "newData.isString() && newData.val().length <= 500 || newData.val() == null" },
+        "expires_at":     { ".validate": "newData.isNumber() || newData.val() == null" },
+        "activated_at":   { ".validate": "newData.isNumber() || newData.val() == null" },
+        "last_seen_at":   { ".validate": "newData.isNumber() || newData.val() == null" },
+        "bound_account":  { ".validate": "newData.isString() && newData.val().length <= 64 || newData.val() == null" },
+        "bound_broker":   { ".validate": "newData.isString() && newData.val().length <= 64 || newData.val() == null" },
+        "following_pid":  { ".validate": "(newData.isString() && newData.val().matches(/^NAV-[A-Z0-9]{3,10}$/)) || newData.val() == null" }
+      }
+    },
+
     "deleted_providers": {
       "_comment": "Archive of providers deleted from the admin console. Admins can list/read to undo; nothing else has access. Manual cleanup after ~30 days (later PR: automated trim).",
       ".read":  "auth != null && root.child('admins').child(auth.uid).val() === true",

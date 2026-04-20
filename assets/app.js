@@ -488,6 +488,228 @@ export async function deleteProvider(adminUser, providerId) {
   return { archived_at: now };
 }
 
+// ── REC- (paid Pro Receiver) LICENSE HELPERS ──
+//
+// REC-XXXXXXXX codes are user-owned, time-limited licenses for the paid Pro
+// Receiver EA sold on MQL5 Market. Unlike SUB- codes (which live under a
+// provider's free 10-slot cap), REC- codes are independent: the buyer picks
+// which provider to follow at first activation (that PID is pinned to the
+// license server-side). Admins mint / revoke / expire / rotate these from
+// /admin.html. Cloud Functions read /rec_licenses/{code} when an EA presents
+// a REC- prefixed license.
+//
+// Schema at /rec_licenses/{code}:
+//   state           "unused" | "active" | "revoked" | "expired"
+//   created_at      number   (ms)
+//   created_by_uid  string   (admin uid)
+//   owner_email     string?  (buyer email from MQL5)
+//   mql5_order_id   string?  (optional buyer-side receipt ref)
+//   note            string?  (free-form admin note)
+//   expires_at      number?  (ms; null = no expiry)
+//   activated_at    number?  (ms; set on first receiver_ack)
+//   last_seen_at    number?  (ms; bumped on each receiver_ack)
+//   bound_account   string?  (MT5 account number from receiver_ack)
+//   bound_broker    string?  (broker name from receiver_ack)
+//   following_pid   string?  (pinned on first activation)
+
+function recLicenseRef(code) {
+  return ref(db, `rec_licenses/${code}`);
+}
+
+// Random REC- code, 8 chars from an unambiguous alphabet (no 0/O/1/I/L).
+// 32^8 ≈ 1.1T combinations; in-batch collisions are astronomically rare,
+// and the mint path re-tries on duplicates anyway.
+function randomRecLicenseCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  let out = LICENSE_PREFIXES.receiverPaid;
+  for (let i = 0; i < 8; i++) out += alphabet[bytes[i] % alphabet.length];
+  return out;
+}
+
+// Admin-only: mint a new REC- license. Returns the license code + the full
+// record that was written. Retries up to 5 times on collision. The minted
+// code has state="unused" until a receiver_ack activates it.
+//
+// opts: { owner_email?, mql5_order_id?, note?, expires_at?, expires_in_days? }
+//   Pass either expires_at (absolute ms) or expires_in_days (e.g. 90 for
+//   3 months). If both are absent the license has no expiry.
+export async function mintRecLicense(adminUser, opts = {}) {
+  if (!adminUser) throw new Error("adminUser required");
+  const now = Date.now();
+  let expiresAt = null;
+  if (typeof opts.expires_at === "number" && opts.expires_at > now) {
+    expiresAt = opts.expires_at;
+  } else if (typeof opts.expires_in_days === "number" && opts.expires_in_days > 0) {
+    expiresAt = now + Math.floor(opts.expires_in_days * 24 * 60 * 60 * 1000);
+  }
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = randomRecLicenseCode();
+    const existing = await get(recLicenseRef(code));
+    if (existing.exists()) continue;
+
+    const record = {
+      state:          "unused",
+      created_at:     now,
+      created_by_uid: adminUser.uid
+    };
+    if (opts.owner_email)    record.owner_email   = String(opts.owner_email).slice(0, 256);
+    if (opts.mql5_order_id)  record.mql5_order_id = String(opts.mql5_order_id).slice(0, 64);
+    if (opts.note)           record.note          = String(opts.note).slice(0, 500);
+    if (expiresAt)           record.expires_at    = expiresAt;
+
+    await set(recLicenseRef(code), record);
+    return { code, record };
+  }
+  throw new Error("Could not mint a unique REC- code after 5 attempts. Try again.");
+}
+
+// Admin-only: list every REC- license, newest first. Returns an array of
+// { code, data } records. Use for the admin console table.
+export async function listAllRecLicenses() {
+  const snap = await get(ref(db, "rec_licenses"));
+  if (!snap.exists()) return [];
+  const all = snap.val();
+  return Object.keys(all)
+    .map((code) => ({ code, data: all[code] || {} }))
+    .sort((a, b) => (b.data.created_at || 0) - (a.data.created_at || 0));
+}
+
+// Admin-only: flip a REC- license to "revoked". Next receiver poll returns
+// 403 license_revoked within ~1 s. Does not delete the record so you can see
+// the history in the admin console.
+export async function revokeRecLicense(adminUser, code) {
+  if (!adminUser || !code) throw new Error("adminUser + code required");
+  const snap = await get(recLicenseRef(code));
+  if (!snap.exists()) throw new Error(`REC license ${code} not found.`);
+  const prev = snap.val() || {};
+  const boundAcct = prev.bound_account;
+  const followingPid = prev.following_pid;
+
+  const updates = {
+    [`rec_licenses/${code}/state`]: "revoked"
+  };
+  // Also mark the paid receiver row inactive on the provider's dashboard so
+  // their Active Copiers count drops immediately.
+  if (followingPid && boundAcct) {
+    updates[`${DB_PATHS.providers}/${followingPid}/receivers/${boundAcct}/state`] = "inactive";
+  }
+  await update(ref(db), updates);
+}
+
+// Admin-only: extend (or set) a REC- license's expiry. Pass either
+// new_expires_at (absolute ms) or extend_days (relative to the current
+// expires_at, or to now if none was set). Useful for "buyer renewed" flows.
+export async function updateRecLicenseExpiry(adminUser, code, opts = {}) {
+  if (!adminUser || !code) throw new Error("adminUser + code required");
+  const snap = await get(recLicenseRef(code));
+  if (!snap.exists()) throw new Error(`REC license ${code} not found.`);
+  const prev = snap.val() || {};
+
+  let newExpiresAt = null;
+  if (typeof opts.new_expires_at === "number" && opts.new_expires_at > 0) {
+    newExpiresAt = opts.new_expires_at;
+  } else if (typeof opts.extend_days === "number" && opts.extend_days > 0) {
+    const base = typeof prev.expires_at === "number" && prev.expires_at > Date.now()
+      ? prev.expires_at
+      : Date.now();
+    newExpiresAt = base + Math.floor(opts.extend_days * 24 * 60 * 60 * 1000);
+  } else if (opts.clear === true) {
+    newExpiresAt = null;
+  } else {
+    throw new Error("Pass new_expires_at (ms), extend_days (number), or clear:true.");
+  }
+
+  const updates = { [`rec_licenses/${code}/expires_at`]: newExpiresAt };
+  // If it was expired and we're pushing the date forward, also un-expire the
+  // state so the receiver starts working again on next poll.
+  if (prev.state === "expired" && (newExpiresAt == null || newExpiresAt > Date.now())) {
+    updates[`rec_licenses/${code}/state`] = prev.bound_account ? "active" : "unused";
+  }
+  await update(ref(db), updates);
+  return { new_expires_at: newExpiresAt };
+}
+
+// Admin-only: rotate a REC- license code. Deletes the old record entirely
+// (so a stale Cloud Function cache can't resurrect it) and mints a new code
+// that carries over the expiry / following_pid / buyer metadata. Use when
+// a buyer reports the code was leaked. Returns the new code.
+export async function rotateRecLicense(adminUser, oldCode) {
+  if (!adminUser || !oldCode) throw new Error("adminUser + oldCode required");
+  const snap = await get(recLicenseRef(oldCode));
+  if (!snap.exists()) throw new Error(`REC license ${oldCode} not found.`);
+  const prev = snap.val() || {};
+
+  let newCode;
+  for (let i = 0; i < 8; i++) {
+    const candidate = randomRecLicenseCode();
+    const collision = await get(recLicenseRef(candidate));
+    if (!collision.exists()) { newCode = candidate; break; }
+  }
+  if (!newCode) throw new Error("Could not generate a unique new REC- code. Try again.");
+
+  const now = Date.now();
+  const newRecord = {
+    state:          prev.bound_account ? "active" : "unused",
+    created_at:     now,
+    created_by_uid: adminUser.uid,
+    rotated_from:   oldCode
+  };
+  if (prev.owner_email)    newRecord.owner_email   = prev.owner_email;
+  if (prev.mql5_order_id)  newRecord.mql5_order_id = prev.mql5_order_id;
+  if (prev.note)           newRecord.note          = prev.note;
+  if (prev.expires_at)     newRecord.expires_at    = prev.expires_at;
+  if (prev.bound_account)  newRecord.bound_account = prev.bound_account;
+  if (prev.bound_broker)   newRecord.bound_broker  = prev.bound_broker;
+  if (prev.following_pid)  newRecord.following_pid = prev.following_pid;
+  if (prev.activated_at)   newRecord.activated_at  = prev.activated_at;
+
+  const updates = {
+    [`rec_licenses/${oldCode}`]: null,   // delete old
+    [`rec_licenses/${newCode}`]: newRecord
+  };
+  // Repoint the provider's receiver row at the new code so the dashboard
+  // stays consistent.
+  if (prev.following_pid && prev.bound_account) {
+    updates[`${DB_PATHS.providers}/${prev.following_pid}/receivers/${prev.bound_account}/license_code`] = newCode;
+  }
+  await update(ref(db), updates);
+  return newCode;
+}
+
+// Admin-only: permanently delete a REC- license record. Use for test/mistake
+// cleanup; for revocation prefer revokeRecLicense (keeps the audit trail).
+export async function deleteRecLicense(adminUser, code) {
+  if (!adminUser || !code) throw new Error("adminUser + code required");
+  await remove(recLicenseRef(code));
+}
+
+// Roll up a list of REC license records into counts for the admin KPI strip.
+// Cheap pure function — no network.
+export function rollupRecLicenseStats(rows) {
+  const out = {
+    rec_total: 0, rec_unused: 0, rec_active: 0, rec_revoked: 0, rec_expired: 0,
+    rec_expiring_soon_7d: 0
+  };
+  const now = Date.now();
+  const soonWindow = 7 * 24 * 60 * 60 * 1000;
+  for (const r of rows) {
+    out.rec_total++;
+    const s = r.data?.state || "unused";
+    if (s === "unused")  out.rec_unused++;
+    if (s === "active")  out.rec_active++;
+    if (s === "revoked") out.rec_revoked++;
+    if (s === "expired") out.rec_expired++;
+    if (s === "active" && typeof r.data?.expires_at === "number"
+        && r.data.expires_at > now && r.data.expires_at - now < soonWindow) {
+      out.rec_expiring_soon_7d++;
+    }
+  }
+  return out;
+}
+
 // ── DATABASE HELPERS ──
 
 export function providerRef(providerId) {
