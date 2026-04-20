@@ -139,7 +139,7 @@
 
       "$code": {
         "_comment": "Per-code rules grant narrower access than the collection-level .read/.write: a provider can read + mint + revoke codes they own (created_by_pid matches a provider whose owner_uid is auth.uid), scoped so they cannot touch other providers' codes or admin-minted codes.",
-        ".read":  "auth != null && (root.child('admins').child(auth.uid).val() === true || (data.child('created_by_pid').exists() && root.child('providers').child(data.child('created_by_pid').val()).child('owner_uid').val() === auth.uid))",
+        ".read":  "auth != null && (root.child('admins').child(auth.uid).val() === true || !data.exists() || (data.child('created_by_pid').exists() && root.child('providers').child(data.child('created_by_pid').val()).child('owner_uid').val() === auth.uid))",
         ".write": "auth != null && (root.child('admins').child(auth.uid).val() === true || (!data.exists() && newData.child('created_by_pid').exists() && root.child('providers').child(newData.child('created_by_pid').val()).child('owner_uid').val() === auth.uid && newData.child('created_by_uid').val() === auth.uid && newData.child('following_pid').val() === newData.child('created_by_pid').val()) || (data.exists() && data.child('created_by_pid').exists() && root.child('providers').child(data.child('created_by_pid').val()).child('owner_uid').val() === auth.uid))",
         ".validate": "newData.hasChildren(['state','created_at'])",
         "state":          { ".validate": "newData.val() === 'unused' || newData.val() === 'active' || newData.val() === 'revoked' || newData.val() === 'expired'" },
