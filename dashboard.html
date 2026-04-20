@@ -165,6 +165,31 @@
   border-color: rgba(255,85,85,0.5);
   color: var(--red);
 }
+/* Armed two-step confirm: destructive button flips to a filled red "Confirm?"
+   pill so it reads as clearly more committed than the calmer idle state. */
+.slot-action.armed {
+  background: rgba(255,85,85,0.14);
+  border-color: rgba(255,85,85,0.6);
+  color: var(--red);
+  box-shadow: 0 0 0 1px rgba(255,85,85,0.15) inset;
+}
+.slot-action.armed:hover {
+  background: rgba(255,85,85,0.22);
+  color: var(--white);
+}
+/* The inline ✕ cancel sibling. Subtle grey; not a real action, just an escape hatch. */
+.slot-action.cancel {
+  color: var(--muted);
+  border-color: rgba(150,160,175,0.25);
+  padding: 6px 9px;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+.slot-action.cancel:hover {
+  color: var(--white);
+  background: rgba(150,160,175,0.08);
+  border-color: rgba(150,160,175,0.5);
+}
 
 /* Claim provider modal / empty state */
 .claim-panel {
@@ -481,6 +506,64 @@
     status.style.color = isErr ? "var(--red)" : "var(--teal)";
   }
 
+  // Inline two-step confirmation for destructive row actions. First click arms
+  // the button (text flips to "Confirm?", danger styling, adds an inline ✕
+  // cancel sibling). Second click fires onConfirm. Cancel button or a 4 s
+  // timeout reverts. Only one armed action across the whole table at a time —
+  // arming a new row auto-reverts the previous one. Cheaper + prettier than a
+  // modal, keeps the table inline, zero layout jank.
+  let pendingRevert = null; // () => void that reverts the currently-armed btn
+  const ARM_TIMEOUT_MS = 4000;
+
+  function armInlineConfirm(btn, onConfirm, opts = {}) {
+    const originalText  = btn.textContent;
+    const originalClass = btn.className;
+    let cancelBtn = null;
+    let timer = null;
+    let armed = false;
+
+    function revert() {
+      if (!armed) return;
+      armed = false;
+      btn.textContent = originalText;
+      btn.className = originalClass;
+      if (cancelBtn) cancelBtn.remove();
+      cancelBtn = null;
+      if (timer) { clearTimeout(timer); timer = null; }
+      if (pendingRevert === revert) pendingRevert = null;
+    }
+
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      if (armed) {
+        // Second click — fire the action. Revert the UI so onConfirm starts
+        // from a clean button, then run it.
+        armed = false;
+        if (cancelBtn) cancelBtn.remove();
+        cancelBtn = null;
+        if (timer) { clearTimeout(timer); timer = null; }
+        if (pendingRevert === revert) pendingRevert = null;
+        btn.className = originalClass;
+        await onConfirm();
+        return;
+      }
+      // First click — arm. Revert any other row's pending confirm first.
+      if (pendingRevert && pendingRevert !== revert) pendingRevert();
+      armed = true;
+      pendingRevert = revert;
+      btn.textContent = "Confirm?";
+      btn.className = "slot-action danger armed";
+      cancelBtn = document.createElement("button");
+      cancelBtn.type = "button";
+      cancelBtn.className = "slot-action cancel";
+      cancelBtn.setAttribute("aria-label", "Cancel");
+      cancelBtn.textContent = "✕";
+      cancelBtn.addEventListener("click", (ev) => { ev.stopPropagation(); revert(); });
+      btn.insertAdjacentElement("afterend", cancelBtn);
+      timer = setTimeout(revert, ARM_TIMEOUT_MS);
+    });
+  }
+
   function showError(err) {
     const msg = err?.code === "PERMISSION_DENIED"
       ? "Your Firebase database rules are blocking reads from /users/" + (currentUser?.uid || "") + "."
@@ -649,11 +732,9 @@
       });
 
       body.querySelectorAll("[data-revoke]").forEach(btn => {
-        btn.addEventListener("click", async () => {
+        armInlineConfirm(btn, async () => {
           const code = btn.dataset.revoke;
-          if (!confirm(`Revoke ${code}?\n\nThe receiver's EA will lose access on its next poll (~1s). The slot will show as revoked and its bound account clears. Rotate it later if you want to reuse the slot with a fresh code.`)) return;
           btn.disabled = true;
-          const prev = btn.textContent;
           btn.textContent = "Revoking…";
           try {
             await revokeSubLicense(currentUser, currentProviderId, code);
@@ -662,18 +743,16 @@
             console.error(e);
             setSlotsStatus(`Revoke failed: ${e?.message || e}`, true);
             btn.disabled = false;
-            btn.textContent = prev;
+            btn.textContent = "Revoke";
           }
           // Table re-renders via subscribeProvider; no manual cleanup needed.
-        });
+        }, { kind: "revoke" });
       });
 
       body.querySelectorAll("[data-rotate]").forEach(btn => {
-        btn.addEventListener("click", async () => {
+        armInlineConfirm(btn, async () => {
           const code = btn.dataset.rotate;
-          if (!confirm(`Rotate ${code}?\n\nThe old code will be DELETED from the database — whoever was using it loses access permanently. A fresh SUB-XXXXXXXX code will be generated in its place and copied to your clipboard.`)) return;
           btn.disabled = true;
-          const prev = btn.textContent;
           btn.textContent = "Rotating…";
           try {
             const newCode = await rotateSubLicense(currentUser, currentProviderId, code);
@@ -683,10 +762,10 @@
             console.error(e);
             setSlotsStatus(`Rotate failed: ${e?.message || e}`, true);
             btn.disabled = false;
-            btn.textContent = prev;
+            btn.textContent = "Rotate";
           }
           // Table re-renders via subscribeProvider; no manual cleanup needed.
-        });
+        }, { kind: "rotate" });
       });
     }
 
