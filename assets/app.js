@@ -686,6 +686,130 @@ export async function deleteRecLicense(adminUser, code) {
   await remove(recLicenseRef(code));
 }
 
+// ── PROVIDER-MINTED REC- LICENSES ──
+//
+// In the Navigator Algo business model, the platform sells the Pro Receiver
+// EA on MQL5 Market ($30 / 3 months) but the EA is useless by itself — the
+// buyer needs a REC- code from a signal provider to point the EA at. Providers
+// collect their own subscription fees (Telegram, Discord, their own site)
+// and mint a REC- code for each paying subscriber here. The code is born
+// with following_pid already pinned to the minting provider, so the buyer
+// can't use it to follow anyone else.
+//
+// Auth model: database.rules.json gates writes to /rec_licenses/{code} and
+// /providers/{pid}/issued_rec_licenses/{code} to Firebase users whose UID
+// matches /providers/{pid}/owner_uid — same pattern as SUB- mint / revoke.
+// No Cloud Function required.
+
+// Provider-owner: mint a new REC- code pre-pinned to this provider. The code
+// carries an expiry (defaults to 3 months to match the Pro Receiver's MQL5
+// listing) and an optional subscriber note / email to help the provider
+// track who each code was issued to. Returns { code, record }.
+//
+// opts: { expires_in_days?, expires_at?, owner_email?, note? }
+//   expires_in_days defaults to 90. Pass 0 or null for no expiry (not
+//   recommended — the code never auto-expires if the subscriber stops paying).
+export async function providerMintRecLicense(user, providerId, opts = {}) {
+  if (!user)       throw new Error("user required");
+  if (!providerId) throw new Error("providerId required");
+
+  // Client-side owner check so we can throw a friendly error before the
+  // Firebase rules reject the write.
+  const provSnap = await get(providerRef(providerId));
+  if (!provSnap.exists()) throw new Error(`Provider ${providerId} not found.`);
+  const prov = provSnap.val() || {};
+  if (prov.owner_uid !== user.uid) {
+    throw new Error("Only the provider's owner can mint REC- codes for it.");
+  }
+
+  const now = Date.now();
+  let expiresAt = null;
+  if (typeof opts.expires_at === "number" && opts.expires_at > now) {
+    expiresAt = opts.expires_at;
+  } else if (opts.expires_in_days === null || opts.expires_in_days === 0) {
+    expiresAt = null;
+  } else {
+    const days = (typeof opts.expires_in_days === "number" && opts.expires_in_days > 0)
+      ? opts.expires_in_days
+      : 90;
+    expiresAt = now + Math.floor(days * 24 * 60 * 60 * 1000);
+  }
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = randomRecLicenseCode();
+    const existing = await get(recLicenseRef(code));
+    if (existing.exists()) continue;
+
+    const record = {
+      state:          "unused",
+      created_at:     now,
+      created_by_uid: user.uid,
+      created_by_pid: providerId,
+      following_pid:  providerId
+    };
+    if (opts.owner_email) record.owner_email = String(opts.owner_email).slice(0, 256);
+    if (opts.note)        record.note        = String(opts.note).slice(0, 500);
+    if (expiresAt)        record.expires_at  = expiresAt;
+
+    const updates = {
+      [`rec_licenses/${code}`]: record,
+      [`${DB_PATHS.providers}/${providerId}/issued_rec_licenses/${code}`]: true
+    };
+    await update(ref(db), updates);
+    return { code, record };
+  }
+  throw new Error("Could not mint a unique REC- code after 5 attempts. Try again.");
+}
+
+// Provider-owner: list every REC- code this provider has minted, newest first.
+// Reads the per-provider index at /providers/{pid}/issued_rec_licenses and
+// fetches each /rec_licenses/{code} record in parallel.
+export async function listProviderRecLicenses(user, providerId) {
+  if (!user)       throw new Error("user required");
+  if (!providerId) throw new Error("providerId required");
+
+  const indexSnap = await get(ref(db, `${DB_PATHS.providers}/${providerId}/issued_rec_licenses`));
+  if (!indexSnap.exists()) return [];
+  const codes = Object.keys(indexSnap.val() || {});
+  if (!codes.length) return [];
+
+  const records = await Promise.all(codes.map(async (code) => {
+    const snap = await get(recLicenseRef(code));
+    return { code, data: snap.exists() ? snap.val() : null };
+  }));
+  // Drop any stale index entries whose /rec_licenses/{code} was deleted.
+  return records
+    .filter((r) => r.data)
+    .sort((a, b) => (b.data.created_at || 0) - (a.data.created_at || 0));
+}
+
+// Provider-owner: revoke a REC- code they own. Flips state to "revoked"; the
+// Cloud Function's eaRead / eaWrite paths reject the code on the next poll
+// within ~1 s. Does not delete the record so the provider can see the
+// history in their dashboard and re-enable by extending expiry later.
+export async function providerRevokeRecLicense(user, providerId, code) {
+  if (!user)        throw new Error("user required");
+  if (!providerId)  throw new Error("providerId required");
+  if (!code)        throw new Error("code required");
+
+  const snap = await get(recLicenseRef(code));
+  if (!snap.exists()) throw new Error(`REC license ${code} not found.`);
+  const prev = snap.val() || {};
+  if (prev.created_by_pid !== providerId) {
+    throw new Error("This REC- code was not minted by this provider.");
+  }
+
+  const updates = {
+    [`rec_licenses/${code}/state`]: "revoked"
+  };
+  // Also flip the receiver row on the provider's dashboard so the Active
+  // Copiers KPI drops immediately (same pattern as admin-side revoke).
+  if (prev.following_pid && prev.bound_account) {
+    updates[`${DB_PATHS.providers}/${prev.following_pid}/receivers/${prev.bound_account}/state`] = "inactive";
+  }
+  await update(ref(db), updates);
+}
+
 // Roll up a list of REC license records into counts for the admin KPI strip.
 // Cheap pure function — no network.
 export function rollupRecLicenseStats(rows) {

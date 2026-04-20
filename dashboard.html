@@ -397,6 +397,43 @@
       <p id="slotsStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-top:14px;letter-spacing:0.05em;"></p>
     </div>
 
+    <div class="panel" style="margin-bottom: 24px;">
+      <div class="section-title">
+        <span>Paid Pro Receiver <em>licenses</em></span>
+        <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">
+          REC- codes for paying subscribers
+        </span>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;line-height:1.7;">
+        Mint a <code class="mono-code">REC-XXXXXXXX</code> code for each paying subscriber who installs the <strong style="color:var(--text);">Pro Receiver</strong> from the MQL5 Market. Unlike the free <code class="mono-code">SUB-</code> slots above, REC- codes have no 10-slot cap and carry an expiry (defaults to 3 months). Each code is pinned to your Provider ID at mint time — your subscriber's Pro Receiver can only copy <em>your</em> signals with it.
+      </p>
+      <form id="recMintForm" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+        <input id="recOwnerEmail" class="form-input" type="email" placeholder="Subscriber email (optional)" style="max-width:220px;">
+        <input id="recNote" class="form-input" type="text" placeholder="Note (optional)" maxlength="500" style="max-width:220px;">
+        <input id="recExpiresInDays" class="form-input" type="number" placeholder="Expiry (days)" min="1" max="3650" value="90" style="max-width:140px;">
+        <button type="submit" id="recMintBtn" class="btn btn-primary" style="padding:10px 18px;font-size:11px;">Mint REC- code</button>
+        <span id="recMintStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.05em;"></span>
+      </form>
+      <div style="overflow-x:auto;">
+        <table class="slot-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Status</th>
+              <th>Subscriber</th>
+              <th>Bound account</th>
+              <th>Expires</th>
+              <th style="text-align:right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="recBody">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+      <p id="recListStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-top:14px;letter-spacing:0.05em;"></p>
+    </div>
+
     <div class="panel">
       <div class="section-title">
         <span>EA <em>credentials</em></span>
@@ -476,7 +513,8 @@
   import {
     watchAuth, signOutUser,
     getUserProviderId, subscribeProvider, claimProvider, countActiveCopiers,
-    regenerateEaKey, generateSubLicenseSlots, revokeSubLicense, rotateSubLicense
+    regenerateEaKey, generateSubLicenseSlots, revokeSubLicense, rotateSubLicense,
+    providerMintRecLicense, listProviderRecLicenses, providerRevokeRecLicense
   } from "./assets/app.js";
 
   const $ = (id) => document.getElementById(id);
@@ -773,6 +811,91 @@
     const shareUrl = window.location.origin + "/p/" + currentProviderId;
     $("shareUrl").textContent = shareUrl;
     $("previewShareBtn").href = shareUrl;
+
+    // Paid REC- licenses panel — live-reload the table on every dashboard
+    // re-render so newly-minted or revoked codes show up without a manual
+    // refresh. The list lives in a separate RTDB path (not under the provider
+    // node) so subscribeProvider doesn't cover it directly.
+    renderRecLicenses().catch((e) => {
+      console.error("[Navigator Algo] renderRecLicenses failed:", e);
+      setRecListStatus("Could not load REC- licenses: " + (e?.message || e), true);
+    });
+  }
+
+  function setRecMintStatus(msg, isErr = false) {
+    const el = $("recMintStatus");
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = isErr ? "var(--red)" : "var(--teal)";
+  }
+
+  function setRecListStatus(msg, isErr = false) {
+    const el = $("recListStatus");
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = isErr ? "var(--red)" : "var(--muted)";
+  }
+
+  async function renderRecLicenses() {
+    if (!currentUser || !currentProviderId) return;
+    const body = $("recBody");
+    const rows = await listProviderRecLicenses(currentUser, currentProviderId);
+    body.innerHTML = "";
+    if (!rows.length) {
+      body.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">
+        No REC- codes minted yet. Use the form above to mint one for your first paying Pro Receiver subscriber.
+      </td></tr>`;
+      setRecListStatus("");
+      return;
+    }
+    for (const r of rows) {
+      const d = r.data || {};
+      const state = d.state || "unused";
+      const subscriber = d.owner_email
+        ? String(d.owner_email)
+        : (d.note ? String(d.note).slice(0, 40) : "—");
+      const expires = d.expires_at ? fmtDate(d.expires_at) : "never";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><span class="slot-code">${r.code}</span></td>
+        <td><span class="slot-status ${state}">${state}</span></td>
+        <td>${subscriber}</td>
+        <td>${maskAccount(d.bound_account)}</td>
+        <td>${expires}</td>
+        <td style="text-align:right; white-space:nowrap;">
+          <button class="slot-action" data-rec-copy="${r.code}">Copy</button>
+          ${state === "revoked" || state === "expired"
+            ? ""
+            : `<button class="slot-action danger" data-rec-revoke="${r.code}">Revoke</button>`}
+        </td>
+      `;
+      body.appendChild(tr);
+    }
+    body.querySelectorAll("[data-rec-copy]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        navigator.clipboard.writeText(btn.dataset.recCopy);
+        btn.textContent = "Copied";
+        setTimeout(() => btn.textContent = "Copy", 1200);
+      });
+    });
+    body.querySelectorAll("[data-rec-revoke]").forEach(btn => {
+      armInlineConfirm(btn, async () => {
+        const code = btn.dataset.recRevoke;
+        btn.disabled = true;
+        btn.textContent = "Revoking…";
+        try {
+          await providerRevokeRecLicense(currentUser, currentProviderId, code);
+          setRecListStatus(`Revoked ${code}. The Pro Receiver loses access on next poll.`);
+          await renderRecLicenses();
+        } catch (e) {
+          console.error(e);
+          setRecListStatus("Revoke failed: " + (e?.message || e), true);
+          btn.disabled = false;
+          btn.textContent = "Revoke";
+        }
+      }, { kind: "revoke" });
+    });
+    setRecListStatus("");
   }
 
   async function beginClaimFlow() {
@@ -818,6 +941,45 @@
     navigator.clipboard.writeText(t);
     $("copyShareBtn").textContent = "Copied";
     setTimeout(() => $("copyShareBtn").textContent = "Copy link", 1200);
+  });
+
+  // ── PAID REC- MINT FORM ──
+  $("recMintForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!currentUser || !currentProviderId) return;
+    const btn = $("recMintBtn");
+    const emailEl = $("recOwnerEmail");
+    const noteEl  = $("recNote");
+    const daysEl  = $("recExpiresInDays");
+
+    const days = parseInt(daysEl.value, 10);
+    if (!(days > 0 && days <= 3650)) {
+      setRecMintStatus("Expiry must be between 1 and 3650 days.", true);
+      return;
+    }
+
+    btn.disabled = true;
+    const origLabel = btn.textContent;
+    btn.textContent = "Minting…";
+    setRecMintStatus("Minting REC- code…");
+    try {
+      const { code } = await providerMintRecLicense(currentUser, currentProviderId, {
+        owner_email:     emailEl.value.trim() || undefined,
+        note:            noteEl.value.trim()  || undefined,
+        expires_in_days: days
+      });
+      try { await navigator.clipboard.writeText(code); } catch { /* clipboard may fail in rare envs */ }
+      setRecMintStatus(`✓ Minted ${code} — copied to clipboard. Send it to your subscriber.`);
+      emailEl.value = "";
+      noteEl.value  = "";
+      await renderRecLicenses();
+    } catch (err) {
+      console.error("[Navigator Algo] providerMintRecLicense failed:", err);
+      setRecMintStatus("Mint failed: " + (err?.message || err), true);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = origLabel;
+    }
   });
 
   // ── EA CREDENTIALS PANEL ──
