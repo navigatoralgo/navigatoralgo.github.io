@@ -30,7 +30,8 @@ const db = getDatabase();
 const REGION = "us-central1";
 const FREE_LICENSE_CAP = 10;           // 10 active sub-licenses per provider for the free tier.
 const AUTO_MINT_COUNT = 10;            // number of sub-license codes auto-generated on first heartbeat.
-const SUB_LICENSE_PREFIX = "SUB-";     // matches LICENSE_PREFIXES.subLicense in firebase-config.js.
+const SUB_LICENSE_PREFIX = "SUB-";     // matches LICENSE_PREFIXES.subLicense in firebase-config.js. Free Partner Receiver only.
+const REC_LICENSE_PREFIX = "REC-";     // matches LICENSE_PREFIXES.receiverPaid. Paid Pro Receiver (MQL5 Market), stored at /rec_licenses/{code}.
 const SUB_LICENSE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I/L — unambiguous when spoken.
 const SIGNAL_READ_LIMIT = 50;          // max signals returned per eaRead call.
 const MAX_BODY_BYTES = 16 * 1024;      // 16 KB cap on request body (EA payloads are ~1 KB).
@@ -98,16 +99,36 @@ async function readJsonBody(req) {
   throw new Error("bad_json");
 }
 
-// Walk /providers and find the pid whose sub_licenses contains the given code.
-// Used for receiver-side auth where the EA only knows its license_code.
-async function findProviderByLicenseCode(code) {
+// Resolve a license_code presented by a receiver EA to the signal provider it
+// should follow + the license record used for state/expiry checks. Routes by
+// prefix so the two receiver products stay properly separated:
+//
+//   SUB-XXXXXXXX — free Partner Receiver. Code is one of a provider's 10 free
+//                  slots; provider owns it; lookup scans /providers/{pid}/sub_licenses.
+//   REC-XXXXXXXX — paid Pro Receiver (MQL5 Market). Code is user-owned,
+//                  time-limited, independent of any provider's cap. Looked up
+//                  directly at /rec_licenses/{code}; the receiver picked which
+//                  provider to follow at first activation (following_pid).
+//
+// Returns a normalized shape:
+//   { kind: "sub" | "rec", pid, data?, license }
+// or null if the code doesn't resolve.
+async function findLicense(code) {
+  if (typeof code !== "string") return null;
+  if (code.startsWith(REC_LICENSE_PREFIX)) {
+    const snap = await db.ref(`/rec_licenses/${code}`).get();
+    if (!snap.exists()) return null;
+    const license = snap.val();
+    return { kind: "rec", pid: license.following_pid || null, license };
+  }
+  // Default path (includes SUB- and any legacy codes without prefix).
   const snap = await db.ref("/providers").get();
   if (!snap.exists()) return null;
   const all = snap.val();
   for (const pid of Object.keys(all)) {
     const subs = all[pid]?.sub_licenses;
     if (subs && Object.prototype.hasOwnProperty.call(subs, code)) {
-      return { pid, data: all[pid], license: subs[code] };
+      return { kind: "sub", pid, data: all[pid], license: subs[code] };
     }
   }
   return null;
@@ -231,16 +252,18 @@ async function writeStat(pid, payload) {
   return { ok: true };
 }
 
-async function writeReceiverAck(pid, licenseCode, license, payload) {
-  // The receiver's EA is acknowledging it picked up a signal / is live.
-  // payload: { account: "123456", broker: "ICMarkets", last_seq_received: 1487 }
+// Free Partner Receiver (SUB- code) path. Enforces the provider's 10-slot cap
+// on first activation, then writes the activation/heartbeat state under
+// /providers/{pid}/sub_licenses/{code} + /providers/{pid}/receivers/{acct}.
+async function writeReceiverAckSub(pid, licenseCode, license, payload) {
   const acct = payload?.account;
   if (!acct || typeof acct !== "string") return { err: "bad_payload", details: "account required" };
   const now = Date.now();
 
   // Enforce free-tier cap: if this license has never activated AND total
   // currently-active sub_licenses for this provider is already at the cap,
-  // reject.
+  // reject. Paid REC- receivers skip this check entirely — they don't consume
+  // a provider slot.
   if (license.state === "unused" || !license.state) {
     const subsSnap = await db.ref(`/providers/${pid}/sub_licenses`).get();
     const subs = subsSnap.val() || {};
@@ -260,15 +283,14 @@ async function writeReceiverAck(pid, licenseCode, license, payload) {
   });
 
   // Write a receiver record keyed by account — useful for dashboard counts.
-  // `tier` is sent by the EA (NavigatorReceiverFree → "free", NavigatorReceiverPro → "paid").
-  // Legacy EAs that don't send `tier` default to "free" so counts don't crash.
-  const tier = (payload.tier === "paid") ? "paid" : "free";
+  // SUB- codes always resolve to tier:"free". The EA-reported `tier` field is
+  // ignored now that the prefix itself encodes the product.
   const ea = (typeof payload.ea === "string") ? payload.ea.slice(0, 64) : null;
   const recUpdate = {
     state: "active",
     bound_broker: typeof payload.broker === "string" ? payload.broker.slice(0, 64) : null,
     license_code: licenseCode,
-    tier,
+    tier: "free",
     activated_at: license.activated_at || now,
     last_seen_at: now
   };
@@ -276,6 +298,70 @@ async function writeReceiverAck(pid, licenseCode, license, payload) {
   await db.ref(`/providers/${pid}/receivers/${acct}`).update(recUpdate);
 
   return { ok: true };
+}
+
+// Paid Pro Receiver (REC- code) path. License lives at /rec_licenses/{code}
+// and is independent of any provider's free-tier cap. On first activation the
+// receiver must pick a provider to follow via payload.pid_to_follow; that PID
+// is pinned to the license (following_pid) and cannot be silently switched
+// thereafter — an explicit admin rotation is required.
+async function writeReceiverAckRec(licenseCode, license, payload) {
+  const acct = payload?.account;
+  if (!acct || typeof acct !== "string") return { err: "bad_payload", details: "account required" };
+  const now = Date.now();
+
+  // Enforce expiry. If the license has an expires_at in the past, flip state
+  // to "expired" so future lookups can short-circuit without re-checking the
+  // clock, and reject.
+  if (typeof license.expires_at === "number" && license.expires_at > 0 && license.expires_at < now) {
+    if (license.state !== "expired") {
+      await db.ref(`/rec_licenses/${licenseCode}/state`).set("expired");
+    }
+    return { err: "license_expired" };
+  }
+
+  // Pin the provider on first activation; subsequent activations must match.
+  let followingPid = license.following_pid || null;
+  const requestedPid = typeof payload.pid_to_follow === "string" ? payload.pid_to_follow.trim().toUpperCase() : null;
+
+  if (!followingPid) {
+    if (!requestedPid || !/^NAV-[A-Z0-9]{3,10}$/.test(requestedPid)) {
+      return { err: "bad_payload", details: "pid_to_follow required on first activation (NAV-XXXX format)" };
+    }
+    // Verify the provider actually exists before pinning; an EA typo shouldn't
+    // permanently brick the license.
+    const provSnap = await db.ref(`/providers/${requestedPid}`).get();
+    if (!provSnap.exists()) return { err: "provider_not_found", details: `pid_to_follow ${requestedPid} does not exist` };
+    followingPid = requestedPid;
+  } else if (requestedPid && requestedPid !== followingPid) {
+    return { err: "pid_mismatch", details: `license is already pinned to ${followingPid}; contact support to change providers` };
+  }
+
+  // Update the license node
+  await db.ref(`/rec_licenses/${licenseCode}`).update({
+    state: "active",
+    bound_account: acct,
+    bound_broker: typeof payload.broker === "string" ? payload.broker.slice(0, 64) : null,
+    following_pid: followingPid,
+    activated_at: license.activated_at || now,
+    last_seen_at: now
+  });
+
+  // Mirror as a "paid" receiver under the followed provider so it shows up in
+  // that provider's dashboard counts + admin analytics.
+  const ea = (typeof payload.ea === "string") ? payload.ea.slice(0, 64) : null;
+  const recUpdate = {
+    state: "active",
+    bound_broker: typeof payload.broker === "string" ? payload.broker.slice(0, 64) : null,
+    license_code: licenseCode,
+    tier: "paid",
+    activated_at: license.activated_at || now,
+    last_seen_at: now
+  };
+  if (ea) recUpdate.ea = ea;
+  await db.ref(`/providers/${followingPid}/receivers/${acct}`).update(recUpdate);
+
+  return { ok: true, pid: followingPid };
 }
 
 // ── ENDPOINT: eaWrite ──
@@ -314,11 +400,14 @@ exports.eaWrite = onRequest(
       }
 
       if (VALID_KINDS_RECEIVER.has(kind)) {
-        // Receiver path: needs {license_code}
+        // Receiver path: needs {license_code}. Routed by prefix — SUB- goes to
+        // the free Partner Receiver flow (provider-owned slot), REC- to the
+        // paid Pro Receiver flow (user-owned, time-limited, picks which
+        // provider to follow at first activation).
         if (!license_code || typeof license_code !== "string" || license_code.length < 4 || license_code.length > 64) {
           return err(res, 400, "bad_license_code");
         }
-        const found = await findProviderByLicenseCode(license_code);
+        const found = await findLicense(license_code);
         if (!found) return err(res, 404, "license_not_found");
         if (found.license.state === "revoked") return err(res, 403, "license_revoked");
         if (found.license.state === "expired") return err(res, 403, "license_expired");
@@ -326,9 +415,17 @@ exports.eaWrite = onRequest(
         if (!checkRate(`lic:${license_code}`)) return err(res, 429, "rate_limited");
 
         if (kind === "receiver_ack") {
-          const result = await writeReceiverAck(found.pid, license_code, found.license, payload);
-          if (result?.err) return err(res, result.err === "cap_exceeded" ? 403 : 400, result.err, result.details);
-          return ok(res, { pid: found.pid });
+          const result = found.kind === "rec"
+            ? await writeReceiverAckRec(license_code, found.license, payload)
+            : await writeReceiverAckSub(found.pid, license_code, found.license, payload);
+          if (result?.err) {
+            const status = result.err === "cap_exceeded" ? 403
+                         : result.err === "license_expired" ? 403
+                         : result.err === "provider_not_found" ? 404
+                         : 400;
+            return err(res, status, result.err, result.details);
+          }
+          return ok(res, { pid: result.pid || found.pid });
         }
       }
 
@@ -365,10 +462,23 @@ exports.eaRead = onRequest(
 
       if (!license_code || typeof license_code !== "string") return err(res, 400, "bad_license_code");
 
-      const found = await findProviderByLicenseCode(license_code);
+      const found = await findLicense(license_code);
       if (!found) return err(res, 404, "license_not_found");
       if (found.license.state === "revoked") return err(res, 403, "license_revoked");
       if (found.license.state === "expired") return err(res, 403, "license_expired");
+
+      // REC- licenses enforce expiry on every read too, not just on activation,
+      // so a paid receiver whose subscription lapses stops polling within
+      // a single round-trip even if the background "expire" sweep hasn't run.
+      if (found.kind === "rec" && typeof found.license.expires_at === "number"
+          && found.license.expires_at > 0 && found.license.expires_at < Date.now()) {
+        await db.ref(`/rec_licenses/${license_code}/state`).set("expired");
+        return err(res, 403, "license_expired");
+      }
+
+      // A REC- code that hasn't activated yet has no following_pid — nothing
+      // to read.
+      if (!found.pid) return err(res, 409, "license_not_activated", "call receiver_ack with pid_to_follow first");
 
       if (!checkRate(`read:${license_code}`)) return err(res, 429, "rate_limited");
 

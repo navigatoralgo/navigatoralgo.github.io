@@ -469,6 +469,64 @@
         </div>
       </div>
 
+      <!-- REC- LICENSE MINT + LIST -->
+      <!--
+        REC-XXXXXXXX codes power the paid Pro Receiver EA sold on MQL5 Market.
+        Unlike SUB- codes (provider-owned, consume a free slot), REC- codes
+        are buyer-owned, time-limited, and independent of any provider's cap.
+        The buyer picks which provider to follow at first activation (pinned
+        to the license server-side). One mint per MQL5 purchase; rotate if
+        a code leaks.
+      -->
+      <div class="panel">
+        <div class="section-title">Mint paid <em>Pro Receiver</em> (REC-) license</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">
+          Generates a single <code class="mono-code">REC-XXXXXXXX</code> code for a paid Pro Receiver buyer (MQL5 Market). Give this code to the buyer — their Pro Receiver EA uses it to connect. The first activation pins the chosen Provider&nbsp;ID to the license; after that the receiver only mirrors that provider.
+        </p>
+        <form id="recMintForm">
+          <div class="mint-row">
+            <input id="recOwnerEmail" class="form-input" type="email" placeholder="Buyer email (optional)" maxlength="256" style="max-width:260px;">
+            <input id="recMql5Order" class="form-input" type="text" placeholder="MQL5 order ID (optional)" maxlength="64" style="max-width:220px;">
+            <input id="recExpiresInDays" class="form-input" type="number" placeholder="Expiry (days)" min="1" max="3650" value="90" style="max-width:140px;">
+            <button type="submit" id="recMintBtn" class="btn btn-primary">Mint REC- code</button>
+            <span id="recMintStatus" class="mint-status"></span>
+          </div>
+          <div style="margin-top:10px;">
+            <input id="recNote" class="form-input" type="text" placeholder="Admin note (optional — visible only to admins)" maxlength="500">
+          </div>
+        </form>
+
+        <div id="recMintedCard" class="minted-card hidden">
+          <div class="section-title">Send this to the <em>buyer</em></div>
+          <div class="minted-row">
+            <span class="minted-key">REC license code</span>
+            <span class="minted-val" id="recMintedCode">—</span>
+            <button type="button" class="copy-btn" data-copy-target="recMintedCode">Copy</button>
+          </div>
+          <div class="minted-row">
+            <span class="minted-key">Expires</span>
+            <span class="minted-val" id="recMintedExpiry" style="font-size:13px;">—</span>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:12px;margin-bottom:0;">
+            Buyer pastes <strong style="color:var(--text);">REC license code</strong> + their chosen <strong style="color:var(--text);">Provider ID</strong> into the Pro Receiver EA inputs on their MT5. First connection pins the provider to this license server-side.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">
+          All <em>REC-</em> licenses
+          <button id="recRefreshBtn" type="button" class="btn btn-ghost" style="font-size:11px;padding:8px 14px;">Refresh</button>
+        </div>
+        <p id="recListStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-bottom:12px;letter-spacing:0.05em;"></p>
+        <div id="recKpiStrip" class="kpi-grid" style="margin-bottom:16px;">
+          <div class="prov-empty">Loading…</div>
+        </div>
+        <div id="recList">
+          <div class="prov-empty">Loading licenses…</div>
+        </div>
+      </div>
+
     </div>
 
   </section>
@@ -511,7 +569,9 @@
 <script type="module">
   import {
     watchAuth, isAdmin, mintProvider, listAllProviders,
-    rollupAdminStats, perProviderCounts, deleteProvider
+    rollupAdminStats, perProviderCounts, deleteProvider,
+    mintRecLicense, listAllRecLicenses, revokeRecLicense,
+    updateRecLicenseExpiry, rotateRecLicense, rollupRecLicenseStats
   } from "./assets/app.js";
 
   const $ = (id) => document.getElementById(id);
@@ -736,6 +796,236 @@
     }
   }
 
+  // ── REC- LICENSE UI WIRING ──
+
+  function fmtExpiry(ts) {
+    if (ts == null) return "No expiry";
+    try {
+      const d = new Date(ts);
+      if (Number.isNaN(d.getTime())) return "—";
+      const diffMs = ts - Date.now();
+      const absDays = Math.floor(Math.abs(diffMs) / 86400000);
+      const base = d.toLocaleDateString();
+      if (diffMs <= 0) return `${base} (expired ${absDays}d ago)`;
+      if (absDays < 60)  return `${base} (${absDays}d left)`;
+      return `${base} (${Math.round(absDays / 30)}mo left)`;
+    } catch { return "—"; }
+  }
+
+  function recStateBadgeClass(state) {
+    if (state === "active")  return "claimed";    // green
+    if (state === "unused")  return "unclaimed";  // gold
+    return "";                                    // revoked / expired: plain
+  }
+
+  function renderRecKpiStrip(rollup) {
+    const el = $("recKpiStrip");
+    el.innerHTML = `
+      <div class="kpi-cell">
+        <div class="kpi-label">REC- Licenses</div>
+        <div class="kpi-value">${rollup.rec_total}</div>
+        <div class="kpi-sub"><span class="k-green">${rollup.rec_active} active</span> · <span class="k-teal">${rollup.rec_unused} unused</span></div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Expiring soon</div>
+        <div class="kpi-value">${rollup.rec_expiring_soon_7d}</div>
+        <div class="kpi-sub">active + expires in &lt; 7d</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Revoked</div>
+        <div class="kpi-value">${rollup.rec_revoked}</div>
+        <div class="kpi-sub">manually shut off</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Expired</div>
+        <div class="kpi-value">${rollup.rec_expired}</div>
+        <div class="kpi-sub">past expires_at</div>
+      </div>
+    `;
+  }
+
+  function setRecListStatus(msg, isError = false) {
+    const el = $("recListStatus");
+    if (!msg) { el.textContent = ""; el.className = "mint-status"; return; }
+    el.textContent = msg;
+    el.className = "mint-status " + (isError ? "error" : "success");
+  }
+
+  async function refreshRecLicenses() {
+    const listEl = $("recList");
+    listEl.innerHTML = `<div class="prov-empty">Loading licenses…</div>`;
+    try {
+      const rows = await listAllRecLicenses();
+      renderRecKpiStrip(rollupRecLicenseStats(rows));
+      if (!rows.length) {
+        listEl.innerHTML = `<div class="prov-empty">No REC- licenses minted yet. Use the form above for each paid Pro Receiver buyer.</div>`;
+        return;
+      }
+      const html = `
+        <div class="prov-list">
+          ${rows.map((r) => {
+            const code = r.code;
+            const d = r.data || {};
+            const stateCls = recStateBadgeClass(d.state);
+            const stateTxt = (d.state || "unused").toUpperCase();
+            const followed = d.following_pid || "—";
+            const bound = d.bound_account ? `${d.bound_account}${d.bound_broker ? ` @ ${d.bound_broker}` : ""}` : "Not activated";
+            const owner = d.owner_email || (d.mql5_order_id ? `order ${d.mql5_order_id}` : "—");
+            const lastSeen = d.last_seen_at ? fmtTimestamp(d.last_seen_at) : "Never";
+            return `
+              <div class="prov-card" data-code="${escapeHtml(code)}" style="cursor:default;">
+                <div class="prov-card-head">
+                  <div class="prov-card-pid">${escapeHtml(code)}</div>
+                  <div class="prov-card-name">${escapeHtml(owner)}</div>
+                  <div class="prov-card-owner">${escapeHtml(bound)}</div>
+                  <div style="margin-top:8px;"><span class="prov-status ${stateCls}">${escapeHtml(stateTxt)}</span></div>
+                  ${d.note ? `<div class="prov-card-owner" style="margin-top:6px;opacity:0.8;">${escapeHtml(d.note)}</div>` : ""}
+                </div>
+                <div class="prov-card-stats">
+                  <div>
+                    <div class="prov-stat-label">Follows</div>
+                    <div class="prov-stat-value" style="font-size:14px;">${escapeHtml(followed)}</div>
+                  </div>
+                  <div>
+                    <div class="prov-stat-label">Expires</div>
+                    <div class="prov-stat-value" style="font-size:11px;font-weight:600;">${escapeHtml(fmtExpiry(d.expires_at))}</div>
+                  </div>
+                  <div>
+                    <div class="prov-stat-label">Created</div>
+                    <div class="prov-stat-value" style="font-size:11px;font-weight:600;">${escapeHtml(fmtTimestamp(d.created_at))}</div>
+                  </div>
+                  <div>
+                    <div class="prov-stat-label">Last seen</div>
+                    <div class="prov-stat-value" style="font-size:11px;font-weight:600;">${escapeHtml(lastSeen)}</div>
+                  </div>
+                </div>
+                <div class="prov-card-side" data-noclick>
+                  <span class="row-actions">
+                    <button type="button" class="row-action" data-rec-extend="${escapeHtml(code)}">+30d</button>
+                    <button type="button" class="row-action" data-rec-rotate="${escapeHtml(code)}">Rotate</button>
+                    <button type="button" class="row-action danger" data-rec-revoke="${escapeHtml(code)}">Revoke</button>
+                  </span>
+                </div>
+              </div>`;
+          }).join("")}
+        </div>`;
+      listEl.innerHTML = html;
+      wireRecListActions();
+    } catch (err) {
+      listEl.innerHTML = `<div class="prov-empty" style="color:var(--red);">Failed to load: ${escapeHtml(err?.message || String(err))}</div>`;
+      $("recKpiStrip").innerHTML = `<div class="prov-empty" style="color:var(--red);">Stats unavailable.</div>`;
+    }
+  }
+
+  function wireRecListActions() {
+    // Extend expiry +30d (one-shot, no confirm — it's non-destructive).
+    document.querySelectorAll("[data-rec-extend]").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const code = btn.dataset.recExtend;
+        btn.disabled = true;
+        const prev = btn.textContent;
+        btn.textContent = "…";
+        try {
+          const { new_expires_at } = await updateRecLicenseExpiry(currentUser, code, { extend_days: 30 });
+          setRecListStatus(`${code} extended. New expiry: ${fmtExpiry(new_expires_at)}.`);
+          refreshRecLicenses().catch(() => {});
+        } catch (err) {
+          console.error(err);
+          setRecListStatus(`Extend failed: ${err?.message || err}`, true);
+          btn.disabled = false;
+          btn.textContent = prev;
+        }
+      });
+    });
+
+    // Revoke: two-step confirm (reuses the existing armInlineConfirm helper).
+    document.querySelectorAll("[data-rec-revoke]").forEach(btn => {
+      armInlineConfirm(btn, async () => {
+        const code = btn.dataset.recRevoke;
+        btn.disabled = true;
+        btn.textContent = "Revoking…";
+        setRecListStatus("");
+        try {
+          await revokeRecLicense(currentUser, code);
+          setRecListStatus(`${code} revoked. Receiver will stop working within ~1s.`);
+          refreshRecLicenses().catch(() => {});
+        } catch (err) {
+          console.error(err);
+          setRecListStatus(`Revoke failed: ${err?.message || err}`, true);
+          btn.disabled = false;
+          btn.textContent = "Revoke";
+        }
+      });
+    });
+
+    // Rotate: two-step confirm (code change is disruptive; buyer must update EA).
+    document.querySelectorAll("[data-rec-rotate]").forEach(btn => {
+      armInlineConfirm(btn, async () => {
+        const code = btn.dataset.recRotate;
+        btn.disabled = true;
+        btn.textContent = "Rotating…";
+        setRecListStatus("");
+        try {
+          const newCode = await rotateRecLicense(currentUser, code);
+          setRecListStatus(`${code} → ${newCode}. Send the new code to the buyer; the old one is dead.`);
+          refreshRecLicenses().catch(() => {});
+        } catch (err) {
+          console.error(err);
+          setRecListStatus(`Rotate failed: ${err?.message || err}`, true);
+          btn.disabled = false;
+          btn.textContent = "Rotate";
+        }
+      });
+    });
+  }
+
+  function wireRecMintForm() {
+    const form = $("recMintForm");
+    const btn  = $("recMintBtn");
+    const statusEl = $("recMintStatus");
+    const card = $("recMintedCard");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusEl.className = "mint-status";
+      statusEl.textContent = "";
+      btn.disabled = true;
+      const prevLabel = btn.textContent;
+      btn.textContent = "Minting…";
+      try {
+        const days = Number($("recExpiresInDays").value) || null;
+        const opts = {
+          owner_email:    ($("recOwnerEmail").value || "").trim() || null,
+          mql5_order_id:  ($("recMql5Order").value || "").trim() || null,
+          note:           ($("recNote").value || "").trim() || null,
+          expires_in_days: days
+        };
+        const { code, record } = await mintRecLicense(currentUser, opts);
+        $("recMintedCode").textContent = code;
+        $("recMintedExpiry").textContent = fmtExpiry(record.expires_at || null);
+        card.classList.remove("hidden");
+
+        statusEl.className = "mint-status success";
+        statusEl.textContent = "Minted.";
+        $("recOwnerEmail").value = "";
+        $("recMql5Order").value  = "";
+        $("recNote").value       = "";
+
+        refreshRecLicenses().catch(() => {});
+      } catch (err) {
+        console.error("[Navigator Algo admin] REC mint failed:", err);
+        statusEl.className = "mint-status error";
+        statusEl.textContent = err?.code === "PERMISSION_DENIED"
+          ? "Firebase rejected the write — check /rec_licenses rules + admin allowlist."
+          : (err?.message || String(err));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = prevLabel;
+      }
+    });
+  }
+
   function wireMintForm() {
     const form = $("mintForm");
     const btn = $("mintBtn");
@@ -805,6 +1095,9 @@
   $("refreshBtn").addEventListener("click", () => {
     refreshProvidersList().catch(() => {});
   });
+  $("recRefreshBtn").addEventListener("click", () => {
+    refreshRecLicenses().catch(() => {});
+  });
 
   watchAuth(
     async (user) => {
@@ -815,7 +1108,14 @@
         $("adminEmail").textContent = user.email || user.uid;
         show(adminState);
         wireMintForm();
+        wireRecMintForm();
         refreshProvidersList().catch(showError);
+        refreshRecLicenses().catch((err) => {
+          console.warn("[Navigator Algo admin] REC list load failed:", err);
+          setRecListStatus(err?.code === "PERMISSION_DENIED"
+            ? "Firebase rejected the read — publish the /rec_licenses rules block from firebase/database.rules.json."
+            : (err?.message || String(err)), true);
+        });
       } catch (err) {
         showError(err);
       }
