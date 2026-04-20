@@ -810,6 +810,129 @@ export async function providerRevokeRecLicense(user, providerId, code) {
   await update(ref(db), updates);
 }
 
+// Provider-owner: reactivate a previously-revoked REC- code owned by this
+// provider. Flips state revoked → active on the SAME code (no new mint) and
+// restores the receiver row to "active" if it was bound before revoke. Use
+// when a subscriber was revoked in error or resumed paying. Refuses to act
+// on "expired" codes — those need expiry extension via admin first.
+export async function providerReactivateRecLicense(user, providerId, code) {
+  if (!user)        throw new Error("user required");
+  if (!providerId)  throw new Error("providerId required");
+  if (!code)        throw new Error("code required");
+
+  const snap = await get(recLicenseRef(code));
+  if (!snap.exists()) throw new Error(`REC license ${code} not found.`);
+  const prev = snap.val() || {};
+  if (prev.created_by_pid !== providerId) {
+    throw new Error("This REC- code was not minted by this provider.");
+  }
+  if (prev.state !== "revoked") {
+    throw new Error(`Cannot reactivate a code in state "${prev.state || "unused"}". Only revoked codes can be reactivated here.`);
+  }
+  if (typeof prev.expires_at === "number" && prev.expires_at < Date.now()) {
+    throw new Error("Cannot reactivate an expired code. Rotate to mint a replacement with a fresh expiry, or ask an admin to extend the expiry.");
+  }
+
+  // If it was previously bound, resume "active"; otherwise drop back to
+  // "unused" so the first eaRead / receiver_ack drives the normal activation
+  // path (matches the semantics of rotateRecLicense).
+  const newState = prev.bound_account ? "active" : "unused";
+  const updates = {
+    [`rec_licenses/${code}/state`]: newState
+  };
+  if (prev.following_pid && prev.bound_account) {
+    updates[`${DB_PATHS.providers}/${prev.following_pid}/receivers/${prev.bound_account}/state`] = "active";
+  }
+  await update(ref(db), updates);
+}
+
+// Provider-owner: rotate a REC- code this provider minted. Mints a new code
+// carrying over the subscriber metadata, bound account, expiry, and
+// following_pid, then deletes the old record + its index entry atomically.
+// Use when a subscriber reports the code leaked or they want a fresh code.
+// Works on any state (unused, active, revoked, expired). Returns the new code.
+export async function providerRotateRecLicense(user, providerId, oldCode) {
+  if (!user)        throw new Error("user required");
+  if (!providerId)  throw new Error("providerId required");
+  if (!oldCode)     throw new Error("oldCode required");
+
+  const snap = await get(recLicenseRef(oldCode));
+  if (!snap.exists()) throw new Error(`REC license ${oldCode} not found.`);
+  const prev = snap.val() || {};
+  if (prev.created_by_pid !== providerId) {
+    throw new Error("This REC- code was not minted by this provider.");
+  }
+
+  let newCode;
+  for (let i = 0; i < 8; i++) {
+    const candidate = randomRecLicenseCode();
+    const collision = await get(recLicenseRef(candidate));
+    if (!collision.exists()) { newCode = candidate; break; }
+  }
+  if (!newCode) throw new Error("Could not generate a unique new REC- code. Try again.");
+
+  const now = Date.now();
+  const newRecord = {
+    state:          prev.bound_account ? "active" : "unused",
+    created_at:     now,
+    created_by_uid: user.uid,
+    created_by_pid: providerId,
+    following_pid:  providerId,
+    rotated_from:   oldCode
+  };
+  if (prev.owner_email)    newRecord.owner_email   = prev.owner_email;
+  if (prev.note)           newRecord.note          = prev.note;
+  if (prev.expires_at)     newRecord.expires_at    = prev.expires_at;
+  if (prev.bound_account)  newRecord.bound_account = prev.bound_account;
+  if (prev.bound_broker)   newRecord.bound_broker  = prev.bound_broker;
+  if (prev.activated_at)   newRecord.activated_at  = prev.activated_at;
+
+  const updates = {
+    // Delete the old record + drop it from the per-provider index. The new
+    // code replaces it in both places atomically so the dashboard stays
+    // consistent even if the write is mid-flight.
+    [`rec_licenses/${oldCode}`]: null,
+    [`${DB_PATHS.providers}/${providerId}/issued_rec_licenses/${oldCode}`]: null,
+    [`rec_licenses/${newCode}`]: newRecord,
+    [`${DB_PATHS.providers}/${providerId}/issued_rec_licenses/${newCode}`]: true
+  };
+  // Re-point the receiver row at the new code so the dashboard's
+  // Active Copiers list doesn't drift.
+  if (prev.bound_account) {
+    updates[`${DB_PATHS.providers}/${providerId}/receivers/${prev.bound_account}/license_code`] = newCode;
+    updates[`${DB_PATHS.providers}/${providerId}/receivers/${prev.bound_account}/state`] = "active";
+  }
+  await update(ref(db), updates);
+  return newCode;
+}
+
+// Provider-owner: permanently delete a REC- code this provider minted, plus
+// its entry in the per-provider index. Refuses on "active" codes — callers
+// must Revoke first (two-step guard so a stray click on a paying
+// subscriber's row can't kill them silently). Rotate is the path for "kill
+// the old and mint a new one in one click".
+export async function providerDeleteRecLicense(user, providerId, code) {
+  if (!user)        throw new Error("user required");
+  if (!providerId)  throw new Error("providerId required");
+  if (!code)        throw new Error("code required");
+
+  const snap = await get(recLicenseRef(code));
+  if (!snap.exists()) throw new Error(`REC license ${code} not found.`);
+  const prev = snap.val() || {};
+  if (prev.created_by_pid !== providerId) {
+    throw new Error("This REC- code was not minted by this provider.");
+  }
+  if (prev.state === "active") {
+    throw new Error('Cannot delete an "active" code. Revoke it first, then delete.');
+  }
+
+  const updates = {
+    [`rec_licenses/${code}`]: null,
+    [`${DB_PATHS.providers}/${providerId}/issued_rec_licenses/${code}`]: null
+  };
+  await update(ref(db), updates);
+}
+
 // Roll up a list of REC license records into counts for the admin KPI strip.
 // Cheap pure function — no network.
 export function rollupRecLicenseStats(rows) {

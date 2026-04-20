@@ -514,7 +514,8 @@
     watchAuth, signOutUser,
     getUserProviderId, subscribeProvider, claimProvider, countActiveCopiers,
     regenerateEaKey, generateSubLicenseSlots, revokeSubLicense, rotateSubLicense,
-    providerMintRecLicense, listProviderRecLicenses, providerRevokeRecLicense
+    providerMintRecLicense, listProviderRecLicenses, providerRevokeRecLicense,
+    providerReactivateRecLicense, providerRotateRecLicense, providerDeleteRecLicense
   } from "./assets/app.js";
 
   const $ = (id) => document.getElementById(id);
@@ -856,18 +857,27 @@
         : (d.note ? String(d.note).slice(0, 40) : "—");
       const expires = d.expires_at ? fmtDate(d.expires_at) : "never";
       const tr = document.createElement("tr");
+      // Action column — buttons vary by state:
+      //   Copy    — always (useful even on revoked for support forwarding)
+      //   Revoke  — states that still work (unused, active)
+      //   Activate — revoked only (un-revoke; flips back to active/unused)
+      //   Rotate  — any state (mint a replacement carrying the metadata)
+      //   Delete  — any non-active state (active must be Revoked first)
+      const canRevoke   = state !== "revoked" && state !== "expired";
+      const canActivate = state === "revoked";
+      const canDelete   = state !== "active";
+      const actions = [`<button class="slot-action" data-rec-copy="${r.code}">Copy</button>`];
+      if (canRevoke)   actions.push(`<button class="slot-action danger" data-rec-revoke="${r.code}">Revoke</button>`);
+      if (canActivate) actions.push(`<button class="slot-action" data-rec-activate="${r.code}">Activate</button>`);
+      actions.push(`<button class="slot-action" data-rec-rotate="${r.code}">Rotate</button>`);
+      if (canDelete)   actions.push(`<button class="slot-action danger" data-rec-delete="${r.code}">Delete</button>`);
       tr.innerHTML = `
         <td><span class="slot-code">${r.code}</span></td>
         <td><span class="slot-status ${state}">${state}</span></td>
         <td>${subscriber}</td>
         <td>${maskAccount(d.bound_account)}</td>
         <td>${expires}</td>
-        <td style="text-align:right; white-space:nowrap;">
-          <button class="slot-action" data-rec-copy="${r.code}">Copy</button>
-          ${state === "revoked" || state === "expired"
-            ? ""
-            : `<button class="slot-action danger" data-rec-revoke="${r.code}">Revoke</button>`}
-        </td>
+        <td style="text-align:right; white-space:nowrap;">${actions.join("")}</td>
       `;
       body.appendChild(tr);
     }
@@ -892,6 +902,61 @@
           setRecListStatus("Revoke failed: " + (e?.message || e), true);
           btn.disabled = false;
           btn.textContent = "Revoke";
+        }
+      }, { kind: "revoke" });
+    });
+    // Activate — single-click (no arm-confirm). Non-destructive; worst case
+    // is re-enabling a code you meant to keep revoked, which you can then
+    // just revoke again.
+    body.querySelectorAll("[data-rec-activate]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const code = btn.dataset.recActivate;
+        btn.disabled = true;
+        btn.textContent = "Activating…";
+        try {
+          await providerReactivateRecLicense(currentUser, currentProviderId, code);
+          setRecListStatus(`Reactivated ${code}. The Pro Receiver will resume on next poll.`);
+          await renderRecLicenses();
+        } catch (e) {
+          console.error(e);
+          setRecListStatus("Activate failed: " + (e?.message || e), true);
+          btn.disabled = false;
+          btn.textContent = "Activate";
+        }
+      });
+    });
+    body.querySelectorAll("[data-rec-rotate]").forEach(btn => {
+      armInlineConfirm(btn, async () => {
+        const code = btn.dataset.recRotate;
+        btn.disabled = true;
+        btn.textContent = "Rotating…";
+        try {
+          const newCode = await providerRotateRecLicense(currentUser, currentProviderId, code);
+          try { await navigator.clipboard.writeText(newCode); } catch { /* clipboard may fail in rare envs */ }
+          setRecListStatus(`Rotated ${code} → ${newCode}. New code copied to clipboard. Send it to the subscriber; the old code is now dead.`);
+          await renderRecLicenses();
+        } catch (e) {
+          console.error(e);
+          setRecListStatus("Rotate failed: " + (e?.message || e), true);
+          btn.disabled = false;
+          btn.textContent = "Rotate";
+        }
+      }, { kind: "rotate" });
+    });
+    body.querySelectorAll("[data-rec-delete]").forEach(btn => {
+      armInlineConfirm(btn, async () => {
+        const code = btn.dataset.recDelete;
+        btn.disabled = true;
+        btn.textContent = "Deleting…";
+        try {
+          await providerDeleteRecLicense(currentUser, currentProviderId, code);
+          setRecListStatus(`Deleted ${code} from your list.`);
+          await renderRecLicenses();
+        } catch (e) {
+          console.error(e);
+          setRecListStatus("Delete failed: " + (e?.message || e), true);
+          btn.disabled = false;
+          btn.textContent = "Delete";
         }
       }, { kind: "revoke" });
     });
