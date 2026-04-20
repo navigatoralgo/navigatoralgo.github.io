@@ -102,9 +102,20 @@ export async function signOutUser() {
 // Schema:
 //   /users/{uid}/email        — mirror of auth email
 //   /users/{uid}/display_name — optional friendly name (user-editable)
-//   /users/{uid}/provider_id  — "NAV-XXXX" once EA is claimed
+//   /users/{uid}/provider_id  — "NAV-XXXX" once a provider is bound to this user
 //   /users/{uid}/created_at   — server timestamp on first sign-in
 //   /users/{uid}/last_seen_at — server timestamp refreshed each sign-in
+//
+// Also mirrors email -> uid at /users_by_email/{encodeEmailKey(email)} so the
+// admin console can resolve a user's UID from their email at provider-bind
+// time without needing Admin SDK access from the browser.
+
+// RTDB keys may not contain . $ # [ ] /. Only `.` occurs in real email
+// addresses; map it to `,` so the key is deterministic and reversible enough
+// for our purposes (we never read back out).
+export function encodeEmailKey(email) {
+  return String(email || "").trim().toLowerCase().replace(/\./g, ",");
+}
 
 export async function getUserProfile(uid) {
   const snap = await get(ref(db, `users/${uid}`));
@@ -112,7 +123,10 @@ export async function getUserProfile(uid) {
 }
 
 // Idempotent — creates /users/{uid} with basic info on first sign-in,
-// refreshes last_seen_at on every subsequent load.
+// refreshes last_seen_at on every subsequent load. Also refreshes the
+// /users_by_email index so admins can find this user by email when binding a
+// provider. Best-effort on the index write — failing to update the index
+// must not block sign-in (e.g. a stale rule deploy would reject the write).
 export async function touchUserProfile(user) {
   const updates = {
     [`users/${user.uid}/email`]:        user.email || null,
@@ -123,7 +137,30 @@ export async function touchUserProfile(user) {
     updates[`users/${user.uid}/created_at`] = serverTimestamp();
     if (user.displayName) updates[`users/${user.uid}/display_name`] = user.displayName;
   }
-  await update(ref(db), updates);
+  if (user.email) {
+    updates[`users_by_email/${encodeEmailKey(user.email)}`] = user.uid;
+  }
+  try {
+    await update(ref(db), updates);
+  } catch (err) {
+    // If the email-index write is the failing one (e.g. stale rules not yet
+    // published), fall back to writing only the /users/{uid} half so the
+    // user can still sign in. Admin-bind will fail later with a clear error.
+    console.warn("[Navigator Algo] touchUserProfile multi-path write failed; retrying without email index:", err?.code || err?.message || err);
+    const fallback = { ...updates };
+    delete fallback[`users_by_email/${encodeEmailKey(user.email || "")}`];
+    await update(ref(db), fallback);
+  }
+}
+
+// Admin-only: resolve a user's UID from their email by reading the
+// /users_by_email/{encoded_email} index written at sign-in. Returns the UID
+// string, or null if no user with that email has signed in yet.
+export async function lookupUidByEmail(email) {
+  const key = encodeEmailKey(email);
+  if (!key) return null;
+  const snap = await get(ref(db, `users_by_email/${key}`));
+  return snap.exists() ? snap.val() : null;
 }
 
 // Writes the user's editable profile fields.
@@ -174,16 +211,6 @@ function randomProviderId() {
   return `NAV-${s}`;
 }
 
-// Claim token: 12 hex chars in three groups of 4, e.g. "9F3A-1C77-B204".
-// One-shot secret used by a human to bind their Firebase account to a provider
-// node. Cleared after claim.
-function randomClaimToken() {
-  const bytes = new Uint8Array(6);
-  crypto.getRandomValues(bytes);
-  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0").toUpperCase()).join("");
-  return `${hex.slice(0, 4)}-${hex.slice(4, 8)}-${hex.slice(8, 12)}`;
-}
-
 // EA key: 16 hex chars in four groups of 4, e.g. "4F72-91A0-BC33-8E12".
 // Long-lived machine secret — pasted into the EA's inputs on the provider's
 // MT5 terminal. Authenticates every eaWrite/eaRead Cloud Function call. Does
@@ -196,31 +223,130 @@ export function randomEaKey() {
   return `${hex.slice(0, 4)}-${hex.slice(4, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}`;
 }
 
-// Admin-only: mints a new (provider_id, claim_token, ea_key) triple and writes
-// it to /providers/{pid} with no owner_uid. Retries up to 5 times on
-// provider_id collision (astronomically unlikely with 31^5 ≈ 28M combinations).
-// Returns { providerId, claimToken, eaKey }.
-export async function mintProvider(adminUser, opts = {}) {
-  const { display_name = null, license = "navigator-algo" } = opts;
+// Admin-only: mints a new provider bound to an already-signed-up user's
+// account. The admin supplies the user's email; we resolve it to a UID via
+// /users_by_email and write the provider with `owner_uid` set from the start
+// so the user sees their dashboard on next refresh without a separate
+// claim-token step.
+//
+// Throws:
+//   "user_not_found"   — no account with that email has signed in
+//   "user_already_bound" — that user already has a provider bound
+//
+// Returns { providerId, eaKey, ownerUid, ownerEmail }.
+export async function mintProviderBound(adminUser, opts = {}) {
+  const { email, display_name = null, license = "navigator-algo" } = opts;
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail) throw new Error("Email required.");
+
+  const ownerUid = await lookupUidByEmail(normalizedEmail);
+  if (!ownerUid) {
+    const err = new Error("user_not_found");
+    err.code = "user_not_found";
+    err.userMessage = `No account found for ${normalizedEmail}. Ask them to sign up at /dashboard first, then try again.`;
+    throw err;
+  }
+
+  const existingProfile = await get(ref(db, `users/${ownerUid}/provider_id`));
+  if (existingProfile.exists() && existingProfile.val()) {
+    const err = new Error("user_already_bound");
+    err.code = "user_already_bound";
+    err.userMessage = `${normalizedEmail} already has provider ${existingProfile.val()} bound. Unbind it first, or mint for a different user.`;
+    throw err;
+  }
 
   for (let attempt = 0; attempt < 5; attempt++) {
-    const providerId  = randomProviderId();
-    const claimToken  = randomClaimToken();
-    const eaKey       = randomEaKey();
-    const existing = await get(providerRef(providerId));
+    const providerId = randomProviderId();
+    const eaKey      = randomEaKey();
+    const existing   = await get(providerRef(providerId));
     if (existing.exists()) continue;
 
-    await set(providerRef(providerId), {
-      claim_token:    claimToken,
+    const updates = {};
+    updates[`providers/${providerId}`] = {
+      owner_uid:      ownerUid,
+      owner_email:    normalizedEmail,
       ea_key:         eaKey,
       license:        license,
       display_name:   display_name,
       created_at:     Date.now(),
+      claimed_at:     Date.now(),
       created_by_uid: adminUser.uid
-    });
-    return { providerId, claimToken, eaKey };
+    };
+    updates[`users/${ownerUid}/provider_id`] = providerId;
+    updates[`users/${ownerUid}/email`]       = normalizedEmail;
+    await update(ref(db), updates);
+    return { providerId, eaKey, ownerUid, ownerEmail: normalizedEmail };
   }
   throw new Error("Could not mint a unique provider ID after 5 attempts. Try again.");
+}
+
+// Admin-only: rebind an existing unbound provider to a signed-up user's
+// email. Mirrors mintProviderBound but for providers that already exist
+// (e.g. older claim-token-flow providers that were never linked). If the
+// provider is already bound, the caller must unbindProvider first.
+//
+// Returns { providerId, ownerUid, ownerEmail }.
+export async function bindProviderToEmail(adminUser, providerId, email) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail) throw new Error("Email required.");
+
+  const snap = await get(providerRef(providerId));
+  if (!snap.exists()) throw new Error("Provider not found.");
+  const data = snap.val();
+  if (data.owner_uid) {
+    const err = new Error("provider_already_bound");
+    err.code = "provider_already_bound";
+    err.userMessage = `${providerId} is already bound to ${data.owner_email || data.owner_uid}. Unbind it first.`;
+    throw err;
+  }
+
+  const ownerUid = await lookupUidByEmail(normalizedEmail);
+  if (!ownerUid) {
+    const err = new Error("user_not_found");
+    err.code = "user_not_found";
+    err.userMessage = `No account found for ${normalizedEmail}. Ask them to sign up at /dashboard first, then try again.`;
+    throw err;
+  }
+
+  const existingProfile = await get(ref(db, `users/${ownerUid}/provider_id`));
+  if (existingProfile.exists() && existingProfile.val()) {
+    const err = new Error("user_already_bound");
+    err.code = "user_already_bound";
+    err.userMessage = `${normalizedEmail} already has provider ${existingProfile.val()} bound. Unbind that first.`;
+    throw err;
+  }
+
+  const updates = {};
+  updates[`providers/${providerId}/owner_uid`]   = ownerUid;
+  updates[`providers/${providerId}/owner_email`] = normalizedEmail;
+  updates[`providers/${providerId}/claim_token`] = null;
+  updates[`providers/${providerId}/claimed_at`]  = Date.now();
+  updates[`users/${ownerUid}/provider_id`]       = providerId;
+  updates[`users/${ownerUid}/email`]             = normalizedEmail;
+  await update(ref(db), updates);
+  return { providerId, ownerUid, ownerEmail: normalizedEmail };
+}
+
+// Admin-only: detach a provider from its current owner without deleting it.
+// Clears owner_uid + owner_email on the provider and clears the user's
+// /users/{uid}/provider_id pointer. The ea_key is NOT rotated — the admin
+// can rotate it separately if they want to revoke the old owner's MT5
+// access. Useful when a mint goes to the wrong email, or when transferring
+// a provider between accounts.
+export async function unbindProvider(adminUser, providerId) {
+  const snap = await get(providerRef(providerId));
+  if (!snap.exists()) throw new Error("Provider not found.");
+  const data = snap.val();
+
+  const updates = {};
+  updates[`providers/${providerId}/owner_uid`]   = null;
+  updates[`providers/${providerId}/owner_email`] = null;
+  updates[`providers/${providerId}/claimed_at`]  = null;
+  if (data.owner_uid) {
+    updates[`users/${data.owner_uid}/provider_id`] = null;
+  }
+  await update(ref(db), updates);
+  return { providerId, previousOwnerUid: data.owner_uid || null };
 }
 
 // Provider-owner or admin: rotate ea_key on an existing provider. Old key
@@ -991,41 +1117,6 @@ export function subscribeProvider(providerId, callback, onError) {
       if (onError) onError(err);
     }
   );
-}
-
-// Claim a provider_id for the signed-in user.
-// Validates the activation token (generated by the EA and shown in the EA's panel)
-// before writing /users/{uid}/provider_id.
-//
-// The EA writes:
-//   /providers/{providerId}/claim_token = "<random 16-char token>"
-//   /providers/{providerId}/owner_uid   = null   (initially)
-//
-// Claim logic:
-//   1. Check the claim_token matches.
-//   2. Check the provider is unclaimed (owner_uid == null).
-//   3. Write owner_uid = user.uid and clear claim_token.
-//   4. Write /users/{uid}/provider_id.
-//
-// All of this needs to be enforced by Firebase security rules too — client-side
-// checks are just for UX.
-export async function claimProvider(user, providerId, claimToken) {
-  const snap = await get(providerRef(providerId));
-  if (!snap.exists()) throw new Error("Provider ID not found. Make sure the EA has connected to Firebase at least once.");
-  const data = snap.val();
-  if (data.owner_uid && data.owner_uid !== user.uid) throw new Error("This provider is already linked to another account.");
-  if (data.claim_token !== claimToken) throw new Error("Activation token doesn't match. Copy the exact token from your EA's panel.");
-
-  const updates = {};
-  updates[`${DB_PATHS.providers}/${providerId}/owner_uid`]   = user.uid;
-  updates[`${DB_PATHS.providers}/${providerId}/owner_email`] = user.email || null;
-  updates[`${DB_PATHS.providers}/${providerId}/claim_token`] = null;
-  updates[`${DB_PATHS.providers}/${providerId}/claimed_at`]  = serverTimestamp();
-  updates[`users/${user.uid}/provider_id`] = providerId;
-  updates[`users/${user.uid}/email`]       = user.email || null;
-
-  await update(ref(db), updates);
-  return providerId;
 }
 
 // Count active copiers = number of sub_licenses with state == "active".
