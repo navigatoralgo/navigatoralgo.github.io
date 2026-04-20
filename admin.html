@@ -408,14 +408,15 @@
       <div class="panel">
         <div class="section-title">Mint new <em>provider</em></div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">
-          Generates a one-time (Provider&nbsp;ID, Activation&nbsp;Token) pair. Send both to the buyer — they
-          paste them into their dashboard on navigatoralgo.com to claim the provider. Once claimed, only
-          their Firebase account can read or write that provider's data.
+          Enter the buyer's email (they must have signed up at <code class="mono-code">/dashboard</code> at least
+          once). The provider is bound to their account immediately — they refresh their dashboard and see it.
+          Send them just the Provider&nbsp;ID + EA&nbsp;key; no token to paste.
         </p>
         <form id="mintForm">
           <div class="mint-row">
+            <input id="mintEmailInput" class="form-input" type="email" placeholder="Buyer's email (required) — they must have signed up first" maxlength="256" required>
             <input id="mintNameInput" class="form-input" type="text" placeholder="Optional display name (e.g. Buyer's EA name)" maxlength="64">
-            <button type="submit" id="mintBtn" class="btn btn-primary">Mint new pair</button>
+            <button type="submit" id="mintBtn" class="btn btn-primary">Mint &amp; bind</button>
             <span id="mintStatus" class="mint-status"></span>
           </div>
         </form>
@@ -428,23 +429,19 @@
             <button type="button" class="copy-btn" data-copy-target="mintedId">Copy</button>
           </div>
           <div class="minted-row">
-            <span class="minted-key">Activation token</span>
-            <span class="minted-val" id="mintedToken">—</span>
-            <button type="button" class="copy-btn" data-copy-target="mintedToken">Copy</button>
-          </div>
-          <div class="minted-row">
             <span class="minted-key">EA key</span>
             <span class="minted-val" id="mintedEaKey">—</span>
             <button type="button" class="copy-btn" data-copy-target="mintedEaKey">Copy</button>
           </div>
           <div class="minted-row">
-            <span class="minted-key">All three (one-line)</span>
+            <span class="minted-key">Both (one-line)</span>
             <span class="minted-val" id="mintedCombo" style="font-size:12px;">—</span>
             <button type="button" class="copy-btn" data-copy-target="mintedCombo">Copy</button>
           </div>
-          <p style="font-size:11px;color:var(--muted);margin-top:12px;margin-bottom:0;">
-            <strong style="color:var(--text);">Activation token</strong> = one-shot, pasted once into <code class="mono-code">dashboard.html</code> to bind a Firebase account.<br>
-            <strong style="color:var(--text);">EA key</strong> = long-lived secret, pasted into the MT5 EA's inputs (<code class="mono-code">ProviderKey</code>). Authenticates every trade push via the Cloud Function proxy. Provider can regenerate it any time from their dashboard.
+          <p id="mintedBoundTo" style="font-size:11px;color:var(--muted);margin-top:12px;margin-bottom:0;">
+            Bound to <strong id="mintedBoundEmail" style="color:var(--text);">—</strong>.
+            They see the dashboard on next refresh. They paste the <strong style="color:var(--text);">EA&nbsp;key</strong>
+            into the MT5 EA's inputs (<code class="mono-code">ProviderKey</code>). Provider can rotate it from their dashboard.
           </p>
         </div>
       </div>
@@ -568,8 +565,8 @@
 <script type="module" src="assets/nav-auth.js"></script>
 <script type="module">
   import {
-    watchAuth, isAdmin, mintProvider, listAllProviders,
-    rollupAdminStats, perProviderCounts, deleteProvider,
+    watchAuth, isAdmin, mintProviderBound, bindProviderToEmail, unbindProvider,
+    listAllProviders, rollupAdminStats, perProviderCounts, deleteProvider,
     mintRecLicense, listAllRecLicenses, revokeRecLicense,
     updateRecLicenseExpiry, rotateRecLicense, rollupRecLicenseStats
   } from "./assets/app.js";
@@ -749,7 +746,13 @@
                 </div>
                 <div class="prov-card-side" data-noclick>
                   <div class="prov-card-meta">Created<br>${escapeHtml(fmtTimestamp(d.created_at))}</div>
-                  <span class="row-actions"><button type="button" class="row-action danger" data-delete="${escapeHtml(pid)}">Delete</button></span>
+                  <span class="row-actions">
+                    ${claimed
+                      ? `<button type="button" class="row-action" data-unbind="${escapeHtml(pid)}">Unbind</button>`
+                      : `<button type="button" class="row-action" data-bind="${escapeHtml(pid)}">Bind to email</button>`
+                    }
+                    <button type="button" class="row-action danger" data-delete="${escapeHtml(pid)}">Delete</button>
+                  </span>
                 </div>
               </div>`;
           }).join("")}
@@ -787,6 +790,45 @@
             setProvidersStatus(`Delete failed: ${e?.message || e}`, true);
             btn.disabled = false;
             btn.textContent = "Delete";
+          }
+        });
+      });
+      listEl.querySelectorAll("[data-bind]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const pid = btn.dataset.bind;
+          const email = window.prompt(`Bind ${pid} to which user's email?\n(The user must have signed up at /dashboard at least once.)`);
+          if (!email) return;
+          btn.disabled = true;
+          const prev = btn.textContent;
+          btn.textContent = "Binding…";
+          setProvidersStatus("");
+          try {
+            const { ownerEmail } = await bindProviderToEmail(currentUser, pid, email);
+            setProvidersStatus(`${pid} bound to ${ownerEmail}. They'll see the dashboard on next refresh.`);
+            refreshProvidersList().catch(() => {});
+          } catch (e) {
+            console.error(e);
+            setProvidersStatus(`Bind failed: ${e?.userMessage || e?.message || e}`, true);
+            btn.disabled = false;
+            btn.textContent = prev;
+          }
+        });
+      });
+      listEl.querySelectorAll("[data-unbind]").forEach(btn => {
+        armInlineConfirm(btn, async () => {
+          const pid = btn.dataset.unbind;
+          btn.disabled = true;
+          btn.textContent = "Unbinding…";
+          setProvidersStatus("");
+          try {
+            await unbindProvider(currentUser, pid);
+            setProvidersStatus(`${pid} unbound. Use "Bind to email" to re-link it to a user.`);
+            refreshProvidersList().catch(() => {});
+          } catch (e) {
+            console.error(e);
+            setProvidersStatus(`Unbind failed: ${e?.userMessage || e?.message || e}`, true);
+            btn.disabled = false;
+            btn.textContent = "Unbind";
           }
         });
       });
@@ -1039,7 +1081,8 @@
     const form = $("mintForm");
     const btn = $("mintBtn");
     const status = $("mintStatus");
-    const nameInput = $("mintNameInput");
+    const emailInput = $("mintEmailInput");
+    const nameInput  = $("mintNameInput");
     const mintedCard = $("mintedCard");
 
     form.addEventListener("submit", async (e) => {
@@ -1051,17 +1094,20 @@
       btn.textContent = "Minting…";
 
       try {
+        const email = (emailInput.value || "").trim();
+        if (!email) throw new Error("Buyer's email required.");
         const name = (nameInput.value || "").trim() || null;
-        const { providerId, claimToken, eaKey } = await mintProvider(currentUser, { display_name: name });
+        const { providerId, eaKey, ownerEmail } = await mintProviderBound(currentUser, { email, display_name: name });
 
-        $("mintedId").textContent = providerId;
-        $("mintedToken").textContent = claimToken;
+        $("mintedId").textContent    = providerId;
         $("mintedEaKey").textContent = eaKey;
-        $("mintedCombo").textContent = `${providerId} / ${claimToken} / ${eaKey}`;
+        $("mintedCombo").textContent = `${providerId} / ${eaKey}`;
+        $("mintedBoundEmail").textContent = ownerEmail;
         mintedCard.classList.remove("hidden");
 
         status.className = "mint-status success";
-        status.textContent = "Minted.";
+        status.textContent = `Minted + bound to ${ownerEmail}.`;
+        emailInput.value = "";
         nameInput.value = "";
 
         // Refresh list in background
@@ -1069,9 +1115,13 @@
       } catch (err) {
         console.error("[Navigator Algo admin] mint failed:", err);
         status.className = "mint-status error";
-        status.textContent = err?.code === "PERMISSION_DENIED"
-          ? "Firebase rejected the write — check admin rules + allowlist."
-          : (err?.message || String(err));
+        if (err?.userMessage) {
+          status.textContent = err.userMessage;
+        } else if (err?.code === "PERMISSION_DENIED") {
+          status.textContent = "Firebase rejected the write — check admin rules + allowlist.";
+        } else {
+          status.textContent = err?.message || String(err);
+        }
       } finally {
         btn.disabled = false;
         btn.textContent = prevLabel;

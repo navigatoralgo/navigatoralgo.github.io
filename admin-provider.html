@@ -649,7 +649,6 @@ details.raw-json pre {
     const rows = [
       kvRow("Provider ID", providerId, { copy: true }),
       kvRow("Display name", d.display_name, { copy: false, mono: false }),
-      kvRow("Activation token", claimed ? null : d.claim_token, { copy: !claimed }),
       kvRow("EA key", d.ea_key, { copy: true }),
       kvRow("EA key rotated", fmtTs(d.ea_key_rotated_at), { mono: true }),
       kvRow("Owner UID", d.owner_uid, { copy: true }),

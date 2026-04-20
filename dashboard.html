@@ -300,37 +300,24 @@
     </div>
   </section>
 
-  <!-- EMPTY STATE (user signed in but hasn't claimed a provider ID yet) -->
+  <!-- EMPTY STATE (user signed in but no provider bound to their account yet) -->
   <section id="claimState" class="hidden">
     <div class="claim-panel">
-      <span class="p-badge p-badge-gold">Setup</span>
-      <h2>Link your Signal Copier EA</h2>
+      <span class="p-badge p-badge-gold">Almost there</span>
+      <h2>Your account isn't linked to a provider yet</h2>
       <p>
-        To see your dashboard, link your MQL5 EA to this account. This only needs to be done once.
+        You're signed in as <strong class="email" id="claimStateEmail">—</strong>.
+        Send that email to Navigator Algo — once they mint and bind a provider to your account,
+        this page will automatically show your dashboard on refresh.
       </p>
-      <ol>
-        <li>Open the <strong>Signal Copier</strong> EA on MT5 in <em>Provider</em> mode.</li>
-        <li>In the EA's panel, find the <strong>Provider ID</strong> and <strong>Activation Token</strong> fields.</li>
-        <li>Paste both below and click <strong>Link</strong>.</li>
-      </ol>
-
-      <form id="claimForm">
-        <div class="form-group">
-          <label class="form-label" for="providerIdInput">Provider ID</label>
-          <input id="providerIdInput" class="form-input" placeholder="NAV-XXXXX" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="claimTokenInput">Activation Token</label>
-          <input id="claimTokenInput" class="form-input" placeholder="e.g. 9F3A-1C77-B204" required>
-        </div>
-        <div id="claimError" class="form-error"></div>
-        <button type="submit" id="claimBtn" class="btn btn-primary" style="width:100%;justify-content:center;">
-          Link dashboard
-        </button>
-      </form>
-
+      <p style="margin-top:16px;margin-bottom:0;font-size:13px;color:var(--muted);">
+        After binding, you'll only need to paste one value into your MT5 EA: the <strong style="color:var(--text);">EA&nbsp;key</strong> (<code class="mono-code">ProviderKey</code> input). No activation token needed.
+      </p>
       <p style="margin-top:20px;margin-bottom:0;font-size:12px;">
         Don't have the Signal Copier EA yet? <a href="signal-copier.html" style="color:var(--teal);text-decoration:none;">See the product page →</a>
+      </p>
+      <p style="margin-top:14px;margin-bottom:0;font-size:12px;color:var(--muted);">
+        Already linked on another device? <button id="claimRefreshBtn" type="button" class="btn btn-ghost" style="font-size:11px;padding:6px 12px;margin-left:4px;">Refresh</button>
       </p>
     </div>
   </section>
@@ -512,7 +499,7 @@
 <script type="module">
   import {
     watchAuth, signOutUser,
-    getUserProviderId, subscribeProvider, claimProvider, countActiveCopiers,
+    getUserProviderId, subscribeProvider, countActiveCopiers,
     regenerateEaKey, generateSubLicenseSlots, revokeSubLicense, rotateSubLicense,
     providerMintRecLicense, listProviderRecLicenses, providerRevokeRecLicense,
     providerReactivateRecLicense, providerRotateRecLicense, providerDeleteRecLicense
@@ -963,36 +950,46 @@
     setRecListStatus("");
   }
 
-  async function beginClaimFlow() {
+  // User has signed up but admin hasn't bound a provider to their account
+  // yet. Show a contact-admin screen; re-check on refresh or on Refresh click.
+  // (The old claim-token form is gone — provider binding is now admin-side.)
+  async function showUnlinkedState() {
+    const emailEl = $("claimStateEmail");
+    if (emailEl && currentUser) emailEl.textContent = currentUser.email || currentUser.uid || "—";
     show(claimState);
-    const form = $("claimForm");
-    const errEl = $("claimError");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      errEl.textContent = "";
-      const pid = $("providerIdInput").value.trim().toUpperCase();
-      const tok = $("claimTokenInput").value.trim();
-      if (!pid || !tok) { errEl.textContent = "Both fields required."; return; }
-      $("claimBtn").disabled = true;
-      $("claimBtn").textContent = "Linking…";
-      try {
-        await claimProvider(currentUser, pid, tok);
-        // Re-resolve and render.
-        currentProviderId = pid;
-        bindProviderUpdates(pid);
-      } catch (e) {
-        errEl.textContent = e.message || "Could not link your EA. Check the values and try again.";
-        $("claimBtn").disabled = false;
-        $("claimBtn").textContent = "Link dashboard";
-      }
-    }, { once: true });
+    const refreshBtn = $("claimRefreshBtn");
+    if (refreshBtn && !refreshBtn.dataset.wired) {
+      refreshBtn.dataset.wired = "1";
+      refreshBtn.addEventListener("click", async () => {
+        refreshBtn.disabled = true;
+        const prev = refreshBtn.textContent;
+        refreshBtn.textContent = "Checking…";
+        try {
+          const pid = await getUserProviderId(currentUser.uid);
+          if (pid) {
+            currentProviderId = pid;
+            bindProviderUpdates(pid);
+          } else {
+            refreshBtn.textContent = "Still not linked";
+            setTimeout(() => {
+              refreshBtn.disabled = false;
+              refreshBtn.textContent = prev;
+            }, 1200);
+          }
+        } catch (err) {
+          console.error("[Navigator Algo dashboard] refresh check failed:", err);
+          refreshBtn.disabled = false;
+          refreshBtn.textContent = prev;
+        }
+      });
+    }
   }
 
   function bindProviderUpdates(pid) {
     if (unsubProvider) unsubProvider();
     unsubProvider = subscribeProvider(pid, (data) => {
       if (!data) {
-        beginClaimFlow();
+        showUnlinkedState();
         return;
       }
       show(dashState);
@@ -1120,7 +1117,7 @@
         currentProviderId = pid;
         bindProviderUpdates(pid);
       } else {
-        beginClaimFlow();
+        showUnlinkedState();
       }
     } catch (err) {
       showError(err);
