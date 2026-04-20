@@ -300,11 +300,49 @@ async function writeReceiverAckSub(pid, licenseCode, license, payload) {
   return { ok: true };
 }
 
+// REC- licenses pick which provider to follow at first activation and pin it
+// server-side. Both eaRead and receiver_ack can do that activation: whichever
+// call arrives first carrying a valid pid_to_follow wins. Subsequent calls
+// must match or they get pid_mismatch.
+//
+// Returns { err?, details?, followingPid?, didPin? }:
+//   didPin=true means this call just set following_pid on the license, and
+//   the caller should persist the rest of the state (activated_at etc.) too.
+async function resolveAndMaybePinPid(licenseCode, currentFollowingPid, requestedPidRaw, opts = {}) {
+  const { requirePid = false } = opts;
+  const requestedPid = typeof requestedPidRaw === "string"
+    ? requestedPidRaw.trim().toUpperCase()
+    : null;
+
+  if (currentFollowingPid) {
+    if (requestedPid && requestedPid !== currentFollowingPid) {
+      return { err: "pid_mismatch", details: `license is already pinned to ${currentFollowingPid}; contact support to change providers` };
+    }
+    return { followingPid: currentFollowingPid, didPin: false };
+  }
+
+  // Not pinned yet.
+  if (!requestedPid) {
+    if (!requirePid) return { followingPid: null, didPin: false };
+    return { err: "bad_payload", details: "pid_to_follow required on first activation (NAV-XXXX format)" };
+  }
+  if (!/^NAV-[A-Z0-9]{3,10}$/.test(requestedPid)) {
+    return { err: "bad_payload", details: `pid_to_follow ${requestedPid} is not a valid NAV-XXXX id` };
+  }
+  // Verify the provider exists before pinning; a user typo shouldn't brick
+  // the license until admin intervention.
+  const provSnap = await db.ref(`/providers/${requestedPid}`).get();
+  if (!provSnap.exists()) return { err: "provider_not_found", details: `pid_to_follow ${requestedPid} does not exist` };
+
+  await db.ref(`/rec_licenses/${licenseCode}/following_pid`).set(requestedPid);
+  return { followingPid: requestedPid, didPin: true };
+}
+
 // Paid Pro Receiver (REC- code) path. License lives at /rec_licenses/{code}
 // and is independent of any provider's free-tier cap. On first activation the
-// receiver must pick a provider to follow via payload.pid_to_follow; that PID
-// is pinned to the license (following_pid) and cannot be silently switched
-// thereafter — an explicit admin rotation is required.
+// receiver must pick a provider to follow via payload.pid_to_follow OR have
+// it already pinned by a previous eaRead call; that PID cannot be silently
+// switched thereafter — an explicit admin rotation is required.
 async function writeReceiverAckRec(licenseCode, license, payload) {
   const acct = payload?.account;
   if (!acct || typeof acct !== "string") return { err: "bad_payload", details: "account required" };
@@ -320,22 +358,17 @@ async function writeReceiverAckRec(licenseCode, license, payload) {
     return { err: "license_expired" };
   }
 
-  // Pin the provider on first activation; subsequent activations must match.
-  let followingPid = license.following_pid || null;
-  const requestedPid = typeof payload.pid_to_follow === "string" ? payload.pid_to_follow.trim().toUpperCase() : null;
-
-  if (!followingPid) {
-    if (!requestedPid || !/^NAV-[A-Z0-9]{3,10}$/.test(requestedPid)) {
-      return { err: "bad_payload", details: "pid_to_follow required on first activation (NAV-XXXX format)" };
-    }
-    // Verify the provider actually exists before pinning; an EA typo shouldn't
-    // permanently brick the license.
-    const provSnap = await db.ref(`/providers/${requestedPid}`).get();
-    if (!provSnap.exists()) return { err: "provider_not_found", details: `pid_to_follow ${requestedPid} does not exist` };
-    followingPid = requestedPid;
-  } else if (requestedPid && requestedPid !== followingPid) {
-    return { err: "pid_mismatch", details: `license is already pinned to ${followingPid}; contact support to change providers` };
-  }
+  // Pin the provider if needed. receiver_ack requires a pid the first time
+  // through; if eaRead already pinned one, requestedPid is optional (and just
+  // verified for consistency).
+  const pinResult = await resolveAndMaybePinPid(
+    licenseCode,
+    license.following_pid || null,
+    payload.pid_to_follow,
+    { requirePid: true }
+  );
+  if (pinResult.err) return pinResult;
+  const followingPid = pinResult.followingPid;
 
   // Update the license node
   await db.ref(`/rec_licenses/${licenseCode}`).update({
@@ -459,6 +492,12 @@ exports.eaRead = onRequest(
 
       const license_code = normCred(params.license_code);
       const last_seq = Number(params.last_seq) || 0;
+      // pid_to_follow is REC--only. The Pro Receiver sends its configured
+      // provider on every read so activation happens on whichever of
+      // eaRead/receiver_ack lands first (receiver_ack is only emitted after a
+      // signal execution, so a fresh receiver with no copied trades would
+      // otherwise deadlock waiting for activation).
+      const pid_to_follow = typeof params.pid_to_follow === "string" ? params.pid_to_follow : null;
 
       if (!license_code || typeof license_code !== "string") return err(res, 400, "bad_license_code");
 
@@ -476,14 +515,52 @@ exports.eaRead = onRequest(
         return err(res, 403, "license_expired");
       }
 
-      // A REC- code that hasn't activated yet has no following_pid — nothing
-      // to read.
-      if (!found.pid) return err(res, 409, "license_not_activated", "call receiver_ack with pid_to_follow first");
+      // A REC- code that hasn't activated yet has no following_pid. Try to
+      // pin it now using the pid_to_follow from this request; if the Pro EA
+      // sends one, we activate transparently without needing receiver_ack.
+      let readPid = found.pid;
+      if (found.kind === "rec" && !readPid) {
+        const pinResult = await resolveAndMaybePinPid(
+          license_code, null, pid_to_follow,
+          { requirePid: true }
+        );
+        if (pinResult.err) {
+          const status = pinResult.err === "provider_not_found" ? 404
+                       : pinResult.err === "bad_payload"        ? 400
+                       : 409;
+          return err(res, status, pinResult.err, pinResult.details);
+        }
+        readPid = pinResult.followingPid;
+        if (pinResult.didPin) {
+          // Mark license as active + stamp activated_at. receiver_ack will
+          // fill in bound_account/broker later when the first trade copies.
+          await db.ref(`/rec_licenses/${license_code}`).update({
+            state: "active",
+            activated_at: found.license.activated_at || Date.now(),
+            last_seen_at: Date.now()
+          });
+        }
+      } else if (found.kind === "rec" && pid_to_follow) {
+        // Already pinned — verify the Pro EA's configured pid still matches.
+        const check = await resolveAndMaybePinPid(license_code, readPid, pid_to_follow);
+        if (check.err) {
+          const status = check.err === "pid_mismatch" ? 400 : 409;
+          return err(res, status, check.err, check.details);
+        }
+        // Refresh last_seen_at so an idle-but-connected Pro Receiver is still
+        // visible on the dashboard.
+        db.ref(`/rec_licenses/${license_code}/last_seen_at`).set(Date.now()).catch(() => {});
+      }
+
+      // Any non-REC path without a pid is a data-integrity bug, not a user
+      // error; shouldn't happen because SUB- licenses inherit pid from the
+      // enclosing provider.
+      if (!readPid) return err(res, 500, "internal", "no pid resolved");
 
       if (!checkRate(`read:${license_code}`)) return err(res, 429, "rate_limited");
 
       // Pull signals with seq > last_seq
-      const snap = await db.ref(`/providers/${found.pid}/signals`)
+      const snap = await db.ref(`/providers/${readPid}/signals`)
         .orderByChild("seq")
         .startAfter(last_seq)
         .limitToFirst(SIGNAL_READ_LIMIT)
@@ -498,7 +575,7 @@ exports.eaRead = onRequest(
       let latest_seq = last_seq;
       for (const s of signals) if (typeof s.seq === "number" && s.seq > latest_seq) latest_seq = s.seq;
 
-      return ok(res, { pid: found.pid, signals, latest_seq });
+      return ok(res, { pid: readPid, signals, latest_seq });
     } catch (e) {
       console.error("[eaRead] uncaught:", e);
       return err(res, 500, "internal", e?.message);
