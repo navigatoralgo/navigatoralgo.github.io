@@ -9,7 +9,7 @@ import {
   GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getDatabase, ref, get, set, update, onValue, runTransaction, serverTimestamp
+  getDatabase, ref, get, set, update, remove, onValue, runTransaction, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 import { firebaseConfig, DB_PATHS, LICENSE_PREFIXES, SUB_LICENSES_PER_PROVIDER } from "./firebase-config.js";
@@ -369,6 +369,123 @@ export async function listAllProviders() {
   return Object.keys(all)
     .map((pid) => ({ providerId: pid, data: all[pid] || {} }))
     .sort((a, b) => (b.data.created_at || 0) - (a.data.created_at || 0));
+}
+
+// Admin-only: roll up per-provider metrics into a single object for the admin
+// KPI strip. Everything here is computed from data already pulled in
+// listAllProviders — no extra network round-trips.
+//
+// Receiver "tier" is written by the Cloud Function from the receiver_ack
+// payload (field: `tier`, values: "free" | "paid"). Legacy receivers that
+// pre-date tier-tracking default to "free".
+export function rollupAdminStats(rows) {
+  const out = {
+    providers_total:    0,
+    providers_claimed:  0,
+    providers_unclaimed:0,
+    signals_total:      0,
+    subs_total:         0,
+    subs_unused:        0,
+    subs_active:        0,
+    subs_revoked:       0,
+    subs_expired:       0,
+    receivers_free:     0,
+    receivers_paid:     0,
+    receivers_active:   0
+  };
+  for (const r of rows) {
+    out.providers_total++;
+    const d = r.data || {};
+    if (d.owner_uid) out.providers_claimed++;
+    else             out.providers_unclaimed++;
+
+    out.signals_total += Number(d?.stats?.total_signals) || 0;
+
+    const subs = d.sub_licenses || {};
+    for (const code in subs) {
+      out.subs_total++;
+      const state = subs[code]?.state || "unused";
+      if (state === "unused")  out.subs_unused++;
+      if (state === "active")  out.subs_active++;
+      if (state === "revoked") out.subs_revoked++;
+      if (state === "expired") out.subs_expired++;
+    }
+
+    const rec = d.receivers || {};
+    for (const acct in rec) {
+      const row = rec[acct] || {};
+      if (row.state === "active") {
+        out.receivers_active++;
+        if (row.tier === "paid") out.receivers_paid++;
+        else                     out.receivers_free++; // default + explicit "free"
+      }
+    }
+  }
+  return out;
+}
+
+// Admin-only: per-provider counts used for the admin table row. Same data
+// source as rollupAdminStats; just narrowed to a single provider.
+export function perProviderCounts(data) {
+  const d = data || {};
+  const signals = Number(d?.stats?.total_signals) || 0;
+  const subs = d.sub_licenses || {};
+  let subs_active = 0, subs_unused = 0;
+  for (const c in subs) {
+    const s = subs[c]?.state;
+    if (s === "active") subs_active++;
+    if (s === "unused" || !s) subs_unused++;
+  }
+  const rec = d.receivers || {};
+  let free = 0, paid = 0;
+  for (const a in rec) {
+    const row = rec[a] || {};
+    if (row.state !== "active") continue;
+    if (row.tier === "paid") paid++; else free++;
+  }
+  return {
+    signals,
+    subs_active, subs_unused,
+    receivers_free: free, receivers_paid: paid,
+    last_heartbeat: d.heartbeat || null
+  };
+}
+
+// Admin-only: permanently remove a provider and everything under it. Before
+// wiping, snapshots the full subtree to /deleted_providers/{pid} with a
+// `deleted_at` timestamp + `deleted_by_uid` for audit + undo. Keep snapshots
+// around for ~30 days (manual cleanup for now; automated trim is a later PR).
+//
+// Security: rules gate both paths to admin-only writes. This function will
+// throw PERMISSION_DENIED if the caller isn't in /admins.
+export async function deleteProvider(adminUser, providerId) {
+  if (!adminUser || !providerId) throw new Error("adminUser + providerId required");
+  const snap = await get(providerRef(providerId));
+  if (!snap.exists()) throw new Error(`Provider ${providerId} not found.`);
+  const data = snap.val();
+
+  const now = Date.now();
+  const snapshot = {
+    ...data,
+    deleted_at: now,
+    deleted_by_uid: adminUser.uid,
+    deleted_by_email: adminUser.email || null
+  };
+  // Write archive first. If this fails (permission etc) we abort before
+  // deleting the live record — no orphaned deletions.
+  await set(ref(db, `deleted_providers/${providerId}`), snapshot);
+
+  // Also clear the /users/{owner_uid}/provider_id pointer so the owner's
+  // dashboard stops showing a stale claim. Best-effort; don't fail the whole
+  // op if the owner entry doesn't exist.
+  const ownerUid = data.owner_uid;
+  if (ownerUid) {
+    try { await remove(ref(db, `users/${ownerUid}/provider_id`)); }
+    catch (e) { console.warn("[Navigator Algo] deleteProvider: failed to clear owner pointer", e); }
+  }
+
+  await remove(providerRef(providerId));
+  return { archived_at: now };
 }
 
 // ── DATABASE HELPERS ──

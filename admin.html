@@ -154,6 +154,106 @@
   color: var(--muted); text-transform: uppercase;
 }
 
+/* Global KPI strip at the top of the console. Gives you at-a-glance answers
+   to 'is the business breathing?' without having to mentally sum the table. */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+.kpi-cell {
+  background: rgba(22,29,42,0.55);
+  border: 1px solid rgba(36,48,64,0.5);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.kpi-label {
+  font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.14em;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.kpi-value {
+  font-family: var(--font-head);
+  font-size: 28px; font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.kpi-sub {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.kpi-sub .k-teal  { color: var(--teal); }
+.kpi-sub .k-gold  { color: var(--gold); }
+.kpi-sub .k-green { color: var(--green); }
+.kpi-sub .k-red   { color: var(--red); }
+
+/* Tiny inline chips used inside the provider row for at-a-glance counts. */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.05em;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(150,160,175,0.2);
+  background: rgba(22,29,42,0.55);
+  color: var(--text);
+  text-transform: uppercase;
+}
+.chip.teal  { color: var(--teal);  border-color: rgba(0,212,200,0.3); }
+.chip.green { color: var(--green); border-color: rgba(0,214,150,0.3); }
+.chip.gold  { color: var(--gold);  border-color: rgba(255,196,48,0.3); }
+.chip.muted { color: var(--muted); }
+
+/* Destructive row actions — same visual language as dashboard.html slot-action. */
+.row-action {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.08em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(150,160,175,0.25);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.row-action:hover { color: var(--white); border-color: rgba(150,160,175,0.5); }
+.row-action.danger {
+  color: var(--red);
+  border-color: rgba(255,85,85,0.3);
+}
+.row-action.danger:hover {
+  background: rgba(255,85,85,0.06);
+  border-color: rgba(255,85,85,0.5);
+}
+.row-action.armed {
+  background: rgba(255,85,85,0.14);
+  border-color: rgba(255,85,85,0.6);
+  color: var(--red);
+  box-shadow: 0 0 0 1px rgba(255,85,85,0.15) inset;
+}
+.row-action.armed:hover { background: rgba(255,85,85,0.22); color: var(--white); }
+.row-action.cancel {
+  color: var(--muted);
+  border-color: rgba(150,160,175,0.25);
+  padding: 6px 9px;
+  font-size: 11px;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+.row-action.cancel:hover {
+  color: var(--white);
+  background: rgba(150,160,175,0.08);
+  border-color: rgba(150,160,175,0.5);
+}
+.row-actions {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
 .hidden { display: none !important; }
 .centered-loading {
   text-align: center;
@@ -285,12 +385,21 @@
         </div>
       </div>
 
+      <!-- GLOBAL KPI STRIP -->
+      <div class="panel">
+        <div class="section-title">Global <em>stats</em></div>
+        <div id="kpiStrip" class="kpi-grid">
+          <div class="prov-empty">Loading…</div>
+        </div>
+      </div>
+
       <!-- PROVIDERS LIST -->
       <div class="panel">
         <div class="section-title">
           All <em>providers</em>
           <button id="refreshBtn" type="button" class="btn btn-ghost" style="font-size:11px;padding:8px 14px;">Refresh</button>
         </div>
+        <p id="providersStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-bottom:12px;letter-spacing:0.05em;"></p>
         <div id="providersList">
           <div class="prov-empty">Loading providers…</div>
         </div>
@@ -337,7 +446,8 @@
 <script type="module" src="assets/nav-auth.js"></script>
 <script type="module">
   import {
-    watchAuth, isAdmin, mintProvider, listAllProviders
+    watchAuth, isAdmin, mintProvider, listAllProviders,
+    rollupAdminStats, perProviderCounts, deleteProvider
   } from "./assets/app.js";
 
   const $ = (id) => document.getElementById(id);
@@ -379,11 +489,96 @@
     } catch { return "—"; }
   }
 
+  // ── Inline two-step confirm helper (mirrors dashboard.html pattern). First
+  //    click arms the button (text → "Confirm?", red styling, ✕ cancel sibling),
+  //    second click fires the action. Auto-reverts after 4 s. Only one row can be
+  //    armed at a time across the whole table.
+  let pendingRevert = null;
+  const ARM_TIMEOUT_MS = 4000;
+  function armInlineConfirm(btn, onConfirm) {
+    const originalText  = btn.textContent;
+    const originalClass = btn.className;
+    let cancelBtn = null;
+    let timer = null;
+    let armed = false;
+    function revert() {
+      if (!armed) return;
+      armed = false;
+      btn.textContent = originalText;
+      btn.className = originalClass;
+      if (cancelBtn) cancelBtn.remove();
+      cancelBtn = null;
+      if (timer) { clearTimeout(timer); timer = null; }
+      if (pendingRevert === revert) pendingRevert = null;
+    }
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      if (armed) {
+        armed = false;
+        if (cancelBtn) cancelBtn.remove();
+        cancelBtn = null;
+        if (timer) { clearTimeout(timer); timer = null; }
+        if (pendingRevert === revert) pendingRevert = null;
+        btn.className = originalClass;
+        await onConfirm();
+        return;
+      }
+      if (pendingRevert && pendingRevert !== revert) pendingRevert();
+      armed = true;
+      pendingRevert = revert;
+      btn.textContent = "Confirm delete?";
+      btn.className = "row-action danger armed";
+      cancelBtn = document.createElement("button");
+      cancelBtn.type = "button";
+      cancelBtn.className = "row-action cancel";
+      cancelBtn.setAttribute("aria-label", "Cancel");
+      cancelBtn.textContent = "✕";
+      cancelBtn.addEventListener("click", (ev) => { ev.stopPropagation(); revert(); });
+      btn.insertAdjacentElement("afterend", cancelBtn);
+      timer = setTimeout(revert, ARM_TIMEOUT_MS);
+    });
+  }
+
+  function renderKpiStrip(rollup) {
+    const k = rollup;
+    const el = $("kpiStrip");
+    el.innerHTML = `
+      <div class="kpi-cell">
+        <div class="kpi-label">Providers</div>
+        <div class="kpi-value">${k.providers_total}</div>
+        <div class="kpi-sub"><span class="k-green">${k.providers_claimed} claimed</span> · <span class="k-gold">${k.providers_unclaimed} unclaimed</span></div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Signals sent</div>
+        <div class="kpi-value">${k.signals_total.toLocaleString()}</div>
+        <div class="kpi-sub">across all providers</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Sub-licenses</div>
+        <div class="kpi-value">${k.subs_total}</div>
+        <div class="kpi-sub"><span class="k-green">${k.subs_active} active</span> · <span class="k-teal">${k.subs_unused} unused</span> · <span class="k-red">${k.subs_revoked} revoked</span></div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">Active receivers</div>
+        <div class="kpi-value">${k.receivers_active}</div>
+        <div class="kpi-sub"><span class="k-teal">${k.receivers_free} free</span> · <span class="k-gold">${k.receivers_paid} paid</span></div>
+      </div>
+    `;
+  }
+
+  function setProvidersStatus(msg, isError = false) {
+    const el = $("providersStatus");
+    if (!msg) { el.textContent = ""; el.className = "mint-status"; return; }
+    el.textContent = msg;
+    el.className = "mint-status " + (isError ? "error" : "success");
+  }
+
   async function refreshProvidersList() {
     const listEl = $("providersList");
     listEl.innerHTML = `<div class="prov-empty">Loading providers…</div>`;
     try {
       const rows = await listAllProviders();
+      renderKpiStrip(rollupAdminStats(rows));
       if (!rows.length) {
         listEl.innerHTML = `<div class="prov-empty">No providers minted yet. Use the button above to create your first pair.</div>`;
         return;
@@ -392,12 +587,15 @@
         <table class="prov-table">
           <thead>
             <tr>
-              <th>Provider ID</th>
-              <th>Activation token</th>
-              <th>EA key</th>
+              <th>Provider</th>
+              <th>Credentials</th>
               <th>Status</th>
-              <th>Owner</th>
+              <th>Signals</th>
+              <th>Subs</th>
+              <th>Receivers</th>
+              <th>Last beat</th>
               <th>Created</th>
+              <th style="text-align:right;">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -412,21 +610,61 @@
                 : "—";
               const tokenTxt = claimed ? "—" : (d.claim_token || "—");
               const eaKeyTxt = d.ea_key || "—";
+              const displayName = d.display_name || "—";
+              const c = perProviderCounts(d);
               return `
                 <tr>
-                  <td><span class="prov-id">${escapeHtml(pid)}</span></td>
-                  <td><span class="prov-token">${escapeHtml(tokenTxt)}</span></td>
-                  <td><span class="prov-token">${escapeHtml(eaKeyTxt)}</span></td>
+                  <td>
+                    <div class="prov-id">${escapeHtml(pid)}</div>
+                    <div class="prov-owner" style="margin-top:4px;">${escapeHtml(displayName)}</div>
+                  </td>
+                  <td>
+                    <div class="prov-token">Token: ${escapeHtml(tokenTxt)}</div>
+                    <div class="prov-token" style="margin-top:2px;">EA: ${escapeHtml(eaKeyTxt)}</div>
+                    <div class="prov-owner" style="margin-top:4px;">${escapeHtml(ownerTxt)}</div>
+                  </td>
                   <td><span class="prov-status ${statusCls}">${statusTxt}</span></td>
-                  <td><span class="prov-owner">${escapeHtml(ownerTxt)}</span></td>
+                  <td><span class="chip ${c.signals > 0 ? 'teal' : 'muted'}">${c.signals.toLocaleString()}</span></td>
+                  <td>
+                    <span class="chip green">${c.subs_active}A</span>
+                    <span class="chip muted" style="margin-left:4px;">${c.subs_unused}U</span>
+                  </td>
+                  <td>
+                    <span class="chip teal">${c.receivers_free}F</span>
+                    <span class="chip gold" style="margin-left:4px;">${c.receivers_paid}P</span>
+                  </td>
+                  <td><span class="prov-owner">${escapeHtml(fmtTimestamp(c.last_heartbeat))}</span></td>
                   <td><span class="prov-owner">${escapeHtml(fmtTimestamp(d.created_at))}</span></td>
+                  <td style="text-align:right;">
+                    <span class="row-actions"><button type="button" class="row-action danger" data-delete="${escapeHtml(pid)}">Delete</button></span>
+                  </td>
                 </tr>`;
             }).join("")}
           </tbody>
         </table>`;
       listEl.innerHTML = html;
+
+      listEl.querySelectorAll("[data-delete]").forEach(btn => {
+        armInlineConfirm(btn, async () => {
+          const pid = btn.dataset.delete;
+          btn.disabled = true;
+          btn.textContent = "Deleting…";
+          setProvidersStatus("");
+          try {
+            await deleteProvider(currentUser, pid);
+            setProvidersStatus(`Deleted ${pid}. Archived to /deleted_providers/${pid} — restorable for ~30 days.`);
+            refreshProvidersList().catch(() => {});
+          } catch (e) {
+            console.error(e);
+            setProvidersStatus(`Delete failed: ${e?.message || e}`, true);
+            btn.disabled = false;
+            btn.textContent = "Delete";
+          }
+        });
+      });
     } catch (err) {
       listEl.innerHTML = `<div class="prov-empty" style="color:var(--red);">Failed to load: ${escapeHtml(err?.message || String(err))}</div>`;
+      $("kpiStrip").innerHTML = `<div class="prov-empty" style="color:var(--red);">Stats unavailable.</div>`;
     }
   }
 
