@@ -149,11 +149,13 @@
   cursor: pointer;
   transition: all 0.2s;
 }
+.slot-action + .slot-action { margin-left: 6px; }
 .slot-action:hover {
   color: var(--white);
   background: rgba(0,212,200,0.08);
   border-color: rgba(0,212,200,0.4);
 }
+.slot-action:disabled { opacity: 0.5; cursor: not-allowed; }
 .slot-action.danger {
   color: var(--red);
   border-color: rgba(255,85,85,0.3);
@@ -449,7 +451,7 @@
   import {
     watchAuth, signOutUser,
     getUserProviderId, subscribeProvider, claimProvider, countActiveCopiers,
-    regenerateEaKey, generateSubLicenseSlots
+    regenerateEaKey, generateSubLicenseSlots, revokeSubLicense, rotateSubLicense
   } from "./assets/app.js";
 
   const $ = (id) => document.getElementById(id);
@@ -468,6 +470,15 @@
     claimState.classList.add("hidden");
     dashState.classList.add("hidden");
     state.classList.remove("hidden");
+  }
+
+  // Shared status-line renderer for the sub-license slots panel — used by the
+  // "Generate 10 slots" button and the per-row Revoke/Rotate actions.
+  function setSlotsStatus(msg, isErr = false) {
+    const status = $("slotsStatus");
+    if (!status) return;
+    status.textContent = msg;
+    status.style.color = isErr ? "var(--red)" : "var(--teal)";
   }
 
   function showError(err) {
@@ -616,12 +627,14 @@
           <td>${maskAccount(s.bound_account)}</td>
           <td>${s.bound_broker ? String(s.bound_broker).slice(0, 20) : "—"}</td>
           <td>${fmtDate(s.activated_at)}</td>
-          <td style="text-align:right;">
+          <td style="text-align:right; white-space:nowrap;">
             ${state === "unused"
-              ? `<button class="slot-action" data-copy="${code}">Copy</button>`
+              ? `<button class="slot-action" data-copy="${code}">Copy</button>
+                 <button class="slot-action" data-rotate="${code}" title="Replace with a fresh code">Rotate</button>`
               : state === "active"
-                ? `<button class="slot-action danger" data-revoke="${code}">Revoke</button>`
-                : `—`}
+                ? `<button class="slot-action danger" data-revoke="${code}">Revoke</button>
+                   <button class="slot-action" data-rotate="${code}" title="Kick this user and mint a new unused code">Rotate</button>`
+                : `<button class="slot-action" data-rotate="${code}" title="Replace this code with a fresh unused one">Rotate</button>`}
           </td>
         `;
         body.appendChild(tr);
@@ -634,8 +647,47 @@
           setTimeout(() => btn.textContent = "Copy", 1200);
         });
       });
-      // "Revoke" wiring intentionally left as a no-op for v1 — needs an admin
-      // SDK call on Firebase. Dashboard currently surfaces the intent only.
+
+      body.querySelectorAll("[data-revoke]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const code = btn.dataset.revoke;
+          if (!confirm(`Revoke ${code}?\n\nThe receiver's EA will lose access on its next poll (~1s). The slot will show as revoked and its bound account clears. Rotate it later if you want to reuse the slot with a fresh code.`)) return;
+          btn.disabled = true;
+          const prev = btn.textContent;
+          btn.textContent = "Revoking…";
+          try {
+            await revokeSubLicense(currentUser, currentProviderId, code);
+            setSlotsStatus(`Revoked ${code}. Receiver EA loses access on next poll.`);
+          } catch (e) {
+            console.error(e);
+            setSlotsStatus(`Revoke failed: ${e?.message || e}`, true);
+            btn.disabled = false;
+            btn.textContent = prev;
+          }
+          // Table re-renders via subscribeProvider; no manual cleanup needed.
+        });
+      });
+
+      body.querySelectorAll("[data-rotate]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const code = btn.dataset.rotate;
+          if (!confirm(`Rotate ${code}?\n\nThe old code will be DELETED from the database — whoever was using it loses access permanently. A fresh SUB-XXXXXXXX code will be generated in its place and copied to your clipboard.`)) return;
+          btn.disabled = true;
+          const prev = btn.textContent;
+          btn.textContent = "Rotating…";
+          try {
+            const newCode = await rotateSubLicense(currentUser, currentProviderId, code);
+            try { await navigator.clipboard.writeText(newCode); } catch { /* clipboard may fail in rare envs */ }
+            setSlotsStatus(`Rotated. New code ${newCode} copied to clipboard. Hand it to the replacement person.`);
+          } catch (e) {
+            console.error(e);
+            setSlotsStatus(`Rotate failed: ${e?.message || e}`, true);
+            btn.disabled = false;
+            btn.textContent = prev;
+          }
+          // Table re-renders via subscribeProvider; no manual cleanup needed.
+        });
+      });
     }
 
     // Share URL
