@@ -76,6 +76,15 @@ function ok(res, extra = {}) {
   return res.status(200).json({ ok: true, server_ts: Date.now(), ...extra });
 }
 
+// Credential strings (pid, ea_key, license_code) are always generated in the
+// client as uppercase ASCII with no internal whitespace. EAs or humans may
+// paste them in with a stray trailing newline / space or in lower-case —
+// normalize once at the edge so a rotated key never 401s for a cosmetic reason.
+function normCred(v) {
+  if (typeof v !== "string") return v;
+  return v.trim().toUpperCase();
+}
+
 async function readJsonBody(req) {
   // onRequest auto-parses JSON when Content-Type is application/json, but we
   // defensively re-read raw and parse to enforce size cap.
@@ -274,7 +283,10 @@ exports.eaWrite = onRequest(
       try { body = await readJsonBody(req); }
       catch (e) { return err(res, 400, e.message || "bad_json"); }
 
-      const { pid, ea_key, license_code, kind, payload } = body || {};
+      const pid          = normCred(body?.pid);
+      const ea_key       = normCred(body?.ea_key);
+      const license_code = normCred(body?.license_code);
+      const { kind, payload } = body || {};
 
       if (!kind || !ALL_KINDS.has(kind)) return err(res, 400, "bad_kind", `kind must be one of ${[...ALL_KINDS].join(", ")}`);
       if (!payload || typeof payload !== "object") return err(res, 400, "bad_payload", "payload object required");
@@ -341,7 +353,7 @@ exports.eaRead = onRequest(
         params = req.query || {};
       }
 
-      const { license_code } = params;
+      const license_code = normCred(params.license_code);
       const last_seq = Number(params.last_seq) || 0;
 
       if (!license_code || typeof license_code !== "string") return err(res, 400, "bad_license_code");
