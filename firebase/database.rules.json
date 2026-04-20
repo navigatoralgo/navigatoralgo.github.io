@@ -75,6 +75,13 @@
           }
         },
 
+        "issued_rec_licenses": {
+          "_comment": "Per-provider index of REC- codes this provider has minted from their dashboard (see /rec_licenses/{code} for the full record). Value is always true — this is just a lookup list so the provider dashboard can list its own paid licenses without needing read access to the global /rec_licenses tree.",
+          "$code": {
+            ".validate": "newData.isBoolean() && newData.val() === true"
+          }
+        },
+
         "signals": {
           "_comment": "Receivers need to read signals; providers write them. Individual signal validation lives on the writer (Cloud Functions).",
           ".read":  "auth != null",
@@ -115,15 +122,19 @@
     },
 
     "rec_licenses": {
-      "_comment": "Paid Pro-Receiver licenses (REC-XXXXXXXX). One node per purchased Pro Receiver on MQL5 Market. Unlike SUB- codes (which live under /providers/{pid}/sub_licenses and consume a provider's free slot), REC- codes are user-owned, time-limited, and independent of any provider's 10-slot cap. The receiver chooses which provider to follow at activation (following_pid). Admins mint / revoke / expire from /admin.html. Cloud Functions read here when an EA presents a REC- prefixed code.",
+      "_comment": "Paid Pro-Receiver licenses (REC-XXXXXXXX). One node per purchased Pro Receiver on MQL5 Market. Unlike SUB- codes (which live under /providers/{pid}/sub_licenses and consume a provider's free slot), REC- codes are user-owned, time-limited, and independent of any provider's 10-slot cap. Two mint paths: (a) admin-minted from /admin.html (for MQL5 Market buyers) — following_pid stays null until first activation; (b) provider-minted from the provider dashboard — following_pid is pre-pinned to the minting provider at creation (see created_by_pid). Cloud Functions read here when an EA presents a REC- prefixed code.",
       ".read":  "auth != null && root.child('admins').child(auth.uid).val() === true",
       ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
 
       "$code": {
+        "_comment": "Per-code rules grant narrower access than the collection-level .read/.write: a provider can read + mint + revoke codes they own (created_by_pid matches a provider whose owner_uid is auth.uid), scoped so they cannot touch other providers' codes or admin-minted codes.",
+        ".read":  "auth != null && (root.child('admins').child(auth.uid).val() === true || (data.child('created_by_pid').exists() && root.child('providers').child(data.child('created_by_pid').val()).child('owner_uid').val() === auth.uid))",
+        ".write": "auth != null && (root.child('admins').child(auth.uid).val() === true || (!data.exists() && newData.child('created_by_pid').exists() && root.child('providers').child(newData.child('created_by_pid').val()).child('owner_uid').val() === auth.uid && newData.child('created_by_uid').val() === auth.uid && newData.child('following_pid').val() === newData.child('created_by_pid').val()) || (data.exists() && data.child('created_by_pid').exists() && root.child('providers').child(data.child('created_by_pid').val()).child('owner_uid').val() === auth.uid))",
         ".validate": "newData.hasChildren(['state','created_at'])",
         "state":          { ".validate": "newData.val() === 'unused' || newData.val() === 'active' || newData.val() === 'revoked' || newData.val() === 'expired'" },
         "created_at":     { ".validate": "newData.isNumber()" },
         "created_by_uid": { ".validate": "newData.isString()" },
+        "created_by_pid": { ".validate": "(newData.isString() && newData.val().matches(/^NAV-[A-Z0-9]{3,10}$/)) || newData.val() == null" },
         "owner_email":    { ".validate": "newData.isString() && newData.val().length <= 256 || newData.val() == null" },
         "mql5_order_id":  { ".validate": "newData.isString() && newData.val().length <= 64 || newData.val() == null" },
         "note":           { ".validate": "newData.isString() && newData.val().length <= 500 || newData.val() == null" },

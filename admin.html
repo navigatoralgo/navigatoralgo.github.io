@@ -872,13 +872,22 @@
             const bound = d.bound_account ? `${d.bound_account}${d.bound_broker ? ` @ ${d.bound_broker}` : ""}` : "Not activated";
             const owner = d.owner_email || (d.mql5_order_id ? `order ${d.mql5_order_id}` : "—");
             const lastSeen = d.last_seen_at ? fmtTimestamp(d.last_seen_at) : "Never";
+            // Source: distinguishes codes minted here (from /admin.html) vs
+            // codes minted by a provider from their dashboard. Provider-minted
+            // codes carry created_by_pid; admin-minted codes don't.
+            const sourceBadge = d.created_by_pid
+              ? `<span class="prov-status paid" title="Minted by provider ${escapeHtml(d.created_by_pid)}">by ${escapeHtml(d.created_by_pid)}</span>`
+              : `<span class="prov-status free" title="Minted from the admin console">admin</span>`;
             return `
               <div class="prov-card" data-code="${escapeHtml(code)}" style="cursor:default;">
                 <div class="prov-card-head">
                   <div class="prov-card-pid">${escapeHtml(code)}</div>
                   <div class="prov-card-name">${escapeHtml(owner)}</div>
                   <div class="prov-card-owner">${escapeHtml(bound)}</div>
-                  <div style="margin-top:8px;"><span class="prov-status ${stateCls}">${escapeHtml(stateTxt)}</span></div>
+                  <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                    <span class="prov-status ${stateCls}">${escapeHtml(stateTxt)}</span>
+                    ${sourceBadge}
+                  </div>
                   ${d.note ? `<div class="prov-card-owner" style="margin-top:6px;opacity:0.8;">${escapeHtml(d.note)}</div>` : ""}
                 </div>
                 <div class="prov-card-stats">
