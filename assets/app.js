@@ -252,6 +252,80 @@ function randomSubLicenseCode() {
   return out;
 }
 
+// Provider-owner: revoke a sub-license. Flips its state to "revoked" (so the
+// Cloud Function's eaRead / eaWrite receiver paths both reject it on the next
+// poll, within ~1 s) and clears the bound account/broker so the slot can be
+// reused by a fresh unused code later. Also flips the /receivers/{acct} record
+// to "inactive" so the Active Copiers KPI on the dashboard drops immediately.
+export async function revokeSubLicense(user, providerId, code) {
+  const snap = await get(providerRef(providerId));
+  if (!snap.exists()) throw new Error("Provider not found.");
+  const data = snap.val();
+  const isOwner = data.owner_uid === user.uid;
+  const admin = await isAdmin(user.uid);
+  if (!isOwner && !admin) throw new Error("Only the provider's owner (or an admin) can revoke a sub-license.");
+
+  const subs = data.sub_licenses || {};
+  const license = subs[code];
+  if (!license) throw new Error(`Sub-license ${code} not found.`);
+
+  const boundAcct = license.bound_account || null;
+  const updates = {
+    [`${DB_PATHS.providers}/${providerId}/sub_licenses/${code}/state`]:         "revoked",
+    [`${DB_PATHS.providers}/${providerId}/sub_licenses/${code}/bound_account`]: null,
+    [`${DB_PATHS.providers}/${providerId}/sub_licenses/${code}/bound_broker`]:  null
+  };
+  if (boundAcct) {
+    updates[`${DB_PATHS.providers}/${providerId}/receivers/${boundAcct}/state`] = "inactive";
+  }
+  await update(ref(db), updates);
+}
+
+// Provider-owner: rotate a sub-license. Deletes the old code entirely from the
+// database (stronger than revoke — no trace remains, so even a stale cache on
+// the Cloud Function can't resurrect it) and mints a fresh SUB-XXXXXXXX code in
+// its place with state="unused". Atomic multi-path update: if one leg fails the
+// other won't go through. Returns the new code string.
+export async function rotateSubLicense(user, providerId, oldCode) {
+  const snap = await get(providerRef(providerId));
+  if (!snap.exists()) throw new Error("Provider not found.");
+  const data = snap.val();
+  const isOwner = data.owner_uid === user.uid;
+  const admin = await isAdmin(user.uid);
+  if (!isOwner && !admin) throw new Error("Only the provider's owner (or an admin) can rotate a sub-license.");
+
+  const subs = data.sub_licenses || {};
+  const oldLicense = subs[oldCode];
+  if (!oldLicense) throw new Error(`Sub-license ${oldCode} not found.`);
+
+  // Generate a new code and make sure it doesn't collide with an existing one
+  // (astronomically unlikely but cheap to check).
+  let newCode;
+  for (let i = 0; i < 8; i++) {
+    const candidate = randomSubLicenseCode();
+    if (!subs[candidate]) { newCode = candidate; break; }
+  }
+  if (!newCode) throw new Error("Could not generate a unique new code. Try again.");
+
+  const boundAcct = oldLicense.bound_account || null;
+  const now = Date.now();
+  const updates = {
+    // Delete the old code entirely — Firebase treats `null` as "remove this node".
+    [`${DB_PATHS.providers}/${providerId}/sub_licenses/${oldCode}`]: null,
+    // Mint the replacement.
+    [`${DB_PATHS.providers}/${providerId}/sub_licenses/${newCode}`]: {
+      state: "unused",
+      created_at: now
+    }
+  };
+  if (boundAcct) {
+    // Clean up the receiver record — old receiver EA loses access on next poll.
+    updates[`${DB_PATHS.providers}/${providerId}/receivers/${boundAcct}/state`] = "inactive";
+  }
+  await update(ref(db), updates);
+  return newCode;
+}
+
 // Provider-owner: generate the batch of free sub-license slots on demand
 // (via the dashboard, before the EA first connects). Idempotent — aborts if
 // sub_licenses already contains any codes. Returns the number of codes minted
