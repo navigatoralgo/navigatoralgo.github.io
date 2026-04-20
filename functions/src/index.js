@@ -19,6 +19,7 @@
 // Deployed to: https://us-central1-signal-provider-pro.cloudfunctions.net/{eaWrite,eaRead}
 
 const { onRequest } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { initializeApp } = require("firebase-admin/app");
 const { getDatabase, ServerValue } = require("firebase-admin/database");
 
@@ -37,6 +38,22 @@ const SIGNAL_READ_LIMIT = 50;          // max signals returned per eaRead call.
 const MAX_BODY_BYTES = 16 * 1024;      // 16 KB cap on request body (EA payloads are ~1 KB).
 const RATE_LIMIT_WINDOW_MS = 10_000;   // 10 s window …
 const RATE_LIMIT_MAX = 50;             // … 50 writes per pid per window.
+
+// Signal-retention cap. The pruneOldSignals scheduler keeps only the most
+// recent SIGNAL_RETENTION_KEEP per provider, deleting older records from
+// /providers/{pid}/signals. Sized generously so even a dashboard that wants
+// to graph "last N signals" has room. Seq-based cut: anything with seq <=
+// (next_seq - SIGNAL_RETENTION_KEEP) is eligible for deletion.
+const SIGNAL_RETENTION_KEEP = 1000;
+const SIGNAL_PRUNE_BATCH = 500;        // delete up to this many per provider per run.
+
+// In-memory license cache used only by the eaRead hot path. TTL is short
+// enough that revoke/expire still propagates in bounded time (worst case
+// LICENSE_CACHE_TTL_MS after state flip) but long enough to cut billable
+// RTDB Downloads on a 1 Hz poll by ~50%. receiver_ack and every other
+// mutating path bypass this cache and always re-read from the DB.
+const LICENSE_CACHE_TTL_MS = 30_000;
+const licenseCache = new Map();        // key: license_code, value: { result, expiresAt }
 
 const VALID_KINDS_PROVIDER = new Set(["signal", "heartbeat", "stat"]);
 const VALID_KINDS_RECEIVER = new Set(["receiver_ack"]);
@@ -132,6 +149,36 @@ async function findLicense(code) {
     }
   }
   return null;
+}
+
+// Cached wrapper for findLicense. Used ONLY in the eaRead hot path — never in
+// receiver_ack or any other mutating handler, because those must see fresh
+// state (e.g. a newly revoked code must not be allowed to bind an account).
+// Cache is keyed by license_code and holds whatever findLicense returned
+// (including null, so garbage codes don't hammer /providers on every poll).
+// TTL is LICENSE_CACHE_TTL_MS; on cache miss we fetch fresh and repopulate.
+// Revoke/expire/rotate flips the DB record but not this cache; worst case an
+// EA sees a stale "active" verdict for up to TTL seconds and then starts
+// hitting the real error on the next TTL-expired poll. Acceptable for a
+// hot-path optimization where a 30-second grace period has no security impact
+// (signals in the window are legitimate server-generated signals; the stolen
+// value is at most TTL seconds of extra signal delivery to a revoked code).
+async function findLicenseCached(code) {
+  const now = Date.now();
+  const hit = licenseCache.get(code);
+  if (hit && hit.expiresAt > now) {
+    return hit.result;
+  }
+  const result = await findLicense(code);
+  licenseCache.set(code, { result, expiresAt: now + LICENSE_CACHE_TTL_MS });
+  // Loose eviction: if the cache balloons, drop anything expired. Bounded at
+  // ~roughly active-license count * TTL, so in practice stays small.
+  if (licenseCache.size > 5000) {
+    for (const [k, v] of licenseCache) {
+      if (v.expiresAt <= now) licenseCache.delete(k);
+    }
+  }
+  return result;
 }
 
 async function validateProviderAuth(pid, eaKey) {
@@ -501,7 +548,10 @@ exports.eaRead = onRequest(
 
       if (!license_code || typeof license_code !== "string") return err(res, 400, "bad_license_code");
 
-      const found = await findLicense(license_code);
+      // Hot path: use the cached lookup. A freshly-revoked license may take up
+      // to LICENSE_CACHE_TTL_MS to start returning license_revoked here; that
+      // window is intentional and documented in findLicenseCached.
+      const found = await findLicenseCached(license_code);
       if (!found) return err(res, 404, "license_not_found");
       if (found.license.state === "revoked") return err(res, 403, "license_revoked");
       if (found.license.state === "expired") return err(res, 403, "license_expired");
@@ -593,5 +643,96 @@ exports.eaRead = onRequest(
       console.error("[eaRead] uncaught:", e);
       return err(res, 500, "internal", e?.message);
     }
+  }
+);
+
+// ── SCHEDULED: pruneOldSignals ──
+//
+// Runs daily (03:00 UTC — pre-London-open, off-peak for copy traffic) and
+// deletes stale /providers/{pid}/signals records. Retention is count-based:
+// keep the most recent SIGNAL_RETENTION_KEEP signals per provider, delete
+// anything older by seq. Seq is monotonic and already indexed, so this is
+// cheap to query; time-based retention would require an extra .indexOn for
+// server_ts which we don't have.
+//
+// Without this the /signals subtree grows forever. Every dashboard load,
+// admin page load, and eaRead poll runs queries against /signals; a 10k
+// unbounded backlog is ~5 MB per query, and billable Downloads multiply by
+// (query count) × (backlog size). Keeping the tail short keeps those costs
+// flat regardless of platform lifetime.
+//
+// Deletes are chunked at SIGNAL_PRUNE_BATCH per provider per run so a single
+// runaway provider can't blow the 5-minute function timeout. The next run
+// picks up wherever this one left off.
+
+exports.pruneOldSignals = onSchedule(
+  {
+    region: REGION,
+    schedule: "every day 03:00",
+    timeZone: "UTC",
+    memory: "256MiB",
+    timeoutSeconds: 300,
+  },
+  async () => {
+    const startedAt = Date.now();
+    let providersScanned = 0;
+    let providersPruned = 0;
+    let totalDeleted = 0;
+
+    const providersSnap = await db.ref("/providers").shallow().get();
+    if (!providersSnap.exists()) {
+      console.log("[pruneOldSignals] no providers, nothing to do");
+      return;
+    }
+
+    const pids = Object.keys(providersSnap.val() || {});
+    for (const pid of pids) {
+      providersScanned++;
+      try {
+        const statsSnap = await db.ref(`/providers/${pid}/stats/next_seq`).get();
+        const nextSeq = typeof statsSnap.val() === "number" ? statsSnap.val() : 0;
+        // Nothing to prune until the backlog exceeds the retention cap.
+        if (nextSeq <= SIGNAL_RETENTION_KEEP) continue;
+
+        // Delete signals with seq <= cutoffSeq. endAt is inclusive on the
+        // ordered child (seq), so this matches "everything at or below the
+        // cutoff" without needing a separate count query.
+        const cutoffSeq = nextSeq - SIGNAL_RETENTION_KEEP;
+        const oldSnap = await db.ref(`/providers/${pid}/signals`)
+          .orderByChild("seq")
+          .endAt(cutoffSeq)
+          .limitToFirst(SIGNAL_PRUNE_BATCH)
+          .get();
+
+        if (!oldSnap.exists()) continue;
+
+        const updates = {};
+        oldSnap.forEach((child) => { updates[child.key] = null; });
+        const deleteCount = Object.keys(updates).length;
+        if (deleteCount === 0) continue;
+
+        await db.ref(`/providers/${pid}/signals`).update(updates);
+        totalDeleted += deleteCount;
+        providersPruned++;
+
+        await db.ref(`/providers/${pid}/stats/pruning`).set({
+          last_run_at: startedAt,
+          last_deleted: deleteCount,
+          cutoff_seq: cutoffSeq,
+          retention_keep: SIGNAL_RETENTION_KEEP,
+        });
+
+        console.log(`[pruneOldSignals] ${pid}: deleted ${deleteCount} signals ` +
+                    `(seq <= ${cutoffSeq}, next_seq=${nextSeq})`);
+      } catch (e) {
+        // One bad provider shouldn't stop the sweep. Log and move on.
+        console.error(`[pruneOldSignals] ${pid}: failed`, e?.message || e);
+      }
+    }
+
+    const durationMs = Date.now() - startedAt;
+    console.log(`[pruneOldSignals] done: scanned=${providersScanned} ` +
+                `pruned=${providersPruned} deleted=${totalDeleted} ` +
+                `duration_ms=${durationMs}`);
   }
 );
