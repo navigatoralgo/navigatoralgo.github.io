@@ -260,13 +260,20 @@ async function writeReceiverAck(pid, licenseCode, license, payload) {
   });
 
   // Write a receiver record keyed by account — useful for dashboard counts.
-  await db.ref(`/providers/${pid}/receivers/${acct}`).update({
+  // `tier` is sent by the EA (NavigatorReceiverFree → "free", NavigatorReceiverPro → "paid").
+  // Legacy EAs that don't send `tier` default to "free" so counts don't crash.
+  const tier = (payload.tier === "paid") ? "paid" : "free";
+  const ea = (typeof payload.ea === "string") ? payload.ea.slice(0, 64) : null;
+  const recUpdate = {
     state: "active",
     bound_broker: typeof payload.broker === "string" ? payload.broker.slice(0, 64) : null,
     license_code: licenseCode,
+    tier,
     activated_at: license.activated_at || now,
     last_seen_at: now
-  });
+  };
+  if (ea) recUpdate.ea = ea;
+  await db.ref(`/providers/${pid}/receivers/${acct}`).update(recUpdate);
 
   return { ok: true };
 }

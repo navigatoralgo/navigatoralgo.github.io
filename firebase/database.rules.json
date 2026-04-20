@@ -36,7 +36,7 @@
 
       "$pid": {
         ".read":  "auth != null && (data.child('owner_uid').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)",
-        ".write": "auth != null && ( (data.exists() && data.child('owner_uid').val() === auth.uid) || (data.exists() && !data.child('owner_uid').exists()) || (!data.exists() && root.child('admins').child(auth.uid).val() === true) )",
+        ".write": "auth != null && ( (data.exists() && data.child('owner_uid').val() === auth.uid) || (data.exists() && !data.child('owner_uid').exists()) || (!data.exists() && root.child('admins').child(auth.uid).val() === true) || root.child('admins').child(auth.uid).val() === true )",
 
         "owner_uid":   { ".validate": "newData.isString() || newData.val() == null" },
         "owner_email": { ".validate": "newData.isString() || newData.val() == null" },
@@ -68,6 +68,8 @@
             "state":        { ".validate": "newData.val() === 'active' || newData.val() === 'inactive'" },
             "bound_broker": { ".validate": "newData.isString() || newData.val() == null" },
             "license_code": { ".validate": "newData.isString()" },
+            "tier":         { ".validate": "newData.val() === 'free' || newData.val() === 'paid'" },
+            "ea":           { ".validate": "newData.isString() && newData.val().length <= 64" },
             "activated_at": { ".validate": "newData.isNumber()" },
             "last_seen_at": { ".validate": "newData.isNumber()" }
           }
@@ -110,6 +112,12 @@
         ".write": false,
         ".validate": "newData.hasChildren(['type','state'])"
       }
+    },
+
+    "deleted_providers": {
+      "_comment": "Archive of providers deleted from the admin console. Admins can list/read to undo; nothing else has access. Manual cleanup after ~30 days (later PR: automated trim).",
+      ".read":  "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
     },
 
     "public_providers": {
