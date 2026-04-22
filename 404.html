@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>404 — Page not found · Navigator Algo</title>
+<meta name="description" content="The page you were looking for doesn't exist on Navigator Algo.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/shared.css">
+<style>
+.nf-shell {
+  position: relative; z-index: 1;
+  min-height: calc(100vh - 104px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 178px 32px 80px;
+  text-align: center;
+}
+.nf-inner {
+  max-width: 640px;
+}
+.nf-code {
+  font-family: var(--font-ui);
+  font-size: clamp(72px, 18vw, 160px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--teal) 0%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.nf-label {
+  font-family: var(--font-ui);
+  font-size: 11px; letter-spacing: 0.18em;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.nf-title {
+  font-family: var(--font-head);
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+.nf-sub {
+  font-size: 15px; line-height: 1.65;
+  color: var(--text);
+  margin-bottom: 32px;
+}
+.nf-actions {
+  display: flex; gap: 12px;
+  justify-content: center; flex-wrap: wrap;
+}
+.nf-btn {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.nf-btn-primary {
+  color: var(--bg);
+  background: linear-gradient(135deg, #12ddd2 0%, #00c8d1 100%);
+  box-shadow: 0 10px 24px rgba(0,212,200,0.2);
+}
+.nf-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(0,212,200,0.28);
+}
+.nf-btn-ghost {
+  color: var(--teal);
+  border: 1px solid rgba(0,212,200,0.35);
+}
+.nf-btn-ghost:hover {
+  border-color: rgba(0,212,200,0.6);
+  background: rgba(0,212,200,0.04);
+}
+.nf-links {
+  margin-top: 36px;
+  display: flex; gap: 18px;
+  justify-content: center; flex-wrap: wrap;
+  font-family: var(--font-ui);
+  font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.nf-links a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nf-links a:hover { color: var(--teal); }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav id="nav">
+  <a href="/" class="nav-logo">
+    <img src="/logo.png" alt="Navigator Algo" class="nav-logo-mark" width="340" height="227">
+  </a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/signal-copier.html">Signal Copier</a></li>
+    <li><a href="/dashboard.html">Dashboard</a></li>
+    <li id="nav-auth-slot"><a href="/signin.html" class="nav-btn-ghost">Sign in</a></li>
+    <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
+  </ul>
+</nav>
+
+<main class="nf-shell">
+  <div class="nf-inner">
+    <div class="nf-code">404</div>
+    <div class="nf-label">// page not found</div>
+    <h1 class="nf-title">This route doesn't exist on Navigator Algo.</h1>
+    <p class="nf-sub">
+      The page may have moved or the link you followed is outdated. Head back home or jump straight to pricing.
+    </p>
+    <div class="nf-actions">
+      <a href="/" class="nf-btn nf-btn-primary">Back to home</a>
+      <a href="/pricing.html" class="nf-btn nf-btn-ghost">View pricing</a>
+    </div>
+    <div class="nf-links">
+      <a href="/signal-copier.html">Signal Copier</a>
+      <a href="/receiver-download.html">Partner Receiver</a>
+      <a href="https://t.me/Navigatoralgo_bot" target="_blank" rel="noopener">Support</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; 2026 Navigator Trading Systems · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/refund.html">Refunds</a></div>
+    <div class="footer-sys">
+      <span class="status-dot"></span> ALL SYSTEMS OPERATIONAL
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => import('/assets/nav-auth.js'));
+  } else {
+    setTimeout(() => import('/assets/nav-auth.js'), 1500);
+  }
+</script>
+</body>
+</html>
