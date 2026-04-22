@@ -307,6 +307,15 @@ async function writeReceiverAckSub(pid, licenseCode, license, payload) {
   if (!acct || typeof acct !== "string") return { err: "bad_payload", details: "account required" };
   const now = Date.now();
 
+  // License-sharing guard. Once a license binds to an MT5 account (first
+  // successful receiver_ack), reject any ack from a different account.
+  // Stops the "one paying user shares the code with 5 friends" leak: the
+  // first account to activate becomes canonical, and every other MT5
+  // running the same SUB- code gets account_mismatch on every trade.
+  if (license.bound_account && String(license.bound_account) !== String(acct)) {
+    return { err: "account_mismatch", details: "license is bound to a different MT5 account; contact support to rebind" };
+  }
+
   // Enforce free-tier cap: if this license has never activated AND total
   // currently-active sub_licenses for this provider is already at the cap,
   // reject. Paid REC- receivers skip this check entirely — they don't consume
@@ -394,6 +403,12 @@ async function writeReceiverAckRec(licenseCode, license, payload) {
   const acct = payload?.account;
   if (!acct || typeof acct !== "string") return { err: "bad_payload", details: "account required" };
   const now = Date.now();
+
+  // License-sharing guard. First account to ack becomes canonical; every
+  // other MT5 running the same REC- code gets account_mismatch.
+  if (license.bound_account && String(license.bound_account) !== String(acct)) {
+    return { err: "account_mismatch", details: "license is bound to a different MT5 account; contact support to rebind" };
+  }
 
   // Enforce expiry. If the license has an expires_at in the past, flip state
   // to "expired" so future lookups can short-circuit without re-checking the
@@ -545,6 +560,14 @@ exports.eaRead = onRequest(
       // signal execution, so a fresh receiver with no copied trades would
       // otherwise deadlock waiting for activation).
       const pid_to_follow = typeof params.pid_to_follow === "string" ? params.pid_to_follow : null;
+      // Optional MT5 account id. When both the caller and the stored license
+      // have an account, any mismatch is a shared-license attempt and the
+      // read is rejected. Older EA builds that don't send `account` continue
+      // to work — receiver_ack will catch the mismatch as soon as the first
+      // trade fires. New EA builds send account on every poll so sharing
+      // is blocked before any signal delivery.
+      const acct = typeof params.account === "string" && params.account ? params.account
+                 : (typeof params.account === "number" ? String(params.account) : null);
 
       if (!license_code || typeof license_code !== "string") return err(res, 400, "bad_license_code");
 
@@ -555,6 +578,10 @@ exports.eaRead = onRequest(
       if (!found) return err(res, 404, "license_not_found");
       if (found.license.state === "revoked") return err(res, 403, "license_revoked");
       if (found.license.state === "expired") return err(res, 403, "license_expired");
+      if (acct && found.license.bound_account
+          && String(found.license.bound_account) !== String(acct)) {
+        return err(res, 403, "account_mismatch", "license is bound to a different MT5 account; contact support to rebind");
+      }
 
       // REC- licenses enforce expiry on every read too, not just on activation,
       // so a paid receiver whose subscription lapses stops polling within
