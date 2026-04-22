@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Refund Policy — Navigator Algo</title>
-<meta name="description" content="Refund policy for Navigator Algo — 7-day no-questions first-charge refund, pro-rated thereafter on good-faith support outreach.">
+<meta name="description" content="Refund policy for Navigator Algo — MQL5 Market refunds for current products, with our good-faith handling of service-side issues.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/shared.css">
@@ -105,63 +105,58 @@
   <h1>Refund <em>Policy</em></h1>
   <div class="legal-meta">Last updated: 22 April 2026 · Version 1.0</div>
 
-  <p>This page explains how and when <strong>Navigator Trading Systems</strong> (operator of navigatoralgo.com) issues refunds. It applies to <strong>Paddle-processed</strong> purchases (the annual Signal Provider subscription and monthly extra-slot add-ons). Purchases made through <strong>MQL5 Market</strong> are governed by the MQL5 Market refund policy in addition to anything written here.</p>
+  <p>This page explains how and when <strong>Navigator Trading Systems</strong> (operator of navigatoralgo.com) issues refunds. All current products — the annual Signal Provider subscription and the Pro Receiver — are sold through <strong>MQL5 Market</strong>, so the <strong>MQL5 Market refund policy</strong> applies to the payment itself. This page covers how we handle refund requests that involve Navigator Algo&rsquo;s side of the service (license state, outages, billing errors on our end) and sets out the good-faith standard we aim to meet beyond what MQL5 handles directly.</p>
 
-  <h2 id="first-charge">1. First-charge guarantee — 7 days, no questions asked</h2>
+  <h2 id="mql5">1. MQL5 Market handles the payment side</h2>
   <div class="legal-callout">
-    <strong>Your very first Paddle charge on any new subscription is refundable in full, no questions asked, within 7 calendar days of purchase.</strong>
+    <strong>Card charges, VAT, receipts, and payment-side refunds are handled by MQL5 Market under their own terms.</strong>
   </div>
-  <p>This covers:</p>
-  <ul>
-    <li>The <strong>$100/year Signal Provider</strong> annual subscription (first year only).</li>
-    <li>The <strong>first $8/month extra-slot charge</strong> for a given provider account.</li>
-  </ul>
-  <p>To claim it, email <a href="mailto:support@navigatoralgo.com">support@navigatoralgo.com</a> or message <a href="https://t.me/Navigatoralgo_bot" target="_blank" rel="noopener">@Navigatoralgo_bot</a> with your Paddle order number. We will cancel the subscription immediately and instruct Paddle to refund your original payment method. Expect the refund to arrive in 5-10 business days depending on your bank / card issuer.</p>
+  <p>If you want to cancel an MQL5 purchase or request a refund for a billing reason (duplicate charge, stolen card, wrong product selected, etc.), start in your <a href="https://www.mql5.com/en/account/purchases" target="_blank" rel="noopener">MQL5 purchases page</a> or contact MQL5 Market support. MQL5&rsquo;s standard policy governs what is and isn&rsquo;t refundable on their side, including any cooling-off or consumer-law rights you have as an EU/UK buyer.</p>
+  <p>If MQL5 refunds your purchase, we will automatically revoke the corresponding Navigator Algo license (<code>REC-</code> code or Provider subscription) to keep our records consistent with your actual entitlement.</p>
 
-  <h2 id="subsequent">2. After the first charge</h2>
-  <p>Following renewal charges (second year of provider subscription, second month onwards of extra-slot add-ons) are <strong>not automatically refundable</strong>. This is standard for subscription software: by continuing past the first billing cycle, you are consenting to the ongoing service.</p>
-  <p>You can <strong>cancel at any time</strong> from your dashboard. Cancellation stops the next renewal charge; the current paid period continues until it naturally ends, and you keep full access until then.</p>
-
-  <h2 id="exceptions">3. Exceptions — case-by-case refunds</h2>
-  <p>We will consider a pro-rated or full refund for a renewal charge if <em>any</em> of the following apply:</p>
+  <h2 id="service-side">2. Service-side issues — contact us</h2>
+  <p>If the problem is on <em>our</em> side rather than MQL5&rsquo;s, email <a href="mailto:support@navigatoralgo.com">support@navigatoralgo.com</a> or message <a href="https://t.me/Navigatoralgo_bot" target="_blank" rel="noopener">@Navigatoralgo_bot</a>. We will consider a refund, credit, or license-extension in good faith if any of the following apply:</p>
   <ul>
-    <li><strong>Service outage.</strong> Navigator Algo was down for more than 12 consecutive hours during the paid period due to a fault on our side, confirmed by our status page / Firebase incident log.</li>
-    <li><strong>Charge you didn't authorize.</strong> Someone charged your card using stolen credentials. Report to us and to Paddle immediately.</li>
-    <li><strong>Duplicate charge / billing error on our side.</strong> Always refunded, full amount.</li>
-    <li><strong>Promised feature not delivered.</strong> If we pre-announced a feature on a specific billing tier and did not deliver, you can request a refund for the tier upgrade.</li>
+    <li><strong>Service outage.</strong> Navigator Algo was unavailable for more than 12 consecutive hours during your paid period due to a fault on our side, confirmed by Firebase incident logs.</li>
+    <li><strong>License not delivered.</strong> You paid on MQL5 but your <code>REC-</code> / Provider subscription was not issued and cannot be recovered by re-running the installer or contacting support.</li>
+    <li><strong>Duplicate credit on our side.</strong> You were charged twice for the same license due to a bug in our issuance flow.</li>
+    <li><strong>Promised feature not delivered.</strong> If we pre-announced a feature and did not deliver, we can issue a pro-rated credit or refund.</li>
   </ul>
+  <p>Because the original charge is on MQL5, a service-side resolution usually takes the form of a <strong>license extension, replacement <code>REC-</code> code, or an MQL5 refund initiated by us on your behalf</strong> (MQL5 lets sellers flag orders for refund from the seller panel). We will explain which applies before acting.</p>
+
+  <h2 id="future">3. If we add direct billing in the future</h2>
+  <p>We may, later on, sell products directly from navigatoralgo.com (for example, extra subscriber-slot subscriptions paid through a third-party payment processor). When and if that launches we will update this page to describe the first-charge guarantee, cooling-off handling, and cancellation behavior <em>before</em> any direct charge is taken.</p>
 
   <h2 id="not">4. What is <em>not</em> refundable</h2>
   <div class="legal-callout warn">
-    <strong>Trading losses are never refundable.</strong> Navigator Algo is a signal-relay infrastructure platform. We do not provide trading advice, we do not execute trades on your broker, and we do not guarantee any signal provider's performance. A losing week or a bad signal from a provider you chose to follow is not grounds for refund from us.
+    <strong>Trading losses are never refundable.</strong> Navigator Algo is a signal-relay infrastructure platform. We do not provide trading advice, we do not execute trades on your broker, and we do not guarantee any signal provider&rsquo;s performance. A losing week or a bad signal from a provider you chose to follow is not grounds for refund from us.
   </div>
-  <p>We also do not refund:</p>
+  <p>We also will not support a refund where:</p>
   <ul>
-    <li>Charges where your license was revoked for breach of the Terms of Service (shared license, reverse engineering, rate-limit abuse, etc.).</li>
-    <li>Charges where you filed a chargeback before contacting us to resolve the issue. Chargebacks without prior contact can also result in account termination.</li>
-    <li>MT5 Receiver EA purchases sold through MQL5 Market — those go through MQL5's own refund process.</li>
-    <li>Partial months / unused slots when you cancel — access continues until end of period, and that's the refund in kind.</li>
+    <li>Your license was revoked for breach of the <a href="terms.html">Terms of Service</a> (shared license, reverse engineering, rate-limit abuse, etc.).</li>
+    <li>You filed a payment-processor chargeback before contacting us or MQL5 Market to resolve the issue. Chargebacks without prior contact can also result in account termination.</li>
+    <li>The complaint is about a partial month / unused portion of a period you already consumed — access continues until the end of the paid period, which is the refund in kind.</li>
   </ul>
 
   <h2 id="chargebacks">5. Chargebacks</h2>
-  <p>If you believe you have been incorrectly charged, <strong>contact us first</strong>. 99% of disputes are simply misunderstandings that we resolve in a day or two. Filing a chargeback with your card issuer before contacting us causes:</p>
+  <p>If you believe you have been incorrectly charged, <strong>contact MQL5 Market and us first</strong>. Most disputes are misunderstandings that resolve in a day or two. Filing a chargeback with your card issuer before contacting anyone causes:</p>
   <ul>
     <li>Immediate suspension of your provider account and any active licenses until the dispute is resolved.</li>
-    <li>A $15 chargeback-handling fee (charged by Paddle, passed to us) that we may recover from you.</li>
     <li>Potential permanent ban from using navigatoralgo.com.</li>
   </ul>
 
   <h2 id="how">6. How to request a refund</h2>
   <ol>
-    <li>Email <a href="mailto:support@navigatoralgo.com">support@navigatoralgo.com</a> from the email on your Paddle receipt, OR message <a href="https://t.me/Navigatoralgo_bot" target="_blank" rel="noopener">@Navigatoralgo_bot</a>.</li>
-    <li>Include: your Paddle order / subscription ID, the date of the charge, the amount, and (optionally) the reason. For exception refunds (§3), give us enough detail to verify.</li>
-    <li>We respond within <strong>2 business days</strong>. Approved refunds are processed through Paddle and arrive in 5-10 business days on your original payment method.</li>
-    <li>If we deny your request, we will explain why in writing. You always retain your rights under applicable consumer law (including the EU 14-day cooling-off period for EU consumers, which is wider than our 7-day window and overrides it for EU customers).</li>
+    <li>If the issue is about the payment itself, start on <a href="https://www.mql5.com/en/account/purchases" target="_blank" rel="noopener">MQL5 purchases</a> and use their refund flow.</li>
+    <li>If the issue is about the Navigator Algo service (undelivered license, outage, our-side error), email <a href="mailto:support@navigatoralgo.com">support@navigatoralgo.com</a> or message <a href="https://t.me/Navigatoralgo_bot" target="_blank" rel="noopener">@Navigatoralgo_bot</a>.</li>
+    <li>Include: your MQL5 order reference (or receipt), the date, the amount, and what happened. For exception cases (§2), give us enough detail to verify.</li>
+    <li>We respond within <strong>2 business days</strong>. Resolution may be a license extension, a replacement <code>REC-</code>, or a seller-initiated MQL5 refund depending on the situation.</li>
+    <li>If we deny your request, we will explain why in writing. You always retain your rights under applicable consumer law, including the EU 14-day cooling-off period described below.</li>
   </ol>
 
   <h2 id="eu">7. EU / UK consumers — statutory right of withdrawal</h2>
   <p>If you are a consumer resident in the EU or UK, you have a <strong>14-day cooling-off period</strong> from the date of purchase during which you may cancel a distance-purchase of digital services and request a full refund, under the EU Consumer Rights Directive (2011/83/EU) and the UK Consumer Contracts Regulations.</p>
-  <p>By actively using the dashboard / minting licenses / running signals during the first 14 days, you expressly waive this right with respect to the portion of the service you have already consumed. We will still refund any unused remainder of your first billing cycle if you cancel within 14 days.</p>
+  <p>By actively using the dashboard / minting licenses / running signals during the first 14 days, you expressly waive this right with respect to the portion of the service you have already consumed. Where MQL5 Market is the seller, MQL5&rsquo;s own cooling-off handling applies to the payment itself; we will support any MQL5-initiated refund by revoking the corresponding license on our end.</p>
 
   <h2 id="contact">8. Questions</h2>
   <p>Email <a href="mailto:support@navigatoralgo.com">support@navigatoralgo.com</a>. We answer within 2 business days, usually faster.</p>
