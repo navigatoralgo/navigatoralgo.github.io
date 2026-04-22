@@ -3,195 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Trigger Pro — MT5 Straddle & Trade Manager | Navigator Algo</title>
 <meta name="description" content="Trigger Pro for MT5: seven execution modules — trade, news, session, range, S/R, pattern, schedule — with six trailing modes, virtual SL/TP, and full risk controls. $45 one-time on MQL5 Market.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://navigatoralgo.com/trigger-pro.html">
+<meta property="og:title" content="Trigger Pro — MT5 Straddle & Trade Manager | Navigator Algo">
+<meta property="og:description" content="Seven execution modules with six trailing modes, virtual SL/TP, and full risk controls. $45 one-time on MQL5 Market.">
+<meta property="og:image" content="https://navigatoralgo.com/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Trigger Pro — MT5 Straddle & Trade Manager | Navigator Algo">
+<meta name="twitter:description" content="Seven execution modules with six trailing modes, virtual SL/TP, and full risk controls. $45 one-time on MQL5 Market.">
+<meta name="twitter:image" content="https://navigatoralgo.com/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/shared.css">
 <style>
-:root {
-  --bg:       #080b0e;
-  --bg2:      #0d1117;
-  --panel:    #0f1520;
-  --border:   #1a2535;
-  --border2:  #243040;
-  --teal:     #00d4c8;
-  --teal2:    #00a89e;
-  --gold:     #f0a500;
-  --gold2:    #c4850a;
-  --text:     #c5d3e0;
-  --muted:    #4e6070;
-  --muted2:   #38505f;
-  --green:    #00e676;
-  --red:      #ff5555;
-  --white:    #edf2f7;
-  --font-mono: 'Sora', sans-serif;
-  --font-body: 'Nunito', sans-serif;
-  --font-cond: 'Nunito', sans-serif;
-  --font-head: 'Sora', sans-serif;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-body {
-  background:
-    radial-gradient(circle at top center, rgba(0,212,200,0.05), transparent 32%),
-    radial-gradient(circle at bottom right, rgba(240,165,0,0.035), transparent 28%),
-    var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 15px;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* ── SCANLINE ── */
-body::after { content: none; }
-
-/* ── GRID BG ── */
-.bg-grid {
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(0,212,200,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,212,200,0.015) 1px, transparent 1px);
-  background-size: 64px 64px;
-  opacity: 0.6;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ── NAV ── */
-#nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
-  height: 104px;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 48px;
-  background: rgba(8,11,14,0.82);
-  border-bottom: 1px solid rgba(36,48,64,0.72);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-}
-
-.nav-logo {
-  display: flex; align-items: center;
-  text-decoration: none;
-}
-.nav-logo-mark {
-  width: min(100%, 340px);
-  height: auto;
-  max-width: 340px;
-  display: block;
-  object-fit: contain;
-  filter: drop-shadow(0 0 16px rgba(0,212,200,0.14));
-}
-
-.nav-links {
-  display: flex; align-items: center; gap: 8px;
-  list-style: none;
-}
-.nav-links a {
-  font-family: var(--font-mono);
-  font-size: 10px; letter-spacing: 0.08em;
-  color: var(--muted);
-  text-decoration: none; text-transform: uppercase;
-  padding: 9px 14px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  transition: all 0.2s;
-}
-.nav-links a:hover {
-  color: var(--teal);
-  border-color: rgba(0,212,200,0.16);
-  background: rgba(255,255,255,0.02);
-}
-.nav-links .nav-btn {
-  color: var(--bg) !important;
-  background: linear-gradient(135deg, #12ddd2 0%, #00c8d1 100%);
-  border-color: transparent !important;
-  border-radius: 999px;
-  clip-path: none;
-  box-shadow: 0 10px 24px rgba(0,212,200,0.2);
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s !important;
-}
-.nav-links .nav-btn-ghost {
-  color: var(--teal) !important;
-  border-color: rgba(0,212,200,0.35) !important;
-  background: rgba(0,212,200,0.04);
-}
-.nav-links .nav-btn-ghost:hover {
-  color: var(--teal) !important;
-  border-color: rgba(0,212,200,0.6) !important;
-  background: rgba(0,212,200,0.10);
-}
-.nav-links .nav-btn:hover {
-  background: linear-gradient(135deg, #1ce7dd 0%, #10d2d9 100%) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(0,212,200,0.24);
-}
-
-/* ── MOBILE NAV TOGGLE ── */
-.nav-toggle {
-  display: none;
-  width: 42px; height: 42px;
-  align-items: center; justify-content: center;
-  background: rgba(0,212,200,0.04);
-  border: 1px solid rgba(0,212,200,0.22);
-  border-radius: 10px;
-  color: var(--teal);
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  padding: 0;
-}
-.nav-toggle:hover {
-  border-color: rgba(0,212,200,0.55);
-  background: rgba(0,212,200,0.10);
-}
-.nav-toggle svg { display: block; }
-.nav-toggle .nav-toggle-close { display: none; }
-#nav.nav-open .nav-toggle .nav-toggle-open  { display: none; }
-#nav.nav-open .nav-toggle .nav-toggle-close { display: block; }
-
-/* ── STATUS BAR ── */
-.status-bar {
-  position: fixed; top: 104px; left: 0; right: 0; z-index: 499;
-  height: 42px;
-  background: rgba(13,17,23,0.78);
-  border-bottom: 1px solid rgba(36,48,64,0.72);
-  display: flex; align-items: center;
-  padding: 0 48px;
-  gap: 8px;
-  overflow-x: auto;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-.status-bar::-webkit-scrollbar { display: none; }
-.status-item {
-  font-family: var(--font-mono);
-  font-size: 9px; letter-spacing: 0.08em;
-  color: var(--muted);
-  padding: 0 14px;
-  border: 1px solid rgba(36,48,64,0.58);
-  background: rgba(15,21,32,0.68);
-  border-radius: 999px;
-  white-space: nowrap;
-  height: 28px; display: flex; align-items: center;
-  flex: 0 0 auto;
-}
-.status-item:first-child { padding-left: 14px; }
-.status-item .val-up   { color: var(--green); }
-.status-item .val-down { color: var(--red); }
-.status-item .val-teal { color: var(--teal); }
-.status-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 6px var(--green);
-  display: inline-block; margin-right: 7px;
-  animation: blink 2s ease-in-out infinite;
-}
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
 /* ── HERO ── */
 #hero {
   position: relative; z-index: 1;
@@ -218,7 +46,7 @@ body::after { content: none; }
 }
 
 .hero-eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.14em;
   color: var(--teal);
   text-transform: uppercase;
@@ -273,7 +101,7 @@ body::after { content: none; }
 }
 
 .btn {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
@@ -314,7 +142,7 @@ body::after { content: none; }
   color: var(--teal); display: block;
 }
 .hero-stat-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.08em;
   color: var(--muted); text-transform: uppercase;
   margin-top: 6px; display: block;
@@ -339,7 +167,7 @@ body::after { content: none; }
 
 .sec-header { margin-bottom: 56px; }
 .sec-tag {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.12em;
   color: var(--teal); text-transform: uppercase;
   display: block; margin-bottom: 10px;
@@ -398,7 +226,7 @@ body::after { content: none; }
 
 .product-card-corner {
   position: absolute; top: 12px; right: 14px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 18px; font-weight: 900;
   opacity: 0.04; color: var(--white);
   line-height: 1;
@@ -406,7 +234,7 @@ body::after { content: none; }
 
 .p-badge {
   display: inline-block;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
   padding: 6px 12px; margin-bottom: 18px;
   border: 1px solid;
@@ -433,7 +261,7 @@ body::after { content: none; }
   border-top: 1px solid rgba(36,48,64,0.72); padding-top: 16px;
 }
 .p-features li {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10.5px; color: var(--text);
   padding: 6px 0 6px 14px;
   position: relative;
@@ -460,13 +288,13 @@ body::after { content: none; }
 .accent-green .p-price { color: var(--green); }
 
 .p-price-unit {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; color: var(--muted);
   display: block; margin-top: 2px;
   letter-spacing: 0.1em;
 }
 .p-cta {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.12em;
   color: var(--teal);
   text-decoration: none; text-transform: uppercase;
@@ -479,7 +307,7 @@ body::after { content: none; }
 .accent-gold .p-cta:hover { color: var(--teal); }
 
 .p-rating {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; color: var(--gold);
   margin-bottom: 14px; letter-spacing: 0.02em;
 }
@@ -503,7 +331,7 @@ body::after { content: none; }
 .flagship::before { content: none; }
 .flagship-label {
   display: inline-block;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.08em;
   color: var(--teal); background: rgba(0,212,200,0.08);
   border: 1px solid rgba(0,212,200,0.18);
@@ -552,7 +380,7 @@ body::after { content: none; }
   color: var(--teal);
 }
 .flagship-price-info {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; color: var(--muted);
   letter-spacing: 0.1em; line-height: 1.8;
 }
@@ -586,7 +414,7 @@ body::after { content: none; }
   justify-content: flex-start;
   gap: 12px;
   margin-bottom: 18px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -653,7 +481,7 @@ body::after { content: none; }
 }
 .cta-strip h2 em { color: var(--teal); font-style: normal; }
 .cta-strip p {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.14em;
   color: var(--muted); text-transform: uppercase;
   margin-bottom: 36px;
@@ -694,7 +522,7 @@ footer {
   filter: drop-shadow(0 0 16px rgba(0,212,200,0.18));
 }
 .footer-brand-sub {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.12em;
   color: var(--muted); margin-bottom: 20px;
 }
@@ -716,7 +544,7 @@ footer {
   font-weight: 700;
 }
 .footer-col h4 {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.1em;
   color: var(--teal); text-transform: uppercase;
   margin-bottom: 16px;
@@ -736,20 +564,14 @@ footer {
   display: flex; justify-content: space-between; align-items: center;
 }
 .footer-copy {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.08em; color: var(--muted);
 }
 .footer-sys {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.1em; color: var(--muted);
   display: flex; align-items: center; gap: 7px;
 }
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); }
-::-webkit-scrollbar-thumb:hover { background: var(--teal2); }
 
 /* ── MOBILE ── */
 @media (max-width: 1024px) {
@@ -845,6 +667,13 @@ footer {
   .section, .cta-strip { padding-left: 14px; padding-right: 14px; }
   .hero-btns { flex-direction: column; }
   .hero-btns .btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 </style>
 </head>
@@ -1066,7 +895,7 @@ footer {
   <div class="footer-main">
     <div>
       <div class="footer-brand">
-        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo" width="510" height="340">
       </div>
       <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
       <p class="footer-brand-desc">Nine professional Expert Advisors for MetaTrader 5. Built for funded account traders, signal traders, manual traders, and everyone in between.</p>

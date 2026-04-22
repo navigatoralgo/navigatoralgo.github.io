@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://navigatoralgo.com/sitemap.xml
+
+# Admin pages
+Disallow: /admin.html
+Disallow: /admin-provider.html

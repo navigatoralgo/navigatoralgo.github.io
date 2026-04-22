@@ -3,8 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Admin — Navigator Algo</title>
 <meta name="description" content="Navigator Algo admin console — mint new provider IDs and activation tokens.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://navigatoralgo.com/admin.html">
+<meta property="og:title" content="Admin — Navigator Algo">
+<meta property="og:description" content="Navigator Algo admin console.">
+<meta property="og:image" content="https://navigatoralgo.com/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Admin — Navigator Algo">
+<meta name="twitter:description" content="Navigator Algo admin console.">
+<meta name="twitter:image" content="https://navigatoralgo.com/logo.png">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,7 +39,7 @@
 }
 .admin-header h1 em { color: var(--teal); font-style: normal; }
 .admin-header-sub {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.12em;
   color: var(--muted); text-transform: uppercase;
 }
@@ -52,7 +63,7 @@
 }
 .mint-row .form-input { max-width: 320px; }
 .mint-status {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.05em;
 }
 .mint-status.success { color: var(--green); }
@@ -74,18 +85,18 @@
 }
 .minted-row:last-child { border-bottom: none; }
 .minted-key {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.1em;
   color: var(--muted); text-transform: uppercase;
 }
 .minted-val {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 15px; font-weight: 600;
   color: var(--white);
   letter-spacing: 0.04em;
 }
 .copy-btn {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.1em;
   padding: 6px 12px;
   color: var(--teal);
@@ -130,7 +141,7 @@
   min-width: 0;
 }
 .prov-card-pid {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 15px; font-weight: 700;
   color: var(--white);
   letter-spacing: 0.02em;
@@ -143,7 +154,7 @@
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .prov-card-owner {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; color: var(--muted);
   letter-spacing: 0.03em;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -154,7 +165,7 @@
   gap: 14px;
 }
 .prov-stat-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 8px; letter-spacing: 0.14em;
   color: var(--muted); text-transform: uppercase;
   margin-bottom: 2px;
@@ -166,7 +177,7 @@
   line-height: 1.1;
 }
 .prov-stat-sub {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.06em;
   color: var(--muted);
   margin-top: 2px;
@@ -179,7 +190,7 @@
   min-width: 120px;
 }
 .prov-card-meta {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.05em;
   color: var(--muted);
   text-align: right;
@@ -187,19 +198,19 @@
 
 /* Legacy table styles retained in case any other admin view re-uses them. */
 .prov-id {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 13px; font-weight: 600;
   color: var(--white);
 }
 .prov-token {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px;
   color: var(--text);
   letter-spacing: 0.04em;
 }
 .prov-status {
   display: inline-block;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.1em;
   padding: 4px 10px;
   border-radius: 999px;
@@ -210,12 +221,12 @@
 .prov-status.claimed   { color: var(--green); background: rgba(0,214,150,0.06); border-color: rgba(0,214,150,0.3); }
 .prov-owner {
   font-size: 11px; color: var(--muted);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
 }
 .prov-empty {
   text-align: center;
   padding: 40px 20px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.1em;
   color: var(--muted); text-transform: uppercase;
 }
@@ -234,7 +245,7 @@
   padding: 16px 18px;
 }
 .kpi-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.14em;
   color: var(--muted); text-transform: uppercase;
   margin-bottom: 6px;
@@ -247,7 +258,7 @@
   line-height: 1.1;
 }
 .kpi-sub {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.08em;
   color: var(--muted);
   margin-top: 4px;
@@ -260,7 +271,7 @@
 /* Tiny inline chips used inside the provider row for at-a-glance counts. */
 .chip {
   display: inline-flex; align-items: center; gap: 6px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.05em;
   padding: 4px 9px;
   border-radius: 999px;
@@ -276,7 +287,7 @@
 
 /* Destructive row actions — same visual language as dashboard.html slot-action. */
 .row-action {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.08em;
   padding: 6px 12px;
   border-radius: 999px;
@@ -324,7 +335,7 @@
 .centered-loading {
   text-align: center;
   padding: 120px 40px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px; letter-spacing: 0.12em;
   color: var(--muted); text-transform: uppercase;
 }
@@ -332,7 +343,7 @@
   text-align: center;
   padding: 120px 40px;
   color: var(--red);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px; letter-spacing: 0.06em;
   max-width: 640px; margin: 0 auto;
 }
@@ -357,7 +368,7 @@
 
 <nav id="nav">
   <a href="index.html" class="nav-logo">
-    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark" width="340" height="227">
   </a>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
@@ -458,7 +469,7 @@
         <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
           Shown as a sticky banner at the top of all provider dashboards. One active notice at a time. Posting replaces the previous. Leave end time blank for "until I clear it".
         </p>
-        <p id="noticeCurrentStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-bottom:12px;letter-spacing:0.05em;">Loading current notice…</p>
+        <p id="noticeCurrentStatus" class="mint-status" style="font-family:var(--font-ui);font-size:11px;margin-bottom:12px;letter-spacing:0.05em;">Loading current notice…</p>
         <form id="noticeForm">
           <div class="mint-row">
             <select id="noticeLevel" class="form-input" style="max-width:140px;">
@@ -499,7 +510,7 @@
           All <em>providers</em>
           <button id="refreshBtn" type="button" class="btn btn-ghost" style="font-size:11px;padding:8px 14px;">Refresh</button>
         </div>
-        <p id="providersStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-bottom:12px;letter-spacing:0.05em;"></p>
+        <p id="providersStatus" class="mint-status" style="font-family:var(--font-ui);font-size:11px;margin-bottom:12px;letter-spacing:0.05em;"></p>
         <div id="providersList">
           <div class="prov-empty">Loading providers…</div>
         </div>
@@ -554,7 +565,7 @@
           All <em>REC-</em> licenses
           <button id="recRefreshBtn" type="button" class="btn btn-ghost" style="font-size:11px;padding:8px 14px;">Refresh</button>
         </div>
-        <p id="recListStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-bottom:12px;letter-spacing:0.05em;"></p>
+        <p id="recListStatus" class="mint-status" style="font-family:var(--font-ui);font-size:11px;margin-bottom:12px;letter-spacing:0.05em;"></p>
         <div id="recKpiStrip" class="kpi-grid" style="margin-bottom:16px;">
           <div class="prov-empty">Loading…</div>
         </div>
@@ -572,7 +583,7 @@
   <div class="footer-main">
     <div>
       <div class="footer-brand">
-        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo" width="510" height="340">
       </div>
       <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
     </div>

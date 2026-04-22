@@ -3,8 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Pricing — Navigator Algo</title>
 <meta name="description" content="Navigator Algo pricing. $100/year signal-provider plan with 10 free subscriber slots. $30/3mo paid receiver on MQL5. All USD.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://navigatoralgo.com/pricing.html">
+<meta property="og:title" content="Pricing — Navigator Algo">
+<meta property="og:description" content="Navigator Algo pricing. $100/year signal-provider plan with 10 free subscriber slots. $30/3mo paid receiver on MQL5.">
+<meta property="og:image" content="https://navigatoralgo.com/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pricing — Navigator Algo">
+<meta name="twitter:description" content="Navigator Algo pricing. $100/year signal-provider plan with 10 free subscriber slots. $30/3mo paid receiver on MQL5.">
+<meta name="twitter:image" content="https://navigatoralgo.com/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/shared.css">
@@ -61,13 +72,13 @@
   content: 'MOST POPULAR';
   position: absolute; top: -11px; left: 24px;
   background: var(--teal); color: var(--bg);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.12em;
   padding: 4px 10px; border-radius: 999px;
   font-weight: 700;
 }
 .price-tier {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.12em;
   color: var(--teal); text-transform: uppercase;
   margin-bottom: 10px;
@@ -94,7 +105,7 @@
   color: var(--muted); margin-left: 4px;
 }
 .price-sub {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.06em;
   color: var(--muted);
   margin-bottom: 22px;
@@ -178,7 +189,7 @@
 .price-table th {
   background: rgba(0,212,200,0.06);
   color: var(--teal);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.08em;
   text-transform: uppercase;
   font-weight: 500;
@@ -198,7 +209,7 @@
 
 <nav id="nav">
   <a href="index.html" class="nav-logo">
-    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark" width="340" height="227">
   </a>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
@@ -306,7 +317,7 @@
   <div class="footer-main">
     <div>
       <div class="footer-brand">
-        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo" width="510" height="340">
       </div>
       <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
     </div>
@@ -338,6 +349,12 @@
   </div>
 </footer>
 
-<script type="module" src="assets/nav-auth.js"></script>
+<script type="module">
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => import('./assets/nav-auth.js'));
+  } else {
+    setTimeout(() => import('./assets/nav-auth.js'), 1500);
+  }
+</script>
 </body>
 </html>
