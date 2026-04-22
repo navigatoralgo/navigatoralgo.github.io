@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pricing — Navigator Algo</title>
-<meta name="description" content="Navigator Algo pricing. $100/year signal-provider plan with 10 free subscriber slots. $8/month per extra slot. $30/3mo paid receiver on MQL5. All USD.">
+<meta name="description" content="Navigator Algo pricing. $100/year signal-provider plan with 10 free subscriber slots. $30/3mo paid receiver on MQL5. All USD.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/shared.css">
@@ -34,7 +34,16 @@
   gap: 24px;
   margin-bottom: 48px;
 }
-@media (max-width: 980px) { .price-grid { grid-template-columns: 1fr; } }
+.price-grid.price-grid-2 {
+  grid-template-columns: 1fr 1fr;
+  max-width: 780px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 980px) {
+  .price-grid,
+  .price-grid.price-grid-2 { grid-template-columns: 1fr; }
+}
 
 .price-card {
   position: relative;
@@ -212,10 +221,10 @@
 
   <div class="price-hero">
     <h1>Simple, <em>fair</em> pricing</h1>
-    <p>One annual plan for signal providers. Pay-as-you-grow extra slots. Separate paid receiver for subscribers who want a license without needing a slot from the provider. All prices in US Dollars. Taxes collected where applicable by our merchant of record.</p>
+    <p>One annual plan for signal providers with 10 free subscriber slots. Separate paid receiver for subscribers who want a license without needing a slot from the provider. All prices in US Dollars, sold through MQL5 Market.</p>
   </div>
 
-  <div class="price-grid">
+  <div class="price-grid price-grid-2">
 
     <!-- Provider annual plan -->
     <div class="price-card featured">
@@ -233,23 +242,6 @@
         <li class="muted">Sold on MQL5 Market for automatic purchase verification.</li>
       </ul>
       <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" rel="noopener" class="price-cta primary">Buy on MQL5 →</a>
-    </div>
-
-    <!-- Extra slots -->
-    <div class="price-card">
-      <div class="price-tier">Extra capacity</div>
-      <div class="price-name">Additional subscriber slot</div>
-      <div class="price-tag">When your free 10 slots fill up, add more — $8 per slot, per month, cancel any time.</div>
-      <div class="price-value">$8<span class="unit">/ slot / month</span></div>
-      <div class="price-sub">Monthly subscription · via Paddle</div>
-      <ul class="price-features">
-        <li>Activates instantly after payment.</li>
-        <li>Add as many seats as you need, up to <strong>50 total subscribers</strong> per provider.</li>
-        <li>End-of-period grandfather on cancel — your current subscribers keep working until the month ends.</li>
-        <li>Paddle receipts auto-emailed; charges appear as "Paddle*Navigator Algo".</li>
-        <li class="muted">Requires an active $100/year Provider plan.</li>
-      </ul>
-      <a href="dashboard.html" class="price-cta ghost">Open dashboard →</a>
     </div>
 
     <!-- Paid Receiver -->
@@ -286,12 +278,6 @@
           <td>MQL5 Market</td>
         </tr>
         <tr>
-          <td><strong>Extra subscriber slot</strong></td>
-          <td>$8 USD / slot / month</td>
-          <td>Monthly, auto-renew</td>
-          <td>Paddle (merchant of record)</td>
-        </tr>
-        <tr>
           <td><strong>Signal Copier · Pro Receiver</strong></td>
           <td>$30 USD / 3 months</td>
           <td>Quarterly, auto-renew</td>
@@ -308,7 +294,7 @@
     </ul>
 
     <h3 style="margin-top:22px;">Refunds &amp; cancellation</h3>
-    <p>Your <strong>first</strong> Paddle charge on any new subscription is refundable in full for 7 days, no questions asked. See our <a href="refund.html">Refund Policy</a> for details on subsequent charges, exceptions (service outage, duplicate charge, etc.), and EU/UK statutory rights. Cancellation from the dashboard is instant; access continues until the end of the paid period.</p>
+    <p>All purchases today go through <strong>MQL5 Market</strong>, which handles refunds, billing, and receipts under its own policy. See our <a href="refund.html">Refund Policy</a> for how to request a refund, what&rsquo;s covered, and EU/UK statutory rights. Cancellation of the annual Provider plan simply means you let it lapse; access continues until the end of the paid period.</p>
 
     <h3 style="margin-top:22px;">Legal</h3>
     <p>By purchasing or using Navigator Algo you agree to our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>. Navigator Algo is operated by <strong>Navigator Trading Systems</strong> (Sri Lanka). Trading involves substantial risk of loss — see the risk disclaimer in §8 of our Terms.</p>

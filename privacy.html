@@ -203,8 +203,8 @@
       </tr>
       <tr>
         <td><strong>Billing</strong></td>
-        <td>Paddle customer ID, subscription ID, status, renewal date. <em>Not collected by us:</em> card number, CVV, billing address — these go directly to Paddle.</td>
-        <td>Paddle webhooks</td>
+        <td>MQL5 order reference and purchase date for products you buy through MQL5 Market. <em>Not collected by us:</em> card number, CVV, billing address — these go directly to MQL5 and its processors.</td>
+        <td>MQL5 Market order exports / support tickets</td>
       </tr>
       <tr>
         <td><strong>Operational logs</strong></td>
@@ -220,18 +220,18 @@
   </table>
 
   <div class="legal-callout">
-    <strong>We do not collect payment card data.</strong> Paddle collects and stores card details under PCI-DSS compliance as merchant of record. We only receive limited billing metadata (customer ID, status, country, masked last-4 if shown on the dashboard).
+    <strong>We do not collect payment card data.</strong> Purchases go through MQL5 Market, which handles card processing under its own PCI-DSS compliance. We only receive limited order metadata (order reference, purchase date, product). If we add a direct-billing product in the future we will update this policy before any such charge is made.
   </div>
 
   <h2 id="purposes">3. Why we process it</h2>
   <ul>
     <li><strong>Run the service.</strong> Relay signals between provider and receivers, enforce license state, check MT5-account binding, rate-limit abuse.</li>
     <li><strong>Authenticate you.</strong> Confirm you own the account / provider / license you claim.</li>
-    <li><strong>Bill you.</strong> Process extra-slot subscriptions through Paddle and credit your slot cap on their webhooks.</li>
+    <li><strong>Fulfil your purchase.</strong> Match your MQL5 order to the license codes (<code>REC-</code>, provider subscription) you&rsquo;re entitled to.</li>
     <li><strong>Support.</strong> Respond to your questions and diagnose issues you report.</li>
     <li><strong>Security &amp; abuse prevention.</strong> Detect license sharing, rate-limit excess traffic, investigate fraud or chargebacks.</li>
     <li><strong>Product improvement.</strong> Aggregated operational stats (active providers, signal rate, EA versions in use) to help us prioritize fixes. No raw individual data is used for this.</li>
-    <li><strong>Legal compliance.</strong> Respond to lawful government requests, tax reporting through Paddle, accounting records.</li>
+    <li><strong>Legal compliance.</strong> Respond to lawful government requests and retain accounting records.</li>
   </ul>
 
   <h2 id="legal">4. Legal basis (GDPR &amp; similar)</h2>
@@ -259,9 +259,9 @@
         <td>US (us-central1)</td>
       </tr>
       <tr>
-        <td>Paddle.com Ltd.</td>
-        <td>Merchant of record for paid subscriptions — billing, tax, receipts, chargebacks</td>
-        <td>UK / USA</td>
+        <td>MetaQuotes Ltd. (MQL5 Market)</td>
+        <td>Payment processor for Provider and Pro Receiver purchases; matches order references to licenses</td>
+        <td>Global (seller order panel accessed from our side)</td>
       </tr>
       <tr>
         <td>Cloudflare</td>
@@ -284,7 +284,7 @@
   <p>We may disclose data in response to a lawful request from a government or court with jurisdiction over us, and we will inform you unless legally prohibited.</p>
 
   <h2 id="transfer">6. International transfers</h2>
-  <p>Your data is stored on Firebase servers in the United States. If you are in the EEA, UK, or another jurisdiction with data-export restrictions, transfers are made under Google's Standard Contractual Clauses. Paddle transfers may occur between the UK, USA, and the EU, under Paddle's own SCCs and DPA.</p>
+  <p>Your data is stored on Firebase servers in the United States. If you are in the EEA, UK, or another jurisdiction with data-export restrictions, transfers are made under Google's Standard Contractual Clauses. MQL5 order data is handled under MetaQuotes&rsquo; own privacy terms.</p>
 
   <h2 id="retention">7. Retention</h2>
   <ul>
@@ -292,7 +292,7 @@
     <li><strong>License codes:</strong> while active, plus 2 years after revocation for anti-abuse audit.</li>
     <li><strong>Trade signals:</strong> 7 days rolling (automatically pruned by the <code>pruneOldSignals</code> scheduled job).</li>
     <li><strong>Operational logs:</strong> 30 days.</li>
-    <li><strong>Billing records:</strong> at least 7 years, as required by tax law.</li>
+    <li><strong>Billing / order records:</strong> at least 7 years, as required by tax and accounting law.</li>
     <li><strong>Support messages:</strong> 2 years, then deleted.</li>
   </ul>
 
@@ -314,7 +314,7 @@
     <li>All traffic to navigatoralgo.com and Firebase is TLS-encrypted (HTTPS).</li>
     <li>Authentication is via Firebase Authentication; passwords are hashed by Google — we never see them.</li>
     <li>RTDB access is enforced by Firebase Security Rules: providers can only read/write their own data; admins have elevated access and are a closed set.</li>
-    <li>Cloud Function secrets (Paddle API key, webhook secret, admin bootstrap token) are stored in Google Secret Manager, not in source.</li>
+    <li>Cloud Function secrets (admin bootstrap token and any future payment-processor keys) are stored in Google Secret Manager, not in source.</li>
     <li>All code changes go through pull-request review before deploy. Rules changes are validated in the Firebase Rules Playground.</li>
     <li>Rate limiting (50 requests per 10 seconds per license) protects against abuse and credential stuffing.</li>
   </ul>
@@ -325,7 +325,6 @@
   <ul>
     <li><strong>Firebase Auth session</strong> — required for sign-in persistence. Cannot be disabled without breaking the site.</li>
     <li><strong>Dashboard preferences</strong> — remember your last-used panel / dismissed banner. Stored in browser localStorage.</li>
-    <li><strong>Paddle checkout cookies</strong> — only set when you open a checkout, to track the session.</li>
   </ul>
   <p>We do <strong>not</strong> use Google Analytics, Facebook Pixel, TikTok Pixel, or any advertising / tracking cookies.</p>
 
