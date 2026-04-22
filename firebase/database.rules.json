@@ -46,7 +46,7 @@
 
       "$pid": {
         ".read":  "auth != null && (data.child('owner_uid').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)",
-        ".write": "auth != null && ( (data.exists() && data.child('owner_uid').val() === auth.uid) || (data.exists() && !data.child('owner_uid').exists()) || (!data.exists() && root.child('admins').child(auth.uid).val() === true) || root.child('admins').child(auth.uid).val() === true )",
+        ".write": "auth != null && ( (data.exists() && data.child('owner_uid').val() === auth.uid) || root.child('admins').child(auth.uid).val() === true )",
 
         "owner_uid":   { ".validate": "newData.isString() || newData.val() == null" },
         "owner_email": { ".validate": "newData.isString() || newData.val() == null" },
@@ -94,8 +94,8 @@
         },
 
         "signals": {
-          "_comment": "Receivers need to read signals; providers write them. Individual signal validation lives on the writer (Cloud Functions).",
-          ".read":  "auth != null",
+          "_comment": "Provider-owned signal stream. Receivers (EAs) read via the eaRead Cloud Function (service-account, bypasses rules) which performs license validation; direct client reads are restricted to the provider owner + admins so one provider cannot scrape another provider's signals. Providers write via eaWrite (service account), not directly.",
+          ".read":  "auth != null && (root.child('providers').child($pid).child('owner_uid').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)",
           ".indexOn": ["seq"]
         },
 
