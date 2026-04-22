@@ -1136,5 +1136,116 @@ export function countActiveCopiers(providerData) {
   return { sub, paid, total: sub + paid };
 }
 
+// ── SYSTEM NOTICE (maintenance banner) ──
+// /system/notice is a single node rendered as a dismissable banner at the
+// top of admin + provider dashboard pages. Readable by any authed user,
+// writable by admins. Schema:
+//   { level: 'info'|'warning'|'critical',
+//     title: string (<=140),
+//     body: string (<=1000),
+//     starts_at?: number (ms epoch, banner hidden before this),
+//     ends_at?: number (ms epoch, banner hidden after this),
+//     show_to: 'providers'|'receivers'|'all',
+//     updated_at: number, updated_by: uid }
+
+const NOTICE_DISMISS_KEY_PREFIX = "nav_notice_dismissed_";
+
+export async function readSystemNotice() {
+  try {
+    const snap = await get(ref(db, "system/notice"));
+    if (!snap.exists()) return null;
+    return snap.val();
+  } catch (err) {
+    console.warn("[Navigator Algo] readSystemNotice failed:", err);
+    return null;
+  }
+}
+
+export async function setSystemNotice(adminUser, { level, title, body, starts_at, ends_at, show_to }) {
+  if (!adminUser || !adminUser.uid) throw new Error("not signed in");
+  if (!["info", "warning", "critical"].includes(level)) throw new Error("bad level");
+  if (!title || title.length > 140) throw new Error("bad title");
+  if (body && body.length > 1000) throw new Error("bad body");
+  const target = ["providers", "receivers", "all"].includes(show_to) ? show_to : "providers";
+  const payload = {
+    level,
+    title,
+    body: body || "",
+    show_to: target,
+    updated_at: Date.now(),
+    updated_by: adminUser.uid
+  };
+  if (typeof starts_at === "number" && starts_at > 0) payload.starts_at = starts_at;
+  if (typeof ends_at === "number" && ends_at > 0) payload.ends_at = ends_at;
+  await set(ref(db, "system/notice"), payload);
+}
+
+export async function clearSystemNotice(adminUser) {
+  if (!adminUser || !adminUser.uid) throw new Error("not signed in");
+  await remove(ref(db, "system/notice"));
+}
+
+// Decide whether a notice should render on a given audience page right now.
+// audience is 'providers' (dashboard) or 'admin' (admin console); admins
+// always see every notice regardless of show_to so they can preview what
+// was posted.
+export function noticeApplies(notice, audience) {
+  if (!notice || !notice.title) return false;
+  const now = Date.now();
+  if (typeof notice.starts_at === "number" && now < notice.starts_at) return false;
+  if (typeof notice.ends_at === "number" && now > notice.ends_at) return false;
+  if (audience === "admin") return true;
+  const target = notice.show_to || "providers";
+  if (target === "all") return true;
+  return target === audience;
+}
+
+// Mounts the banner at the top of the current page body. Caller specifies
+// the audience (providers, receivers, admin). The banner is dismissable —
+// dismiss is keyed by updated_at so a fresh notice re-appears. Safe to call
+// multiple times; replaces any existing banner.
+export async function mountSystemNoticeBanner(audience) {
+  const notice = await readSystemNotice();
+  const existing = document.getElementById("nav-system-notice");
+  if (existing) existing.remove();
+  if (!noticeApplies(notice, audience)) return;
+
+  const dismissKey = NOTICE_DISMISS_KEY_PREFIX + (notice.updated_at || 0);
+  if (window.localStorage.getItem(dismissKey) === "1") return;
+
+  const level = notice.level || "info";
+  const bg = level === "critical" ? "#3a0f14"
+           : level === "warning"  ? "#3a2a0f"
+           : "#0f2a3a";
+  const accent = level === "critical" ? "#ff5a5a"
+              : level === "warning"  ? "#ffb63d"
+              : "#5ac8ff";
+
+  const bar = document.createElement("div");
+  bar.id = "nav-system-notice";
+  bar.setAttribute("role", "status");
+  bar.style.cssText = [
+    "position:sticky", "top:0", "z-index:9999",
+    "padding:10px 48px 10px 16px",
+    `background:${bg}`,
+    `border-bottom:2px solid ${accent}`,
+    "color:#fff", "font-family:inherit", "font-size:13px", "line-height:1.45"
+  ].join(";");
+  const titleText = String(notice.title).replace(/</g, "&lt;");
+  const bodyText = String(notice.body || "").replace(/</g, "&lt;");
+  bar.innerHTML =
+    `<strong style="color:${accent};text-transform:uppercase;letter-spacing:0.05em;font-size:11px;">[${level}]</strong> ` +
+    `<strong>${titleText}</strong>` +
+    (bodyText ? `<div style="margin-top:4px;opacity:0.85;">${bodyText}</div>` : "") +
+    `<button type="button" aria-label="Dismiss" ` +
+      `style="position:absolute;top:6px;right:10px;background:transparent;border:0;color:#fff;font-size:18px;line-height:1;cursor:pointer;padding:4px 8px;">×</button>`;
+  const btn = bar.querySelector("button");
+  btn.addEventListener("click", () => {
+    window.localStorage.setItem(dismissKey, "1");
+    bar.remove();
+  });
+  document.body.insertBefore(bar, document.body.firstChild);
+}
+
 // Expose a minimal, namespaced API for page scripts.
 export { LICENSE_PREFIXES, SUB_LICENSES_PER_PROVIDER, DB_PATHS };

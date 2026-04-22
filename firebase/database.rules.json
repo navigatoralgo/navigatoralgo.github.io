@@ -170,6 +170,23 @@
       "$pid": {
         ".write": false
       }
+    },
+
+    "system": {
+      "_comment": "System-wide announcements. /system/notice is a single node that renders a maintenance/status banner across admin + provider dashboard. Readable by any authed user so EAs and pages can both see it; writable by admins only.",
+      "notice": {
+        ".read":  "auth != null",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "level":     { ".validate": "newData.val() === 'info' || newData.val() === 'warning' || newData.val() === 'critical'" },
+        "title":     { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 140" },
+        "body":      { ".validate": "newData.isString() && newData.val().length <= 1000" },
+        "starts_at": { ".validate": "newData.isNumber() || newData.val() == null" },
+        "ends_at":   { ".validate": "newData.isNumber() || newData.val() == null" },
+        "show_to":   { ".validate": "newData.isString()" },
+        "updated_at":{ ".validate": "newData.isNumber()" },
+        "updated_by":{ ".validate": "newData.isString()" },
+        "$other":    { ".validate": false }
+      }
     }
   }
 }

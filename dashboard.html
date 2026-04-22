@@ -502,7 +502,8 @@
     getUserProviderId, subscribeProvider, countActiveCopiers,
     regenerateEaKey, generateSubLicenseSlots, revokeSubLicense, rotateSubLicense,
     providerMintRecLicense, listProviderRecLicenses, providerRevokeRecLicense,
-    providerReactivateRecLicense, providerRotateRecLicense, providerDeleteRecLicense
+    providerReactivateRecLicense, providerRotateRecLicense, providerDeleteRecLicense,
+    mountSystemNoticeBanner
   } from "./assets/app.js";
 
   const $ = (id) => document.getElementById(id);
@@ -1128,6 +1129,7 @@
   watchAuth(
     (user) => {
       currentUser = user;
+      mountSystemNoticeBanner("providers").catch(() => {});
       loadAccount(user);
     },
     () => {
