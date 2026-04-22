@@ -446,6 +446,45 @@
         </div>
       </div>
 
+      <!-- SYSTEM NOTICE EDITOR -->
+      <!--
+        Posts a banner at the top of the provider dashboard (and the admin
+        console itself). Use for planned maintenance, rules changes, and
+        major announcements. Single active notice at a time — posting a new
+        one replaces the previous. Clear removes it entirely.
+      -->
+      <div class="panel">
+        <div class="section-title">System <em>notice</em> (banner)</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
+          Shown as a sticky banner at the top of all provider dashboards. One active notice at a time. Posting replaces the previous. Leave end time blank for "until I clear it".
+        </p>
+        <p id="noticeCurrentStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-bottom:12px;letter-spacing:0.05em;">Loading current notice…</p>
+        <form id="noticeForm">
+          <div class="mint-row">
+            <select id="noticeLevel" class="form-input" style="max-width:140px;">
+              <option value="info">info</option>
+              <option value="warning" selected>warning</option>
+              <option value="critical">critical</option>
+            </select>
+            <select id="noticeShowTo" class="form-input" style="max-width:160px;">
+              <option value="providers" selected>providers</option>
+              <option value="all">all users</option>
+            </select>
+            <input id="noticeTitle" class="form-input" type="text" placeholder="Title (required, ≤140 chars)" maxlength="140" style="min-width:260px;flex:1;" required>
+          </div>
+          <div style="margin-top:10px;">
+            <input id="noticeBody" class="form-input" type="text" placeholder="Body (optional, ≤1000 chars)" maxlength="1000">
+          </div>
+          <div class="mint-row" style="margin-top:10px;">
+            <input id="noticeStartsAt" class="form-input" type="datetime-local" placeholder="Starts at (blank = now)" style="max-width:220px;">
+            <input id="noticeEndsAt" class="form-input" type="datetime-local" placeholder="Ends at (blank = until cleared)" style="max-width:220px;">
+            <button type="submit" id="noticeSaveBtn" class="btn btn-primary">Post notice</button>
+            <button type="button" id="noticeClearBtn" class="btn btn-ghost">Clear active notice</button>
+            <span id="noticeStatus" class="mint-status"></span>
+          </div>
+        </form>
+      </div>
+
       <!-- GLOBAL KPI STRIP -->
       <div class="panel">
         <div class="section-title">Global <em>stats</em></div>
@@ -568,7 +607,8 @@
     watchAuth, isAdmin, mintProviderBound, bindProviderToEmail, unbindProvider,
     listAllProviders, rollupAdminStats, perProviderCounts, deleteProvider,
     mintRecLicense, listAllRecLicenses, revokeRecLicense,
-    updateRecLicenseExpiry, rotateRecLicense, rollupRecLicenseStats
+    updateRecLicenseExpiry, rotateRecLicense, rollupRecLicenseStats,
+    readSystemNotice, setSystemNotice, clearSystemNotice, mountSystemNoticeBanner
   } from "./assets/app.js";
 
   const $ = (id) => document.getElementById(id);
@@ -1158,6 +1198,80 @@
     refreshRecLicenses().catch(() => {});
   });
 
+  // ── SYSTEM NOTICE ──
+  function setNoticeStatus(msg, isError = false) {
+    const el = $("noticeStatus");
+    el.textContent = msg || "";
+    el.className = "mint-status " + (msg ? (isError ? "error" : "success") : "");
+  }
+
+  function parseLocalDatetime(v) {
+    if (!v) return null;
+    const t = Date.parse(v);
+    return Number.isFinite(t) ? t : null;
+  }
+
+  async function refreshNoticeForm() {
+    const status = $("noticeCurrentStatus");
+    try {
+      const notice = await readSystemNotice();
+      if (!notice) {
+        status.textContent = "No active notice.";
+        status.className = "mint-status";
+        return;
+      }
+      const start = notice.starts_at ? fmtTimestamp(notice.starts_at) : "immediate";
+      const end   = notice.ends_at   ? fmtTimestamp(notice.ends_at)   : "until cleared";
+      status.textContent = `Active [${notice.level}] "${notice.title}" · ${notice.show_to || "providers"} · ${start} → ${end} · updated ${fmtTimestamp(notice.updated_at)}`;
+      status.className = "mint-status success";
+      $("noticeLevel").value = notice.level || "warning";
+      $("noticeShowTo").value = notice.show_to || "providers";
+      $("noticeTitle").value = notice.title || "";
+      $("noticeBody").value  = notice.body  || "";
+    } catch (err) {
+      status.textContent = "Could not load current notice: " + (err?.message || err);
+      status.className = "mint-status error";
+    }
+  }
+
+  $("noticeForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!currentUser) return;
+    setNoticeStatus("Posting…");
+    try {
+      await setSystemNotice(currentUser, {
+        level:     $("noticeLevel").value,
+        show_to:   $("noticeShowTo").value,
+        title:     $("noticeTitle").value.trim(),
+        body:      $("noticeBody").value.trim(),
+        starts_at: parseLocalDatetime($("noticeStartsAt").value),
+        ends_at:   parseLocalDatetime($("noticeEndsAt").value)
+      });
+      setNoticeStatus("Posted.");
+      await refreshNoticeForm();
+      await mountSystemNoticeBanner("admin");
+    } catch (err) {
+      console.error("[Navigator Algo admin] notice post failed:", err);
+      setNoticeStatus("Failed: " + (err?.message || err), true);
+    }
+  });
+
+  $("noticeClearBtn").addEventListener("click", async () => {
+    if (!currentUser) return;
+    if (!window.confirm("Clear the active notice? It will disappear for everyone.")) return;
+    setNoticeStatus("Clearing…");
+    try {
+      await clearSystemNotice(currentUser);
+      setNoticeStatus("Cleared.");
+      await refreshNoticeForm();
+      const banner = document.getElementById("nav-system-notice");
+      if (banner) banner.remove();
+    } catch (err) {
+      console.error("[Navigator Algo admin] notice clear failed:", err);
+      setNoticeStatus("Failed: " + (err?.message || err), true);
+    }
+  });
+
   watchAuth(
     async (user) => {
       currentUser = user;
@@ -1166,6 +1280,8 @@
         if (!admin) { show(forbiddenState); return; }
         $("adminEmail").textContent = user.email || user.uid;
         show(adminState);
+        mountSystemNoticeBanner("admin").catch(() => {});
+        refreshNoticeForm().catch(() => {});
         wireMintForm();
         wireRecMintForm();
         refreshProvidersList().catch(showError);
