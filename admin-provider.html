@@ -3,8 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Provider Detail — Navigator Algo Admin</title>
 <meta name="description" content="Navigator Algo admin console — provider detail view.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://navigatoralgo.com/admin-provider.html">
+<meta property="og:title" content="Provider Detail — Navigator Algo Admin">
+<meta property="og:description" content="Navigator Algo admin console — provider detail view.">
+<meta property="og:image" content="https://navigatoralgo.com/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Provider Detail — Navigator Algo Admin">
+<meta name="twitter:description" content="Navigator Algo admin console — provider detail view.">
+<meta name="twitter:image" content="https://navigatoralgo.com/logo.png">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,7 +29,7 @@
 
 .prov-back {
   display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.1em;
   color: var(--muted); text-transform: uppercase;
   text-decoration: none;
@@ -43,7 +54,7 @@
 }
 .prov-hero h1 em { color: var(--teal); font-style: normal; }
 .prov-hero-sub {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.08em;
   color: var(--muted);
 }
@@ -52,7 +63,7 @@
   font-weight: 600;
 }
 .prov-hero-meta {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.05em;
   color: var(--muted);
   margin-top: 8px;
@@ -60,7 +71,7 @@
 
 .status-pill {
   display: inline-block;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.12em;
   padding: 4px 12px;
   border-radius: 999px;
@@ -101,7 +112,7 @@
   padding: 14px 18px;
 }
 .stat-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.14em;
   color: var(--muted); text-transform: uppercase;
   margin-bottom: 4px;
@@ -113,7 +124,7 @@
   line-height: 1.1;
 }
 .stat-sub {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.05em;
   color: var(--muted);
   margin-top: 4px;
@@ -127,12 +138,12 @@
   align-items: center;
 }
 .kv-key {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.1em;
   color: var(--muted); text-transform: uppercase;
 }
 .kv-val {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px;
   color: var(--text);
   word-break: break-all;
@@ -146,7 +157,7 @@
 .kv-empty { color: var(--muted); font-style: italic; }
 
 .copy-btn {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.1em;
   padding: 6px 11px;
   border-radius: 8px;
@@ -168,7 +179,7 @@
   font-size: 12px;
 }
 .t-table thead th {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.12em;
   color: var(--muted); text-transform: uppercase;
   text-align: left;
@@ -182,14 +193,14 @@
 .t-table tbody tr td:first-child { border-radius: 10px 0 0 10px; }
 .t-table tbody tr td:last-child  { border-radius: 0 10px 10px 0; }
 .t-table tbody td.mono {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   letter-spacing: 0.04em;
 }
 .t-muted { color: var(--muted); }
 
 .state-pill {
   display: inline-block;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.1em;
   padding: 3px 9px;
   border-radius: 999px;
@@ -207,7 +218,7 @@
 .empty-row {
   text-align: center;
   padding: 24px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.1em;
   color: var(--muted); text-transform: uppercase;
 }
@@ -221,7 +232,7 @@ details.raw-json {
 }
 details.raw-json summary {
   cursor: pointer;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.1em;
   color: var(--muted); text-transform: uppercase;
   list-style: none;
@@ -231,7 +242,7 @@ details.raw-json pre {
   margin: 12px 0 0; padding: 12px;
   background: rgba(10,14,22,0.7);
   border-radius: 8px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; line-height: 1.55;
   color: var(--text);
   overflow-x: auto;
@@ -240,7 +251,7 @@ details.raw-json pre {
 
 /* Destructive action (delete button, inline confirm) */
 .row-action {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.08em;
   padding: 8px 16px;
   border-radius: 999px;
@@ -280,7 +291,7 @@ details.raw-json pre {
 }
 
 .status-line {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.05em;
   margin-top: 12px;
 }
@@ -292,7 +303,7 @@ details.raw-json pre {
 .centered-loading {
   text-align: center;
   padding: 120px 40px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px; letter-spacing: 0.12em;
   color: var(--muted); text-transform: uppercase;
 }
@@ -300,7 +311,7 @@ details.raw-json pre {
   text-align: center;
   padding: 120px 40px;
   color: var(--red);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px; letter-spacing: 0.06em;
   max-width: 640px; margin: 0 auto;
 }
@@ -328,7 +339,7 @@ details.raw-json pre {
 
 <nav id="nav">
   <a href="index.html" class="nav-logo">
-    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark" width="340" height="227">
   </a>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
@@ -395,19 +406,19 @@ details.raw-json pre {
 
       <!-- SUB-LICENSES -->
       <div class="panel">
-        <div class="section-title">Sub-<em>licenses</em> <span id="subsCount" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:0.08em;">—</span></div>
+        <div class="section-title">Sub-<em>licenses</em> <span id="subsCount" style="font-family:var(--font-ui);font-size:11px;color:var(--muted);letter-spacing:0.08em;">—</span></div>
         <div id="subsList"></div>
       </div>
 
       <!-- RECEIVERS -->
       <div class="panel">
-        <div class="section-title">Receivers <em>(bound accounts)</em> <span id="receiversCount" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:0.08em;">—</span></div>
+        <div class="section-title">Receivers <em>(bound accounts)</em> <span id="receiversCount" style="font-family:var(--font-ui);font-size:11px;color:var(--muted);letter-spacing:0.08em;">—</span></div>
         <div id="receiversList"></div>
       </div>
 
       <!-- SIGNALS -->
       <div class="panel">
-        <div class="section-title">Recent <em>signals</em> <span id="signalsCount" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:0.08em;">—</span></div>
+        <div class="section-title">Recent <em>signals</em> <span id="signalsCount" style="font-family:var(--font-ui);font-size:11px;color:var(--muted);letter-spacing:0.08em;">—</span></div>
         <div id="signalsList"></div>
       </div>
 
@@ -426,7 +437,7 @@ details.raw-json pre {
   <div class="footer-main">
     <div>
       <div class="footer-brand">
-        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo" width="510" height="340">
       </div>
       <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
     </div>

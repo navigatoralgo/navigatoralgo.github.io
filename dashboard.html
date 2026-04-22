@@ -3,8 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Dashboard — Navigator Algo</title>
 <meta name="description" content="Navigator Algo signal provider dashboard.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://navigatoralgo.com/dashboard.html">
+<meta property="og:title" content="Dashboard — Navigator Algo">
+<meta property="og:description" content="Navigator Algo signal provider dashboard.">
+<meta property="og:image" content="https://navigatoralgo.com/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dashboard — Navigator Algo">
+<meta name="twitter:description" content="Navigator Algo signal provider dashboard.">
+<meta name="twitter:image" content="https://navigatoralgo.com/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/shared.css">
@@ -27,7 +38,7 @@
 }
 .dash-header-left h1 em { color: var(--teal); font-style: normal; }
 .dash-header-sub {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.12em;
   color: var(--muted); text-transform: uppercase;
 }
@@ -53,7 +64,7 @@
   background: rgba(0,212,200,0.3); border-radius: 999px;
 }
 .kpi-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.1em;
   color: var(--muted); text-transform: uppercase;
   margin-bottom: 10px;
@@ -68,7 +79,7 @@
 .kpi-value.gold  { color: var(--gold); }
 .kpi-value.green { color: var(--green); }
 .kpi-sub {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.06em;
   color: var(--muted);
   margin-top: 8px;
@@ -93,7 +104,7 @@
   font-size: 13px;
 }
 .slot-table thead th {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.12em;
   color: var(--muted); text-transform: uppercase;
   text-align: left;
@@ -119,14 +130,14 @@
   border-radius: 0 12px 12px 0;
 }
 .slot-code {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px;
   color: var(--white);
   letter-spacing: 0.05em;
 }
 .slot-status {
   display: inline-block;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.1em;
   padding: 4px 10px;
   border-radius: 999px;
@@ -138,7 +149,7 @@
 .slot-status.expired { color: var(--red);   background: rgba(255,85,85,0.08); border-color: rgba(255,85,85,0.3); }
 .slot-status.revoked { color: var(--gold);  background: rgba(240,165,0,0.08); border-color: rgba(240,165,0,0.3); }
 .slot-action {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 9px; letter-spacing: 0.1em;
   color: var(--teal);
   background: none;
@@ -219,7 +230,7 @@
 .claim-panel ol li { margin-bottom: 8px; line-height: 1.6; }
 
 .signout-link {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 10px; letter-spacing: 0.1em;
   color: var(--muted); text-transform: uppercase;
   background: none; border: none;
@@ -235,7 +246,7 @@
 .centered-loading {
   text-align: center;
   padding: 120px 40px;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 12px; letter-spacing: 0.12em;
   color: var(--muted); text-transform: uppercase;
 }
@@ -259,7 +270,7 @@
 
 <nav id="nav">
   <a href="index.html" class="nav-logo">
-    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark" width="340" height="227">
   </a>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
@@ -360,7 +371,7 @@
     <div class="panel" style="margin-bottom: 24px;">
       <div class="section-title">
         <span>Free sub-license <em>slots</em></span>
-        <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">
+        <span style="font-family:var(--font-ui);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">
           Share with your subscribers
         </span>
       </div>
@@ -381,13 +392,13 @@
           </tbody>
         </table>
       </div>
-      <p id="slotsStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-top:14px;letter-spacing:0.05em;"></p>
+      <p id="slotsStatus" class="mint-status" style="font-family:var(--font-ui);font-size:11px;margin-top:14px;letter-spacing:0.05em;"></p>
     </div>
 
     <div class="panel" style="margin-bottom: 24px;">
       <div class="section-title">
         <span>Paid Pro Receiver <em>licenses</em></span>
-        <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">
+        <span style="font-family:var(--font-ui);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">
           REC- codes for paying subscribers
         </span>
       </div>
@@ -399,7 +410,7 @@
         <input id="recNote" class="form-input" type="text" placeholder="Note (optional)" maxlength="500" style="max-width:220px;">
         <input id="recExpiresInDays" class="form-input" type="number" placeholder="Expiry (days)" min="1" max="3650" value="90" style="max-width:140px;">
         <button type="submit" id="recMintBtn" class="btn btn-primary" style="padding:10px 18px;font-size:11px;">Mint REC- code</button>
-        <span id="recMintStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.05em;"></span>
+        <span id="recMintStatus" class="mint-status" style="font-family:var(--font-ui);font-size:11px;letter-spacing:0.05em;"></span>
       </form>
       <div style="overflow-x:auto;">
         <table class="slot-table">
@@ -418,7 +429,7 @@
           </tbody>
         </table>
       </div>
-      <p id="recListStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-top:14px;letter-spacing:0.05em;"></p>
+      <p id="recListStatus" class="mint-status" style="font-family:var(--font-ui);font-size:11px;margin-top:14px;letter-spacing:0.05em;"></p>
     </div>
 
     <div class="panel">
@@ -429,11 +440,11 @@
         Paste these into your Navigator Provider EA inputs in MT5. The <strong style="color:var(--text);">EA key</strong> authenticates every signal your EA sends to Navigator Algo's cloud. Keep it secret — anyone with this key can push signals as you. Rotate it any time; the old key stops working immediately.
       </p>
       <div style="display:grid;grid-template-columns:auto 1fr auto;gap:10px 14px;align-items:center;">
-        <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">Provider ID</span>
+        <span style="font-family:var(--font-ui);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">Provider ID</span>
         <code id="eaProviderIdDisplay" class="mono-code" style="font-size:13px;padding:10px 14px;">—</code>
         <button id="copyEaProviderIdBtn" class="btn btn-ghost" style="padding:10px 18px;font-size:10px;">Copy</button>
 
-        <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">EA key</span>
+        <span style="font-family:var(--font-ui);font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;">EA key</span>
         <code id="eaKeyDisplay" class="mono-code" style="font-size:13px;padding:10px 14px;">—</code>
         <div style="display:flex;gap:8px;">
           <button id="revealEaKeyBtn" class="btn btn-ghost" style="padding:10px 14px;font-size:10px;">Show</button>
@@ -442,7 +453,7 @@
         </div>
       </div>
       <p id="eaKeyRotated" style="font-size:11px;color:var(--muted);margin-top:12px;margin-bottom:0;display:none;"></p>
-      <p id="eaKeyStatus" class="mint-status" style="font-family:var(--font-mono);font-size:11px;margin-top:8px;letter-spacing:0.05em;"></p>
+      <p id="eaKeyStatus" class="mint-status" style="font-family:var(--font-ui);font-size:11px;margin-top:8px;letter-spacing:0.05em;"></p>
     </div>
 
     <div class="panel">
@@ -466,7 +477,7 @@
   <div class="footer-main">
     <div>
       <div class="footer-brand">
-        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo" width="510" height="340">
       </div>
       <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
     </div>

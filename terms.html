@@ -3,8 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Terms of Service — Navigator Algo</title>
 <meta name="description" content="Terms of Service for Navigator Algo by Navigator Trading Systems — signal-copier platform for MetaTrader 5.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://navigatoralgo.com/terms.html">
+<meta property="og:title" content="Terms of Service — Navigator Algo">
+<meta property="og:description" content="Terms of Service for Navigator Algo by Navigator Trading Systems.">
+<meta property="og:image" content="https://navigatoralgo.com/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Terms of Service — Navigator Algo">
+<meta name="twitter:description" content="Terms of Service for Navigator Algo by Navigator Trading Systems.">
+<meta name="twitter:image" content="https://navigatoralgo.com/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/shared.css">
@@ -23,7 +34,7 @@
 }
 .legal-shell h1 em { color: var(--teal); font-style: normal; }
 .legal-meta {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.1em;
   color: var(--muted); text-transform: uppercase;
   margin-bottom: 36px;
@@ -53,7 +64,7 @@
 .legal-shell a { color: var(--teal); text-decoration: none; border-bottom: 1px dashed rgba(0,212,200,0.4); }
 .legal-shell a:hover { color: var(--white); border-bottom-color: var(--white); }
 .legal-shell code {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 13px;
   background: rgba(36,48,64,0.5);
   padding: 1px 6px; border-radius: 4px;
@@ -76,7 +87,7 @@
   margin-bottom: 36px;
 }
 .legal-toc h3 {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11px; letter-spacing: 0.12em;
   color: var(--muted); text-transform: uppercase;
   margin: 0 0 12px;
@@ -100,7 +111,7 @@
 
 <nav id="nav">
   <a href="index.html" class="nav-logo">
-    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark" width="340" height="227">
   </a>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
@@ -252,7 +263,7 @@
   <div class="footer-main">
     <div>
       <div class="footer-brand">
-        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo" width="510" height="340">
       </div>
       <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
     </div>
@@ -283,6 +294,12 @@
   </div>
 </footer>
 
-<script type="module" src="assets/nav-auth.js"></script>
+<script type="module">
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => import('./assets/nav-auth.js'));
+  } else {
+    setTimeout(() => import('./assets/nav-auth.js'), 1500);
+  }
+</script>
 </body>
 </html>
