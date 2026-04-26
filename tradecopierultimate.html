@@ -370,7 +370,76 @@
   line-height: 1.6;
 }
 
+/* Screenshot frames */
+.shot-figure {
+  margin: 18px auto 6px;
+  text-align: center;
+}
+.shot-figure img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 14px;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.32);
+  background: #0d141e;
+}
+.shot-figure figcaption {
+  font-family: var(--font-ui);
+  font-size: 10.5px; letter-spacing: 0.06em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 12px;
+}
+.shot-narrow img { max-width: 320px; }
+.shot-medium img { max-width: 540px; }
+.shot-wide   img { max-width: 100%; }
+
+/* Hero panel composite */
+.hero-shots {
+  display: flex; gap: 18px; justify-content: center;
+  flex-wrap: wrap;
+  margin: 36px auto 0;
+  max-width: 920px;
+}
+.hero-shots .shot-figure {
+  margin: 0;
+  flex: 0 0 auto;
+  max-width: 280px;
+}
+.hero-shots .shot-figure img {
+  max-width: 280px;
+  border-radius: 12px;
+}
+
+/* Panel tab gallery */
+.panel-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.panel-gallery .shot-figure { margin: 0; }
+.panel-gallery .shot-figure img {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 14px;
+}
+.panel-gallery figcaption {
+  font-size: 10px;
+  margin-top: 10px;
+}
+
 /* Mobile */
+@media (max-width: 900px) {
+  .panel-gallery { grid-template-columns: repeat(2, 1fr); }
+  .hero-shots .shot-figure { max-width: 240px; }
+  .hero-shots .shot-figure img { max-width: 240px; }
+}
+@media (max-width: 600px) {
+  .panel-gallery { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 900px) {
   .feat-grid { grid-template-columns: repeat(2, 1fr); }
   .support-grid { grid-template-columns: 1fr; }
@@ -431,6 +500,17 @@
       <a href="#bridge" class="btn btn-ghost">Bridge App</a>
       <a href="#troubleshooting" class="btn btn-ghost">Troubleshooting</a>
     </div>
+
+    <div class="hero-shots">
+      <figure class="shot-figure">
+        <img src="assets/tcu/tcu-panel-disarmed.png" alt="Trade Copier Ultimate panel — DISARMED state, Home tab" loading="lazy" width="366" height="629">
+        <figcaption>// Disarmed by default</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/tcu/tcu-panel-livesignal.png" alt="Trade Copier Ultimate panel — Live signal received with duplicate filter active" loading="lazy" width="367" height="630">
+        <figcaption>// Bridge + Bot API online · live signal</figcaption>
+      </figure>
+    </div>
   </section>
 
   <!-- QUICK START -->
@@ -451,12 +531,20 @@
         <strong>Allow WebRequest URLs in MT5.</strong> Open <code>Tools → Options → Expert Advisors</code>. Tick <em>Allow WebRequest for listed URL</em> and add both of these (one per line, no trailing slash):
         <div class="url-list">http://127.0.0.1<br>https://api.telegram.org</div>
         <div style="margin-top: 8px; font-size: 12.5px; color: var(--muted);">Without this, Telegram polling and the Bridge app cannot reach the EA. <code>http://127.0.0.1</code> is only used for the local Bridge — nothing leaves your PC on that URL.</div>
+        <figure class="shot-figure shot-medium" style="margin-top: 16px;">
+          <img src="assets/tcu/tcu-webrequest-dialog.png" alt="MT5 Tools → Options → Expert Advisors dialog with both WebRequest URLs added" loading="lazy" width="629" height="410">
+          <figcaption>// MT5 → Tools → Options → Expert Advisors</figcaption>
+        </figure>
       </li>
       <li>
         <strong>Attach the EA to any chart.</strong> Symbol doesn't matter — the EA executes on the symbols inside each signal. Make sure <em>AutoTrading</em> is on (green button in the toolbar) and <em>Allow Algo Trading</em> is checked in the EA dialog.
       </li>
       <li>
         <strong>Pick a mode in the on-chart panel.</strong> Open the panel, go to the <em>Source</em> tab, and turn on exactly one of:
+        <figure class="shot-figure shot-narrow" style="margin-top: 14px;">
+          <img src="assets/tcu/tcu-panel-armed-source.png" alt="Trade Copier Ultimate Source tab with Telegram Bot and Bridge mode enabled" loading="lazy" width="366" height="629">
+          <figcaption>// Source tab · Bot + Bridge enabled</figcaption>
+        </figure>
         <ul style="margin-top: 10px; margin-left: 0; padding-left: 18px; color: var(--muted);">
           <li style="margin-bottom: 6px;"><strong style="color: var(--white);">Telegram Bot API</strong> — paste your <code>Bot Token</code> and <code>Chat ID</code>. The bot must be admin in the channel/group.</li>
           <li style="margin-bottom: 6px;"><strong style="color: var(--white);">Bridge Mode</strong> — set the <code>Bridge Port</code> (default <code>5555</code>) and run the Navigator Command Center app on the same PC.</li>
@@ -472,6 +560,42 @@
     <div class="info-box" style="margin-top: 24px;">
       <strong style="color: var(--teal);">Two safety toggles you should turn ON in the panel:</strong>
       <em>Duplicate Filter</em> (blocks the same signal arriving from two sources) and <em>Entry Armour</em> (rejects messages without a clear direction + symbol + price). Both ship OFF so they don't surprise advanced users running stress tests, but new buyers should turn them on once and forget about them.
+    </div>
+  </section>
+
+  <!-- INSIDE THE PANEL -->
+  <section class="tcu-section" id="panel-tour">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Inside the panel</span>
+      <h2 class="sec-title">Every tab, <em>at a glance</em>.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="panel-gallery">
+      <figure class="shot-figure">
+        <img src="assets/tcu/tcu-panel-armed-source.png" alt="Source tab — Telegram Bot, Bridge, and Discord toggles" loading="lazy" width="366" height="629">
+        <figcaption>// Source · pick your input</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/tcu/tcu-panel-lots.png" alt="Lots tab — Lot Mode, Fixed Lot, Risk %, Max Lot, Over Max Action" loading="lazy" width="367" height="630">
+        <figcaption>// Lots · sizing and risk caps</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/tcu/tcu-panel-filter.png" alt="Filter tab — Duplicate Filter, Spread Filter, Slippage settings" loading="lazy" width="368" height="627">
+        <figcaption>// Filter · safety toggles</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/tcu/tcu-panel-sigtp.png" alt="SigTP tab — Multi-TP split with Lot Distribution percentages" loading="lazy" width="369" height="628">
+        <figcaption>// SigTP · multi-TP allocation</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/tcu/tcu-panel-livesignal.png" alt="Home tab — Bridge ONLINE, Bot ONLINE, Last Signal received, Duplicate Filter active" loading="lazy" width="367" height="630">
+        <figcaption>// Home · live status &amp; last signal</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/tcu/tcu-panel-disarmed.png" alt="Home tab — DISARMED state at first attach, no signals fire until ARM" loading="lazy" width="366" height="629">
+        <figcaption>// Home · DISARMED at first attach</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -788,6 +912,11 @@
         </tbody>
       </table>
     </div>
+
+    <figure class="shot-figure shot-wide" style="margin-top: 24px;">
+      <img src="assets/tcu/tcu-local-copier.png" alt="Local Copier in action — Master MT5 (left) and Slave MT5 (right) with trades mirrored" loading="lazy" width="1566" height="779">
+      <figcaption>// Master (left) and Slave (right) — same PC, two brokers, trades mirrored</figcaption>
+    </figure>
   </section>
 
   <!-- TROUBLESHOOTING -->
