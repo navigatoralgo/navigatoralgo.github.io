@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Trade Copier Ultimate — Setup &amp; Support · Navigator Algo</title>
+<meta name="description" content="Setup, signal-format reference, and troubleshooting for Trade Copier Ultimate v6.00 — multi-source signal execution engine for MT5. Telegram, Discord, Bridge, and local MT5-to-MT5 copying.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://navigatoralgo.com/tradecopierultimate.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://navigatoralgo.com/tradecopierultimate.html">
+<meta property="og:title" content="Trade Copier Ultimate — Setup &amp; Support · Navigator Algo">
+<meta property="og:description" content="Setup, signal-format reference, and troubleshooting for Trade Copier Ultimate v6.00 — multi-source signal execution engine for MT5.">
+<meta property="og:image" content="https://navigatoralgo.com/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Trade Copier Ultimate — Setup &amp; Support · Navigator Algo">
+<meta name="twitter:description" content="Setup, signal-format reference, and troubleshooting for Trade Copier Ultimate v6.00 — multi-source signal execution engine for MT5.">
+<meta name="twitter:image" content="https://navigatoralgo.com/logo.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Trade Copier Ultimate",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "MetaTrader 5",
+  "softwareVersion": "6.00",
+  "url": "https://navigatoralgo.com/tradecopierultimate.html",
+  "description": "Multi-source signal execution engine for MT5. Receives trade signals from Telegram, Discord, or a Bridge app and copies trades between local MT5 terminals.",
+  "offers": {
+    "@type": "Offer",
+    "price": "50",
+    "priceCurrency": "USD",
+    "url": "https://www.mql5.com/en/market/product/164907",
+    "availability": "https://schema.org/InStock"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Navigator Trading Systems",
+    "url": "https://navigatoralgo.com/"
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+.tcu-shell {
+  position: relative; z-index: 1;
+  max-width: 1080px; margin: 0 auto;
+  padding: 172px 48px 40px;
+}
+.tcu-hero {
+  text-align: center; margin-bottom: 48px;
+}
+.tcu-hero .page-hero-h1 { font-size: clamp(36px, 6vw, 68px); }
+
+/* Version banner */
+.tcu-version-banner {
+  background: linear-gradient(135deg, rgba(0,212,200,0.06), rgba(240,165,0,0.04));
+  border: 1px solid rgba(0,212,200,0.22);
+  border-radius: 18px;
+  padding: 16px 22px;
+  margin: 24px auto 0;
+  max-width: 720px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+  text-align: center;
+}
+.tcu-version-banner strong { color: var(--teal); font-weight: 700; }
+
+/* CTA cluster under hero */
+.tcu-hero-ctas {
+  margin-top: 36px;
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+}
+
+/* Section titles centred and consistent */
+.tcu-section { margin-top: 64px; }
+.tcu-section-head {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.tcu-section-head .sec-tag { display: block; margin-bottom: 10px; }
+.tcu-section-head .sec-title { font-size: clamp(22px, 3vw, 34px); }
+.tcu-section-head .sec-rule {
+  margin: 14px auto 0;
+  max-width: 220px;
+  background: linear-gradient(90deg, transparent, rgba(0,212,200,0.4), transparent);
+}
+
+/* Step list (5 quick-start steps) */
+.step-list {
+  margin: 24px 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.step-list li {
+  counter-increment: step;
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 18px;
+  padding: 24px 28px 24px 80px;
+  position: relative;
+  margin-bottom: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  font-size: 14.5px;
+}
+.step-list li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 24px; top: 22px;
+  font-family: var(--font-head);
+  font-size: 22px; font-weight: 900;
+  color: var(--teal);
+  letter-spacing: -0.02em;
+}
+.step-list li strong { color: var(--white); font-weight: 700; }
+.step-list li code {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--teal);
+  background: rgba(0,212,200,0.06);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,212,200,0.12);
+}
+
+/* URL list inside steps */
+.url-list {
+  background: rgba(8,11,14,0.6);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--teal);
+  letter-spacing: 0.02em;
+  overflow-x: auto;
+  margin-top: 8px;
+  line-height: 1.9;
+}
+
+/* Bridge download card (placeholder) */
+.bridge-card {
+  background: var(--panel);
+  border: 1px solid rgba(240,165,0,0.22);
+  border-radius: 28px;
+  padding: 40px 36px;
+  box-shadow: 0 30px 60px rgba(240,165,0,0.04);
+  text-align: center;
+}
+.bridge-tag {
+  font-family: var(--font-ui);
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.bridge-name {
+  font-family: var(--font-head);
+  font-size: 24px; font-weight: 800;
+  color: var(--white);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.bridge-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 auto 26px;
+  max-width: 620px;
+}
+.bridge-coming {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--gold);
+  background: rgba(240,165,0,0.07);
+  border: 1px solid rgba(240,165,0,0.28);
+  padding: 14px 28px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+.bridge-meta {
+  margin-top: 22px;
+  font-family: var(--font-ui);
+  font-size: 10px; letter-spacing: 0.08em;
+  color: var(--muted); text-transform: uppercase;
+}
+
+/* Mode + feature tables */
+.tcu-table-wrap {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 22px;
+  padding: 6px;
+  overflow-x: auto;
+}
+.tcu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  color: var(--text);
+}
+.tcu-table th, .tcu-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(36,48,64,0.5);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.55;
+}
+.tcu-table thead th {
+  font-family: var(--font-ui);
+  font-size: 10px; letter-spacing: 0.12em;
+  color: var(--teal); text-transform: uppercase;
+  background: rgba(0,212,200,0.04);
+  border-bottom: 1px solid rgba(0,212,200,0.18);
+  font-weight: 700;
+}
+.tcu-table tr:last-child td { border-bottom: none; }
+.tcu-table td code {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--teal);
+  background: rgba(0,212,200,0.06);
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,212,200,0.12);
+  white-space: nowrap;
+}
+.tcu-table td:first-child {
+  color: var(--white);
+  font-weight: 600;
+  font-family: var(--font-head);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Feature grid (3-column safety / management) */
+.feat-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.feat-card {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 18px;
+  padding: 22px 22px;
+}
+.feat-card-title {
+  font-family: var(--font-head);
+  font-size: 13px; font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+  letter-spacing: -0.005em;
+}
+.feat-card-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* FAQ */
+.faq-item {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 10px;
+}
+.faq-item summary {
+  font-family: var(--font-head);
+  font-size: 15px; font-weight: 700;
+  color: var(--white);
+  cursor: pointer;
+  list-style: none;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+';
+  font-family: var(--font-ui);
+  font-size: 20px;
+  color: var(--teal);
+  margin-left: 12px;
+  transition: transform 0.2s;
+}
+.faq-item[open] summary::after { content: '−'; }
+.faq-item .faq-body {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.faq-item .faq-body code {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--teal);
+  background: rgba(0,212,200,0.06);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,212,200,0.12);
+}
+
+/* Warning + info boxes */
+.warn-box {
+  background: rgba(240,165,0,0.06);
+  border: 1px solid rgba(240,165,0,0.22);
+  border-radius: 18px;
+  padding: 22px 26px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.75;
+}
+.warn-box strong { color: var(--gold); font-weight: 700; }
+.info-box {
+  background: rgba(0,212,200,0.04);
+  border: 1px solid rgba(0,212,200,0.16);
+  border-radius: 18px;
+  padding: 22px 26px;
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.75;
+}
+
+/* Disclaimer block */
+.disclaimer {
+  background: rgba(8,11,14,0.6);
+  border: 1px solid rgba(36,48,64,0.7);
+  border-radius: 18px;
+  padding: 22px 26px;
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.7;
+}
+.disclaimer strong { color: var(--text); font-weight: 700; }
+
+/* Support panel */
+.support-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.support-card {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 18px;
+  padding: 24px 26px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.support-card:hover {
+  border-color: rgba(0,212,200,0.32);
+  transform: translateY(-2px);
+}
+.support-card-title {
+  font-family: var(--font-head);
+  font-size: 14px; font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.support-card-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .feat-grid { grid-template-columns: repeat(2, 1fr); }
+  .support-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .tcu-shell { padding: 154px 20px 40px; }
+  .step-list li { padding: 22px 20px 22px 66px; font-size: 13.5px; }
+  .step-list li::before { left: 18px; font-size: 20px; }
+  .feat-grid { grid-template-columns: 1fr; }
+  .tcu-table td, .tcu-table th { padding: 12px 14px; font-size: 12.5px; }
+  .tcu-table td:first-child { white-space: normal; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark" width="340" height="227">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="signal-copier.html">Signal Copier</a></li>
+    <li><a href="receiver-download.html">Free Receiver</a></li>
+    <li><a href="tradecopierultimate.html" class="current">Trade Copier Ultimate</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li id="nav-auth-slot"><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
+    <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
+  </ul>
+</nav>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">SUPPORT &amp; SETUP</span></div>
+  <div class="status-item">TRADE COPIER ULTIMATE v6.00</div>
+  <div class="status-item">MT5 ONLY</div>
+  <div class="status-item">TELEGRAM · DISCORD · BRIDGE · LOCAL</div>
+  <div class="status-item">DISARMED BY DEFAULT</div>
+</div>
+
+<main class="tcu-shell">
+
+  <!-- HERO -->
+  <section class="tcu-hero">
+    <div class="page-hero-eyebrow">Trade Copier Ultimate · v6.00</div>
+    <h1 class="page-hero-h1">Multi-source <em>signal execution</em> engine for MT5.</h1>
+    <p class="page-hero-desc" style="margin-top: 16px;">
+      Receive signals from Telegram, Discord, or a local Bridge app — and copy trades between two MT5 terminals on the same PC. Safe-by-default. Strict validation. Built for traders who want their signal provider's edge to actually run.
+    </p>
+
+    <div class="tcu-version-banner">
+      You're on the support page for <strong>v6.00</strong>. If you bought from MQL5, you're on the same line — your purchase auto-updates to v6.00 the moment it ships. Existing inputs and panel state carry over.
+    </div>
+
+    <div class="tcu-hero-ctas">
+      <a href="https://www.mql5.com/en/market/product/164907" target="_blank" rel="noopener" class="btn btn-primary">Buy on MQL5 →</a>
+      <a href="#quickstart" class="btn btn-ghost">Quick-Start Setup</a>
+      <a href="#bridge" class="btn btn-ghost">Bridge App</a>
+      <a href="#troubleshooting" class="btn btn-ghost">Troubleshooting</a>
+    </div>
+  </section>
+
+  <!-- QUICK START -->
+  <section class="tcu-section" id="quickstart">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Quick start</span>
+      <h2 class="sec-title">Five steps to your <em>first signal</em>.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <ol class="step-list">
+      <li>
+        <strong>Install from MQL5 Market.</strong> If you haven't already, buy or download the demo from the
+        <a href="https://www.mql5.com/en/market/product/164907" target="_blank" rel="noopener" style="color: var(--teal); text-decoration: none;">MQL5 product page</a>.
+        After install, the EA shows up under <em>Navigator → Expert Advisors → Trade Copier Ultimate</em>.
+      </li>
+      <li>
+        <strong>Allow WebRequest URLs in MT5.</strong> Open <code>Tools → Options → Expert Advisors</code>. Tick <em>Allow WebRequest for listed URL</em> and add both of these (one per line, no trailing slash):
+        <div class="url-list">http://127.0.0.1<br>https://api.telegram.org</div>
+        <div style="margin-top: 8px; font-size: 12.5px; color: var(--muted);">Without this, Telegram polling and the Bridge app cannot reach the EA. <code>http://127.0.0.1</code> is only used for the local Bridge — nothing leaves your PC on that URL.</div>
+      </li>
+      <li>
+        <strong>Attach the EA to any chart.</strong> Symbol doesn't matter — the EA executes on the symbols inside each signal. Make sure <em>AutoTrading</em> is on (green button in the toolbar) and <em>Allow Algo Trading</em> is checked in the EA dialog.
+      </li>
+      <li>
+        <strong>Pick a mode in the on-chart panel.</strong> Open the panel, go to the <em>Source</em> tab, and turn on exactly one of:
+        <ul style="margin-top: 10px; margin-left: 0; padding-left: 18px; color: var(--muted);">
+          <li style="margin-bottom: 6px;"><strong style="color: var(--white);">Telegram Bot API</strong> — paste your <code>Bot Token</code> and <code>Chat ID</code>. The bot must be admin in the channel/group.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: var(--white);">Bridge Mode</strong> — set the <code>Bridge Port</code> (default <code>5555</code>) and run the Navigator Command Center app on the same PC.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: var(--white);">Discord Mode</strong> — paste your <code>Discord Webhook URL</code>.</li>
+          <li style="margin-bottom: 6px;"><strong style="color: var(--white);">Local Copier</strong> — choose <code>MASTER</code> on the source MT5 and <code>SLAVE</code> on the target MT5, with the same <code>CopierFileName</code>.</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Test, then ARM.</strong> Click <em>Test Connection</em> in the panel — you should see ONLINE for the mode you enabled. The EA starts in <strong style="color: var(--gold);">DISARMED</strong> state (no trades fire). Click <em>ARM</em> when you're ready. The header pill turns green and the next valid signal will execute.
+      </li>
+    </ol>
+
+    <div class="info-box" style="margin-top: 24px;">
+      <strong style="color: var(--teal);">Two safety toggles you should turn ON in the panel:</strong>
+      <em>Duplicate Filter</em> (blocks the same signal arriving from two sources) and <em>Entry Armour</em> (rejects messages without a clear direction + symbol + price). Both ship OFF so they don't surprise advanced users running stress tests, but new buyers should turn them on once and forget about them.
+    </div>
+  </section>
+
+  <!-- BRIDGE APP -->
+  <section class="tcu-section" id="bridge">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Bridge App</span>
+      <h2 class="sec-title">Navigator <em>Command Center</em>.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="bridge-card">
+      <div class="bridge-tag">// Companion App · Windows</div>
+      <div class="bridge-name">NavigatorCommandCenter.exe</div>
+      <p class="bridge-desc">
+        The Bridge app is a small Windows utility that runs on the same PC as your MT5. It logs into your Telegram account (read-only) so it can read <strong>private channels</strong> the Bot API can't reach, and routes per-account groups to the right MT5 terminal. Trade Copier Ultimate connects to it on <code style="color: var(--teal); background: rgba(0,212,200,0.08); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(0,212,200,0.18);">http://127.0.0.1:&lt;port&gt;</code> — nothing ever leaves your machine.
+      </p>
+      <div class="bridge-coming">⚙ In Development — Download Coming Soon</div>
+      <div class="bridge-meta">
+        Verified SHA-256 + signed installer will be published here on release.
+      </div>
+    </div>
+
+    <div class="warn-box" style="margin-top: 18px;">
+      <strong>You don't need the Bridge for most setups.</strong>
+      Bot API mode is enough for any Telegram channel where you can make your bot an admin (most public/group channels), and Discord mode handles webhooks directly. The Bridge is the answer only if your provider broadcasts in a private Telegram channel you can't bot-admin, or if you want one PC to route signals from multiple Telegram accounts to multiple MT5 terminals.
+    </div>
+  </section>
+
+  <!-- OPERATING MODES -->
+  <section class="tcu-section">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Operating modes</span>
+      <h2 class="sec-title">Five ways to feed it <em>signals</em>.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="tcu-table-wrap">
+      <table class="tcu-table">
+        <thead>
+          <tr><th>Mode</th><th>How it works</th><th>Enable setting</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Bridge Mode</td>
+            <td>Receives signals from the Navigator Command Center companion app via local HTTP. Supports private Telegram channels and Discord routing on the same machine.</td>
+            <td><code>EnableBridgeMode = true</code></td>
+          </tr>
+          <tr>
+            <td>Telegram Bot API</td>
+            <td>Polls a Telegram bot directly for formatted signal messages. Requires bot admin access to the channel or group.</td>
+            <td><code>EnableBotAPIMode = true</code></td>
+          </tr>
+          <tr>
+            <td>Local Copier</td>
+            <td>Copies trades between MT5 terminals on the same PC via a shared CSV file. One EA acts as Master (writes trades), another as Slave (reads and executes).</td>
+            <td><code>CopierMode = MASTER / SLAVE</code></td>
+          </tr>
+          <tr>
+            <td>Discord Mode</td>
+            <td>Reads signals from a Discord webhook URL at a configurable polling interval.</td>
+            <td><code>EnableDiscordMode = true</code></td>
+          </tr>
+          <tr>
+            <td>Telegram Broadcast</td>
+            <td>Forwards your executed trades as messages to a Telegram channel or group. Useful for signal providers running their own room.</td>
+            <td><code>EnableTelegramSend = true</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SIGNAL FORMAT -->
+  <section class="tcu-section">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Signal format</span>
+      <h2 class="sec-title">What your provider can <em>send</em>.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="tcu-table-wrap">
+      <table class="tcu-table">
+        <thead>
+          <tr><th>Signal type</th><th>Example</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Market + SL/TP</td>
+            <td><code>BUY GOLD SL 2300 TP 2400</code></td>
+            <td>Executes immediately at market price.</td>
+          </tr>
+          <tr>
+            <td>Multi-TP market</td>
+            <td><code>BUY GOLD SL 2300 TP1 2380 TP2 2420 TP3 2460</code></td>
+            <td>Splits into 3 positions using <em>LotDistribution</em> (default 40/30/30%).</td>
+          </tr>
+          <tr>
+            <td>Sequential bare TPs</td>
+            <td><code>BUY GOLD SL 2300 TP 2380 TP 2420 TP 2460</code></td>
+            <td>Unlabelled TP lines auto-assigned as TP1 / TP2 / TP3.</td>
+          </tr>
+          <tr>
+            <td>Pending order</td>
+            <td><code>GOLD BUY LIMIT 2310 SL 2290 TP 2370</code></td>
+            <td>Places a pending limit or stop order.</td>
+          </tr>
+          <tr>
+            <td>Pending range entry</td>
+            <td><code>GOLD BUY LIMIT 2308-2312 SL 2290 TP 2370</code></td>
+            <td>Uses the lowest price in the range as entry.</td>
+          </tr>
+          <tr>
+            <td>Pending + multi-TP</td>
+            <td><code>BUY LIMIT GOLD 2310 TP 2350 TP 2390 TP 2430 SL 2290</code></td>
+            <td>Places 3 separate pending orders, one per TP leg.</td>
+          </tr>
+          <tr>
+            <td>Close command</td>
+            <td><code>CLOSE GOLD</code> · <code>CLOSE ALL</code> · <code>CLOSE BUY GOLD</code></td>
+            <td>Closes matching positions by symbol and/or direction.</td>
+          </tr>
+          <tr>
+            <td>Breakeven</td>
+            <td><code>BREAKEVEN</code> · <code>MOVE SL TO BREAKEVEN</code></td>
+            <td>Moves SL to entry for all open positions.</td>
+          </tr>
+          <tr>
+            <td>SL/TP modify</td>
+            <td><code>BUY GOLD SL 2285 TP 2395</code> (repeat)</td>
+            <td>Updates the existing position instead of opening a duplicate.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top: 16px; font-size: 13px; color: var(--muted); line-height: 1.7;">
+      Tip: the parser is case-insensitive and tolerant of common provider quirks (extra emoji, broker-suffixed symbols like <code style="color: var(--teal); background: rgba(0,212,200,0.06); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(0,212,200,0.12);">EURUSDm</code> ↔ <code style="color: var(--teal); background: rgba(0,212,200,0.06); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(0,212,200,0.12);">EURUSD</code>, aliases like <em>GOLD</em> → XAUUSD). If a specific provider has odd formatting, the <em>Filter → Custom Symbol Mappings</em> and <em>Filter → Keyword Replace</em> inputs let you rewrite incoming text before parsing.
+    </p>
+  </section>
+
+  <!-- LOTS & RISK -->
+  <section class="tcu-section">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Lots &amp; risk</span>
+      <h2 class="sec-title">Four ways to <em>size</em>.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="tcu-table-wrap">
+      <table class="tcu-table">
+        <thead>
+          <tr><th>Mode</th><th>Parameter</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Fixed</td>
+            <td><code>FixedLotSize</code></td>
+            <td>Always trades a set lot size (e.g. <code>0.10</code>). Same lot every signal.</td>
+          </tr>
+          <tr>
+            <td>Multiplier</td>
+            <td><code>LotMultiplier</code></td>
+            <td>Multiplies the signal's lot value by a factor (only useful for sources that send a lot).</td>
+          </tr>
+          <tr>
+            <td>Risk %</td>
+            <td><code>RiskPercent</code></td>
+            <td>Calculates lot from account balance, SL distance, and tick value. If the signal has no SL, falls back to <code>DefaultSLPoints</code>.</td>
+          </tr>
+          <tr>
+            <td>Cap</td>
+            <td><code>MaxLotSize</code></td>
+            <td>Safety ceiling regardless of mode. Set <em>Over Max Action</em> to <code>TRIM</code> or <code>SKIP</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top: 16px; font-size: 13px; color: var(--muted); line-height: 1.7;">
+      Multi-TP example: <code style="color: var(--teal); background: rgba(0,212,200,0.06); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(0,212,200,0.12);">BUY GOLD SL 2290 TP1 2360 TP2 2400 TP3 2450</code> with 0.10 lots and default distribution → Position 1: 0.04 / Position 2: 0.03 / Position 3: 0.03.
+    </p>
+  </section>
+
+  <!-- TRADE MANAGEMENT -->
+  <section class="tcu-section">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Trade management</span>
+      <h2 class="sec-title">What it does <em>after</em> entry.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-card-title">Trailing Stop</div>
+        <div class="feat-card-desc">Moves SL behind price as it moves into profit. Configurable start distance, trail distance, and step size — no per-tick spam.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Partial Close</div>
+        <div class="feat-card-desc">Closes a percentage or fixed lot at up to 4 pip-based targets. Optional move-SL-to-BE after the first target.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Breakeven on TP1</div>
+        <div class="feat-card-desc">When a multi-TP split hits TP1, moves the remaining legs' SL to entry (with optional buffer pips).</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">SL → TP1 on TP2</div>
+        <div class="feat-card-desc">After TP2 closes, moves the last leg's SL up to the TP1 level to lock in profit.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Smart SL/TP Modify</div>
+        <div class="feat-card-desc">Repeat signals on an open position update its SL/TP instead of opening a duplicate trade.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Opposite Signal Action</div>
+        <div class="feat-card-desc">Configurable: do nothing, close opposites only, or close all on the opposite signal.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Pending Expiry</div>
+        <div class="feat-card-desc">Auto-cancels unfilled pending orders after a configurable number of hours so dead orders don't pile up.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Auto SL / Auto TP</div>
+        <div class="feat-card-desc">Adds a fallback SL or TP when the signal omits them. Existing values are never overwritten.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">News Pause</div>
+        <div class="feat-card-desc">Reads the MT5 economic calendar and blocks new entries around configurable currency / impact / before-after windows. Existing trades keep being managed.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAFETY -->
+  <section class="tcu-section">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Safety filters</span>
+      <h2 class="sec-title">Why it <em>won't</em> blow up your account.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-card-title">Disarmed by default</div>
+        <div class="feat-card-desc">EA starts in DISARMED state. No trades fire until you click ARM in the panel.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Duplicate Filter</div>
+        <div class="feat-card-desc">Hashes each signal. The same signal arriving from two sources fires only once. Survives terminal restarts. <em>Toggle ON in the panel.</em></div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Cooldown Timer</div>
+        <div class="feat-card-desc">Default 3 minutes. Ignores re-entry on the same symbol + direction inside the window. SL/TP updates still apply.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Spread Filter</div>
+        <div class="feat-card-desc">Skips trades when the live spread exceeds your configured point limit.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Time Filter</div>
+        <div class="feat-card-desc">Only executes during your allowed hours. Useful for prop firms with restricted sessions.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Max Positions Cap</div>
+        <div class="feat-card-desc">Blocks new trades when the open position count hits your configured limit.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Circuit Breaker</div>
+        <div class="feat-card-desc">Suspends execution if more than N signals arrive in 60 seconds — protects you from a misfiring source.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Whitelist / Blacklist</div>
+        <div class="feat-card-desc">Comma-separated symbol lists. Whitelist = only these. Blacklist = never these.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Skip Keywords</div>
+        <div class="feat-card-desc">Ignores chat phrases like <em>HIT TP</em>, <em>RUNNING</em>, <em>CLOSED IN PROFIT</em> so commentary doesn't trigger trades.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Entry Armour</div>
+        <div class="feat-card-desc">Requires direction + symbol + (price or SL or TP) before opening. Stops random text from firing. <em>Toggle ON in the panel.</em></div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Universal Symbol Map</div>
+        <div class="feat-card-desc">Auto-resolves broker suffixes both ways — <code>EURUSDm</code> ↔ <code>EURUSD</code>, <code>XAUUSD</code> ↔ <code>GOLD</code>. No manual setup needed for most brokers.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-title">Prop Firm + Beginner Modes</div>
+        <div class="feat-card-desc">One-click profiles. Prop = no comments, require SL, daily loss caps. Beginner = stricter lots and position counts.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCAL COPIER -->
+  <section class="tcu-section">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Local copier</span>
+      <h2 class="sec-title">MT5 → MT5 (and <em>MT4</em>) on one PC.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="tcu-table-wrap">
+      <table class="tcu-table">
+        <thead>
+          <tr><th>Feature</th><th>Detail</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Copy speed</td><td>~50 ms default — configurable via <code>CopierPollMs</code>.</td></tr>
+          <tr><td>Cross-broker</td><td>Works between different brokers on the same PC. Symbol suffix differences handled automatically.</td></tr>
+          <tr><td>SL / TP sync</td><td>When the master modifies SL/TP, the slave position updates automatically.</td></tr>
+          <tr><td>Partial close sync</td><td>When the master partially closes, the slave reduces proportionally.</td></tr>
+          <tr><td>Auto-close</td><td>Slave closes when master closes. Optional — disable for independent management.</td></tr>
+          <tr><td>Initial sync</td><td>On first connect, existing master trades are registered without re-copying. No duplicates on attach.</td></tr>
+          <tr><td>MT4 slave</td><td>Free companion EA <em>NTS Local Copier — MT4 Slave</em> on MQL5 mirrors trades to any MT4 terminal on the same PC.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TROUBLESHOOTING -->
+  <section class="tcu-section" id="troubleshooting">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Troubleshooting</span>
+      <h2 class="sec-title">Something <em>not working?</em></h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <details class="faq-item">
+      <summary>Bridge says <em>BLOCKED</em> or Telegram won't connect</summary>
+      <div class="faq-body">
+        99% of the time this is the WebRequest checkbox in MT5. Open <code>Tools → Options → Expert Advisors</code> and confirm <em>Allow WebRequest for listed URL</em> is ticked, with both <code>http://127.0.0.1</code> and <code>https://api.telegram.org</code> on separate lines (no trailing slash). Click OK, then click <em>Test Connection</em> in the EA panel again. If it still fails, your VPS or Windows firewall is blocking outbound HTTP from <code>terminal64.exe</code> — whitelist it.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Telegram bot is connected but no signals arrive</summary>
+      <div class="faq-body">
+        The bot must be an <strong>admin</strong> in the channel or group you're trying to read. Bot API mode cannot read messages otherwise. To check: open Telegram, go to the channel, tap the title → Administrators → confirm your bot is listed. If it's a private channel where you can't add bots, you need <em>Bridge Mode</em> (Navigator Command Center) instead. Also verify your <code>Chat ID</code> (negative number for groups, positive for DMs) — use <code>@userinfobot</code> to read it.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Signals come in but no trade opens</summary>
+      <div class="faq-body">
+        Walk down this list: (1) <em>AutoTrading</em> button green in the toolbar? (2) EA panel header pill says <strong>ARMED</strong>, not DISARMED? (3) <em>Last Filtered</em> on the Home tab — does it show a recent reject reason? (4) the broker actually has the symbol — check the Market Watch. (5) account has free margin to open the lot you've configured. The EA's diagnostic log (<em>System tab → Diagnostic Log = ON</em>) shows exactly which step rejected the signal.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>The same trade opens twice</summary>
+      <div class="faq-body">
+        Two causes: (a) you have two sources turned on (e.g. Bot API <em>and</em> Bridge) and the same channel arrives in both — turn ON <em>Filter → Duplicate Filter</em>; (b) your provider re-sends the signal with slightly different formatting and the dedupe hash doesn't match — combine with a 3-minute <em>Cooldown</em> and <em>Modify SL/TP If Position Exists = ON</em> so a repeat signal updates instead of stacking.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Wrong lot size</summary>
+      <div class="faq-body">
+        Check the <em>Lots</em> tab. <em>Lot Mode = Fixed</em> with <em>FixedLotSize = 0.10</em> always sends 0.10 — no auto-scaling. <em>Risk %</em> needs an SL on the signal (or a sane <em>DefaultSLPoints</em> fallback). Always verify <em>MaxLotSize</em> and <em>Over Max Action</em>: TRIM caps the lot, SKIP rejects the signal. On crypto/index symbols, the broker's contract size matters — test on demo first.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Pending order never fills</summary>
+      <div class="faq-body">
+        Either price didn't reach the entry (most common), or your broker has stop-level / freeze-level rules that rejected the order — the MT5 <em>Experts</em> log will say so. <em>Pending Expiry</em> deletes pending orders after the configured hours; if it's set too short, valid setups get cancelled before they fire. Check <code>EnablePendingExpiry</code> + <code>PendingExpiryHours</code>.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Broker symbol is named differently (e.g. <code>BTCUSDm</code>, <code>XAUUSD.cash</code>)</summary>
+      <div class="faq-body">
+        The universal symbol mapper handles common suffixes (<code>m</code>, <code>.pro</code>, <code>#</code>, <code>.raw</code>, <code>.cash</code>) automatically. If your broker uses something exotic, fill in <em>Filter → Custom Symbol Mappings</em> with a comma-separated list like <code>EURUSD:EURUSDm,XAUUSD:GOLD</code>. The first value is the signal's symbol, the second is your broker's.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Multi-TP split is missing a leg</summary>
+      <div class="faq-body">
+        Check that the signal actually has TP1 + TP2 + TP3 (or three sequential TP lines) and that <em>SigTP → Multi-TP Split</em> is ON. Verify <em>Lot Distribution</em> total ≤ 100% — if it's higher, the EA caps the last leg. The <em>Max Signal TPs</em> setting limits extraction (1, 2, or 3); if it's 1, you'll only get one trade no matter how many TPs the signal has.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Panel disappears or settings reset after restart</summary>
+      <div class="faq-body">
+        Panel state is auto-saved in MT5 GlobalVariables + a config file in <code>MQL5/Files/Common/</code>. If F7 inputs disagree with the saved panel state, the EA prefers the saved panel. To reset everything clean: remove the EA, run <code>F3 → Global Variables</code>, delete every variable starting with <code>TCU_</code>, then re-attach. If the panel <em>visually</em> disappears (no settings lost), drag the chart edge to redraw — known cosmetic glitch on rare DPI configurations.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>EA freezes / lots of CPU on tick</summary>
+      <div class="faq-body">
+        Make sure you're on <em>Hedging</em> or <em>Netting</em> account type that matches your test plan — Netting accounts behave differently for multi-position ops. Lower <em>BridgePollMs</em> (default 1000 ms) and <em>Bot Poll sec</em> if you've set them too aggressive. Disable <em>Diagnostic Log</em> after setup is confirmed working — chatty logs slow things down on a busy chart. If you see runaway log spam, send the relevant lines to support and we'll trace it.
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Can I run it on a prop-firm account?</summary>
+      <div class="faq-body">
+        Yes — turn ON <em>Prop Firm Mode</em> in the panel. It strips trade comments (some prop firms reject EA-tagged trades), enforces <em>Require SL</em>, and lets you cap daily loss in % or $. Combine with <em>Auto SL fallback</em> if your provider sometimes sends entries without SL. Always verify the prop firm allows EAs at all and that no DLLs are required (TCU is pure MQL5 — no DLLs).
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Where are my settings / bot tokens stored?</summary>
+      <div class="faq-body">
+        Numeric and toggle settings live in MT5 <em>GlobalVariables</em>. String settings (bot tokens, webhooks, custom mappings) are saved as plain text in <code>MQL5/Files/Common/TCU_*.cfg</code> on your PC. <strong>Don't share that file</strong> — it contains your Telegram bot token, which gives full bot control to anyone who has it. If you ever post a settings export for support, redact the token line first.
+      </div>
+    </details>
+  </section>
+
+  <!-- WHAT IT DOESN'T DO -->
+  <section class="tcu-section">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Honest disclaimer</span>
+      <h2 class="sec-title">What this EA does <em>not</em> do.</h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="disclaimer">
+      Trade Copier Ultimate is an <strong>execution utility</strong>. It does not generate trading signals or analysis. It does not guarantee profit or manage drawdown for you — that's your job and the job of the source you're copying. It does not include copy protection that limits your broker, account type, or number of charts.<br><br>
+      <strong>Always test on a demo account before going live.</strong> Behaviour differs between Hedging and Netting accounts; verify your account type and re-run your edge cases. Past performance of any signal provider does not guarantee future results.<br><br>
+      Demo versions from MQL5 run only inside the Strategy Tester. For end-to-end live testing on a demo broker account, use the paid version on a demo MT5 login.
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section class="tcu-section">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Get help</span>
+      <h2 class="sec-title">Stuck? <em>Talk to us.</em></h2>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="support-grid">
+      <a class="support-card" href="https://t.me/Navigatoralgo_bot" target="_blank" rel="noopener">
+        <div class="support-card-title">Support Bot — Telegram</div>
+        <div class="support-card-desc">Fastest way to reach us. Send your account number, your broker, and the issue. <strong style="color: var(--teal);">@Navigatoralgo_bot</strong></div>
+      </a>
+      <a class="support-card" href="https://t.me/navigatoralgo" target="_blank" rel="noopener">
+        <div class="support-card-title">News &amp; Updates Channel</div>
+        <div class="support-card-desc">Version releases, breaking changes, prop-firm-friendly setups. <strong style="color: var(--teal);">t.me/navigatoralgo</strong></div>
+      </a>
+      <a class="support-card" href="https://www.mql5.com/en/market/product/164907" target="_blank" rel="noopener">
+        <div class="support-card-title">MQL5 Comments &amp; Reviews</div>
+        <div class="support-card-desc">Public Q&amp;A on the product page. Good for setup questions other buyers may have already answered.</div>
+      </a>
+      <a class="support-card" href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" rel="noopener">
+        <div class="support-card-title">All Navigator Algo Tools</div>
+        <div class="support-card-desc">Full MQL5 store — Trigger Pro, Prop Firm Protector, free tools, MT4 slave plugin.</div>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo" width="510" height="340">
+      </div>
+      <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
+      <p class="footer-brand-desc">Nine professional Expert Advisors for MetaTrader 5. Built for funded account traders, signal traders, manual traders, and everyone in between.</p>
+      <p class="footer-brand-legal"><strong>Navigator Algo</strong> and the <strong>Navigator Algo</strong> logo are proprietary brand assets of Navigator Trading Systems. Unauthorized use, reproduction, or imitation is prohibited.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Paid Tools</h4>
+      <a href="https://www.mql5.com/en/market/product/170008" target="_blank">Trigger Pro</a>
+      <a href="tradecopierultimate.html">Trade Copier Ultimate</a>
+      <a href="https://www.mql5.com/en/market/product/163674" target="_blank">Prop Firm Protector</a>
+    </div>
+    <div class="footer-col">
+      <h4>Free Tools</h4>
+      <a href="https://www.mql5.com/en/market/product/165390" target="_blank">NTS Local Copier</a>
+      <a href="https://www.mql5.com/en/market/product/163764" target="_blank">Trade Journal Ultimate</a>
+      <a href="https://www.mql5.com/en/market/product/165793" target="_blank">Multi Pair Scanner</a>
+      <a href="https://www.mql5.com/en/market/product/163692" target="_blank">Protector Basic</a>
+      <a href="https://www.mql5.com/en/market/product/165896" target="_blank">Trade Assistant</a>
+      <a href="https://www.mql5.com/en/market/product/168242" target="_blank">MT4 Slave Plugin</a>
+    </div>
+    <div class="footer-col">
+      <h4>Signal Copier</h4>
+      <a href="signal-copier.html">Product page</a>
+      <a href="receiver-download.html">Partner Receiver</a>
+      <a href="dashboard.html">Provider Dashboard</a>
+      <a href="signin.html">Sign in</a>
+      <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank">MQL5 Store</a>
+    </div>
+    <div class="footer-col">
+      <h4>Community &amp; Support</h4>
+      <a href="https://t.me/navigatoralgo" target="_blank" rel="noopener">Telegram channel (updates)</a>
+      <a href="https://t.me/Navigatoralgo_bot" target="_blank" rel="noopener">Support bot @Navigatoralgo_bot</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; 2026 Navigator Trading Systems · All rights reserved · navigatoralgo.com · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="refund.html">Refunds</a></div>
+    <div class="footer-sys">
+      <span class="status-dot"></span> ALL SYSTEMS OPERATIONAL
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="assets/nav-auth.js"></script>
+</body>
+</html>
