@@ -104,13 +104,13 @@
 
 .hero-h1 {
   font-family: var(--font-head);
-  font-size: clamp(40px, 7vw, 86px);
+  font-size: clamp(32px, 5vw, 62px);
   font-weight: 900;
-  line-height: 0.9;
-  letter-spacing: -0.03em;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
   color: var(--white);
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   opacity: 0; animation: up 0.7s 0.25s forwards;
   text-wrap: balance;
 }
@@ -118,21 +118,21 @@
 
 .hero-h2 {
   font-family: var(--font-cond);
-  font-size: clamp(16px, 2.5vw, 26px);
+  font-size: clamp(13px, 1.6vw, 18px);
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   color: var(--gold);
   text-align: center; text-transform: uppercase;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
   opacity: 0; animation: up 0.7s 0.4s forwards;
 }
 
 .hero-desc {
-  max-width: 560px; text-align: center;
-  font-size: 18px; font-weight: 500;
+  max-width: 580px; text-align: center;
+  font-size: 15px; font-weight: 500;
   color: var(--muted2);
-  line-height: 1.8;
-  margin-bottom: 48px;
+  line-height: 1.7;
+  margin-bottom: 36px;
   opacity: 0; animation: up 0.7s 0.55s forwards;
 }
 
@@ -165,21 +165,22 @@
 .btn-ghost:hover { border-color: rgba(0,212,200,0.38); color: var(--white); transform: translateY(-2px); }
 
 .hero-stats {
-  display: flex; gap: 16px; margin-top: 72px;
+  display: flex; gap: 14px; margin-top: 52px;
   opacity: 0; animation: up 0.7s 0.85s forwards;
+  flex-wrap: wrap; justify-content: center;
 }
 .hero-stat {
-  padding: 22px 28px;
+  padding: 16px 22px;
   border: 1px solid rgba(36,48,64,0.72);
   background: rgba(15,21,32,0.72);
-  border-radius: 24px;
+  border-radius: 20px;
   box-shadow: 0 16px 34px rgba(0,0,0,0.16);
   text-align: center;
-  min-width: 150px;
+  min-width: 128px;
 }
 .hero-stat-num {
   font-family: var(--font-head);
-  font-size: 30px; font-weight: 800;
+  font-size: 24px; font-weight: 800;
   color: var(--teal); display: block;
 }
 .hero-stat-label {
@@ -810,7 +811,7 @@ footer {
   .cta-strip { padding: 56px 16px; }
 
   #hero { padding: 104px 16px 56px; min-height: auto; }
-  .hero-h1 { font-size: clamp(38px, 9.5vw, 58px); line-height: 0.95; }
+  .hero-h1 { font-size: clamp(30px, 7.5vw, 46px); line-height: 0.98; }
   .hero-h2 { font-size: 14px; margin-bottom: 18px; }
   .hero-desc { font-size: 15px; line-height: 1.7; margin-bottom: 32px; }
   .hero-btns { gap: 10px; width: 100%; }
