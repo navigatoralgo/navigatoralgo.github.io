@@ -49,6 +49,7 @@
 .tcu-shell {
   position: relative; z-index: 1;
   max-width: 1080px; margin: 0 auto;
+  overflow-x: hidden;
   padding: 172px 48px 40px;
 }
 .tcu-hero {
@@ -392,8 +393,8 @@
   text-transform: uppercase;
   margin-top: 12px;
 }
-.shot-narrow img { max-width: 320px; }
-.shot-medium img { max-width: 540px; }
+.shot-narrow img { max-width: min(320px, 100%); }
+.shot-medium img { max-width: min(540px, 100%); }
 .shot-wide   img { max-width: 100%; }
 
 /* Hero panel composite */
