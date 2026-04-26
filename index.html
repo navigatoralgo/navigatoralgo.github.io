@@ -593,6 +593,48 @@
   margin-top: auto;
 }
 
+/* ── UPCOMING (Cloud Copier) BANNER ── */
+.status-item .val-gold { color: var(--gold); }
+.upcoming-banner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 64px 48px 0;
+  text-align: center;
+}
+.upcoming-banner::before {
+  content: '';
+  display: block;
+  width: 56px; height: 1px;
+  margin: 0 auto 22px;
+  background: linear-gradient(90deg, transparent, rgba(240,165,0,0.55), transparent);
+}
+.upcoming-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 10px; letter-spacing: 0.18em;
+  color: var(--gold);
+  text-transform: uppercase;
+  display: inline-block;
+  padding: 6px 14px;
+  border: 1px solid rgba(240,165,0,0.32);
+  background: rgba(240,165,0,0.05);
+  border-radius: 999px;
+  margin-bottom: 22px;
+}
+.upcoming-title {
+  font-family: var(--font-head);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 800; letter-spacing: -0.02em;
+  color: var(--white);
+  margin: 0 0 14px;
+}
+.upcoming-title em { color: var(--gold); font-style: normal; }
+.upcoming-sub {
+  max-width: 720px;
+  margin: 0 auto;
+  font-size: 15px; line-height: 1.7;
+  color: var(--muted);
+}
+
 /* ── HOW IT WORKS ── */
 .how-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
@@ -827,12 +869,12 @@ footer {
 
 <!-- STATUS BAR -->
 <div class="status-bar">
-  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">SIGNAL NETWORK LIVE</span></div>
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">TRADE COPIER ULTIMATE v6.00 LIVE</span></div>
   <div class="status-item">MT5 NATIVE</div>
-  <div class="status-item">FIREBASE REALTIME</div>
-  <div class="status-item">HEDGING &amp; NETTING</div>
-  <div class="status-item">INSTANT ACTIVATION</div>
+  <div class="status-item">TELEGRAM · DISCORD · BRIDGE · LOCAL</div>
+  <div class="status-item">DISARMED BY DEFAULT</div>
   <div class="status-item">MQL5 VERIFIED BUILDS</div>
+  <div class="status-item"><span class="val-gold">CLOUD COPIER · COMING SOON</span></div>
 </div>
 
 <!-- HERO -->
@@ -840,48 +882,53 @@ footer {
   <div class="hero-glow-l"></div>
   <div class="hero-glow-r"></div>
 
-  <div class="hero-eyebrow">Navigator Algo · MT5 Signal Marketplace</div>
+  <div class="hero-eyebrow">Trade Copier Ultimate · v6.00 · Live on MQL5</div>
 
-  <h1 class="hero-h1">TURN YOUR<br>TRADES INTO A<br><em>SIGNAL BUSINESS</em></h1>
-  <div class="hero-h2">Broadcast MT5 trades · Paid followers · Live dashboard</div>
+  <h1 class="hero-h1">MULTI-SOURCE<br>SIGNAL EXECUTION<br><em>FOR MT5</em></h1>
+  <div class="hero-h2">Telegram · Discord · Bridge App · Local MT5-to-MT5</div>
 
   <p class="hero-desc">
-    Publish your trades in real time from MetaTrader 5 to unlimited copiers worldwide.
-    Every signal carries a magic, ticket, and price — so closes, partials, and stops
-    map cleanly to every follower's account. Or follow a verified provider and auto-copy
-    their edge. All on MT5, all on Firebase, live in minutes.
+    Receive trade signals from any source — Telegram channels, Discord webhooks, or a local
+    Bridge app — and execute them on MT5 with strict validation, duplicate protection, and
+    full risk controls. Or copy trades between two MT5 terminals on the same PC. Safe by
+    default: starts <strong>DISARMED</strong>, no surprise fills.
   </p>
 
   <div class="hero-btns">
-    <a href="signal-copier.html#pricing" class="btn btn-primary">Become a Signal Provider</a>
-    <a href="signal-copier.html" class="btn btn-ghost">How it works →</a>
+    <a href="https://www.mql5.com/en/market/product/164907" target="_blank" rel="noopener" class="btn btn-primary">Buy on MQL5 → $50</a>
+    <a href="tradecopierultimate.html" class="btn btn-ghost">Setup &amp; Support →</a>
   </div>
 
   <div class="hero-stats">
     <div class="hero-stat">
+      <span class="hero-stat-num">$50</span>
+      <span class="hero-stat-label">One-time license</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">4</span>
+      <span class="hero-stat-label">Signal sources</span>
+    </div>
+    <div class="hero-stat">
       <span class="hero-stat-num">MT5</span>
-      <span class="hero-stat-label">Native platform</span>
+      <span class="hero-stat-label">Native · no DLLs</span>
     </div>
     <div class="hero-stat">
-      <span class="hero-stat-num">1–3s</span>
-      <span class="hero-stat-label">Signal-to-copy</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-num">10</span>
-      <span class="hero-stat-label">Free sub slots</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-num">$100/yr</span>
-      <span class="hero-stat-label">Provider license</span>
+      <span class="hero-stat-num">v6.00</span>
+      <span class="hero-stat-label">Latest release</span>
     </div>
   </div>
 </section>
 
-<!-- DUAL AUDIENCE -->
+<!-- COMING SOON: CLOUD COPIER -->
 <div id="audiences" class="flagship">
+  <div class="upcoming-banner">
+    <span class="upcoming-eyebrow">// Coming soon · In development</span>
+    <h2 class="upcoming-title">Navigator <em>Cloud Copier</em>.</h2>
+    <p class="upcoming-sub">A live signal marketplace for MT5 — broadcast your trades to paid followers, or copy verified providers in 1–3 seconds. Below is the design we're shipping. <a href="signal-copier.html" style="color: var(--teal); text-decoration: none; border-bottom: 1px dotted rgba(0,212,200,0.45);">See the full preview →</a></p>
+  </div>
   <div class="flagship-inner audiences-inner">
     <div class="audience-card audience-provider">
-      <span class="flagship-label">For traders with an edge</span>
+      <span class="flagship-label">For traders with an edge · Upcoming</span>
       <h2 class="flagship-title">BROADCAST.<span>Earn from your trades.</span></h2>
       <p class="flagship-desc">Run the Navigator Provider EA on your master MT5. Every trade broadcasts over Firebase in under a second. Price your subscription, mint sub-license codes, and every paying follower's account mirrors yours — hedging or netting, any broker.</p>
       <ul class="audience-list">
@@ -892,13 +939,12 @@ footer {
         <li>$100/yr — cancel any time</li>
       </ul>
       <div class="audience-cta">
-        <a href="signal-copier.html#pricing" class="btn btn-primary">Become a Provider</a>
-        <a href="signal-copier.html" class="mql5-link">How it works →</a>
+        <a href="signal-copier.html" class="btn btn-ghost">See the preview →</a>
       </div>
     </div>
 
     <div class="audience-card audience-follower">
-      <span class="flagship-label audience-gold">For traders who want to copy</span>
+      <span class="flagship-label audience-gold">For traders who want to copy · Upcoming</span>
       <h2 class="flagship-title audience-follower-title">FOLLOW.<span>Auto-copy pro traders.</span></h2>
       <p class="flagship-desc">Got a sub-license code from your provider? Drop the free Partner Receiver EA on any MT5 chart, paste the code, and your trades copy instantly. No subscription — your provider's plan already covers your slot.</p>
       <ul class="audience-list audience-list-gold">
@@ -909,7 +955,7 @@ footer {
         <li>Free for anyone with a provider sub-license</li>
       </ul>
       <div class="audience-cta">
-        <a href="receiver-download.html" class="btn btn-ghost">Download Free Receiver →</a>
+        <a href="receiver-download.html" class="btn btn-ghost">Receiver page →</a>
       </div>
     </div>
   </div>
@@ -918,25 +964,25 @@ footer {
 <!-- HOW IT WORKS -->
 <div id="how" class="section">
   <div class="sec-header">
-    <span class="sec-tag">// Three steps</span>
-    <h2 class="sec-title">LIVE IN <em>MINUTES</em></h2>
+    <span class="sec-tag">// Three steps · Trade Copier Ultimate</span>
+    <h2 class="sec-title">FROM <em>SIGNAL</em> TO TRADE · IN MINUTES</h2>
     <div class="sec-rule"></div>
   </div>
   <div class="how-grid">
     <div class="how-card">
       <div class="how-num">01</div>
-      <div class="how-title">Sign in</div>
-      <p class="how-text">Create a Navigator Algo account with Google or email. Free — no card required until you activate a provider license.</p>
+      <div class="how-title">Buy on MQL5 &amp; install</div>
+      <p class="how-text">Grab Trade Copier Ultimate from the MQL5 Market for $50. Drop it on any MT5 chart — the symbol doesn't matter, the EA executes on whatever symbols arrive in each signal.</p>
     </div>
     <div class="how-card">
       <div class="how-num">02</div>
-      <div class="how-title">Provider or follower</div>
-      <p class="how-text">Providers: activate a $100/yr license and get a provider ID + 10 sub-license slots. Followers: paste a sub-license code from any provider into the free Partner Receiver.</p>
+      <div class="how-title">Pick a signal source</div>
+      <p class="how-text">Telegram bot, Discord webhook, the Navigator Bridge app, or local MT5-to-MT5. Open the Source tab in the on-chart panel, paste your token or pick MASTER/SLAVE, hit Test Connection.</p>
     </div>
     <div class="how-card">
       <div class="how-num">03</div>
-      <div class="how-title">Trade &amp; copy</div>
-      <p class="how-text">Provider trades on MT5 → signals broadcast live → every follower's account mirrors in 1–3 seconds. Closes, partials, and stop moves all sync cleanly.</p>
+      <div class="how-title">Test, then ARM</div>
+      <p class="how-text">EA starts <strong>DISARMED</strong> — no trades fire until you click ARM. Once armed, validated signals execute with strict duplicate protection, lot caps, and cooldown filters baked in.</p>
     </div>
   </div>
 </div>
@@ -949,9 +995,9 @@ footer {
       <h2 class="sec-title">MT5 <em>TOOLKIT</em></h2>
       <div class="sec-rule"></div>
       <p style="margin-top:18px;max-width:680px;color:var(--muted);font-size:14px;line-height:1.7;">
-        The signal marketplace is our main focus — but the same team builds a suite of
+        Trade Copier Ultimate is our flagship — but the same team builds a full suite of
         standalone MT5 Expert Advisors on MQL5 Market. Trade management, risk controls,
-        copy trading, analytics. Use them alongside the signal network, or on their own.
+        copy trading, analytics. Use them alongside the copier, or on their own.
       </p>
     </div>
     <div class="products-grid">
@@ -1209,14 +1255,14 @@ footer {
 
 <!-- CTA STRIP -->
 <div class="cta-strip">
-  <h2>READY TO <em>BROADCAST</em> YOUR EDGE?</h2>
-  <p>// $100/yr · 10 free sub slots · Unlimited copiers · Live in minutes</p>
+  <h2>READY TO RUN YOUR <em>SIGNALS</em>?</h2>
+  <p>// $50 one-time · MT5 native · Telegram · Discord · Bridge · Local copy</p>
   <div class="hero-btns" style="opacity:1;animation:none;">
-    <a href="signal-copier.html#pricing" class="btn btn-primary">Become a Signal Provider</a>
-    <a href="signal-copier.html" class="btn btn-ghost">How it works</a>
+    <a href="https://www.mql5.com/en/market/product/164907" target="_blank" rel="noopener" class="btn btn-primary">Buy Trade Copier Ultimate</a>
+    <a href="tradecopierultimate.html" class="btn btn-ghost">Setup &amp; Support</a>
   </div>
   <br>
-  <a href="receiver-download.html" class="mql5-link">or download the free Partner Receiver →</a>
+  <a href="signal-copier.html" class="mql5-link">or preview the upcoming Cloud Copier →</a>
 </div>
 
 <!-- FOOTER -->
@@ -1246,8 +1292,8 @@ footer {
       <a href="https://www.mql5.com/en/market/product/168242" target="_blank">MT4 Slave Plugin</a>
     </div>
     <div class="footer-col">
-      <h4>Signal Copier</h4>
-      <a href="signal-copier.html">Product page</a>
+      <h4>Cloud Copier <span style="color: var(--gold); font-weight: 500; font-size: 9px; letter-spacing: 0.1em;">· COMING SOON</span></h4>
+      <a href="signal-copier.html">Preview page</a>
       <a href="receiver-download.html">Partner Receiver</a>
       <a href="dashboard.html">Provider Dashboard</a>
       <a href="signin.html">Sign in</a>
