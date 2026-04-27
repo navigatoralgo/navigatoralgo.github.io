@@ -610,20 +610,102 @@
     </div>
 
     <div class="bridge-card">
-      <div class="bridge-tag">// Companion App · Windows</div>
-      <div class="bridge-name">NavigatorCommandCenter.exe</div>
+      <div class="bridge-tag">// Companion App · Windows · v6.00</div>
+      <div class="bridge-name">Navigator Command Center · Bridge v6.00</div>
       <p class="bridge-desc">
-        The Bridge app is a small Windows utility that runs on the same PC as your MT5. It logs into your Telegram account (read-only) so it can read <strong>private channels</strong> the Bot API can't reach, and routes per-account groups to the right MT5 terminal. Trade Copier Ultimate connects to it on <code style="color: var(--teal); background: rgba(0,212,200,0.08); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(0,212,200,0.18);">http://127.0.0.1:&lt;port&gt;</code> — nothing ever leaves your machine.
+        The Bridge is a small Windows app that runs on the same PC as your MT5. It logs into your Telegram account (read-only via MTProto) so it can read <strong>private channels</strong> the Bot API can't reach, then routes per-account groups to the right MT5 terminal. Trade Copier Ultimate connects to it on <code style="color: var(--teal); background: rgba(0,212,200,0.08); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(0,212,200,0.18);">http://127.0.0.1:&lt;port&gt;</code> &mdash; nothing ever leaves your machine.
       </p>
-      <div class="bridge-coming">⚙ In Development — Download Coming Soon</div>
+      <a href="https://navigatoralgo.short.gy/bridge" target="_blank" rel="noopener"
+         class="btn btn-primary"
+         style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase;">
+        <span style="font-size: 16px;">↓</span> Download Bridge v6.00
+      </a>
       <div class="bridge-meta">
-        Verified SHA-256 + signed installer will be published here on release.
+        Free · Windows 10/11 · No install required &mdash; unzip and run.
       </div>
     </div>
 
     <div class="warn-box" style="margin-top: 18px;">
       <strong>You don't need the Bridge for most setups.</strong>
-      Bot API mode is enough for any Telegram channel where you can make your bot an admin (most public/group channels), and Discord mode handles webhooks directly. The Bridge is the answer only if your provider broadcasts in a private Telegram channel you can't bot-admin, or if you want one PC to route signals from multiple Telegram accounts to multiple MT5 terminals.
+      Bot API mode is enough for any Telegram channel where you can make your bot an admin (most public/group channels), and Discord mode handles webhooks directly. The Bridge is the answer only if your provider broadcasts in a private Telegram channel you can't bot-admin, or if you want one PC to route signals from multiple Telegram accounts to multiple MT5 terminals at once.
+    </div>
+
+    <h3 style="margin: 36px 0 8px; font-family: var(--font-head); font-size: 18px; color: var(--white); letter-spacing: -0.01em;">What it looks like</h3>
+    <p style="margin: 0 0 18px; color: var(--muted); font-size: 13.5px; line-height: 1.7; max-width: 760px;">
+      Six screens cover the entire workflow: connect Telegram once, pick which groups feed signals, assign per-group routing to one or many MT5 accounts, then watch the live signal pipeline.
+    </p>
+
+    <div class="panel-gallery">
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-dashboard-running.png" alt="Bridge Dashboard — RUNNING with uptime, Telegram + HTTP endpoints online, assigned groups list, today's signal counters" loading="lazy" width="1024" height="697">
+        <figcaption>// Dashboard · live status &amp; counters</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-telegram-setup.png" alt="Bridge Telegram Setup — API ID, API Hash, phone number, HTTP server port and EA polling URL" loading="lazy" width="1024" height="697">
+        <figcaption>// Telegram Setup · MTProto + HTTP</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-telegram-groups.png" alt="Bridge Telegram Groups — list of assigned groups with checkboxes and copy ID buttons" loading="lazy" width="1024" height="697">
+        <figcaption>// Groups · pick which channels feed signals</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-mt5-accounts.png" alt="Bridge MT5 Accounts — XM, Fusion Markets, Raw Trading shown as separate accounts, each with its own group assignment" loading="lazy" width="1024" height="697">
+        <figcaption>// MT5 Accounts · per-account group routing</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-routing.png" alt="Bridge Routing — duplicate filter toggle, routing keywords, skip keywords, broker symbol suffix" loading="lazy" width="1024" height="697">
+        <figcaption>// Routing · filters &amp; keywords</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-signal-history.png" alt="Bridge Signal History — last 200 messages with timestamps, source group, signal text, lane, delivery status" loading="lazy" width="1024" height="697">
+        <figcaption>// Signal History · full audit trail</figcaption>
+      </figure>
+    </div>
+
+    <div class="tcu-table-wrap" style="margin-top: 22px;">
+      <table class="tcu-table">
+        <thead>
+          <tr><th>Bridge feature</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MTProto Telegram client</td>
+            <td>Logs into your own Telegram account (with code + 2FA). Reads any group or channel you're a member of, including private rooms the Bot API cannot reach.</td>
+          </tr>
+          <tr>
+            <td>Multi-account fan-out</td>
+            <td>One Bridge can route different Telegram groups to different MT5 terminals. Free MT5 demo + funded prop + main live, each fed by their own provider, from one PC.</td>
+          </tr>
+          <tr>
+            <td>Local HTTP endpoint</td>
+            <td>EA polls <code>http://localhost:5555/signals/copier</code>. Loopback only &mdash; nothing leaves your machine. Configurable port + optional API key.</td>
+          </tr>
+          <tr>
+            <td>Duplicate filter</td>
+            <td>Drops identical messages received within 60s, even across multiple groups. Toggle off if you want each source to fire independently.</td>
+          </tr>
+          <tr>
+            <td>Routing keywords</td>
+            <td>Hashtags route to lanes (default <code>#copier</code>, <code>#copy</code>). Advanced: separate TP-manager and pending-order keywords for power users.</td>
+          </tr>
+          <tr>
+            <td>Skip keywords</td>
+            <td>Built-in catches for "running", "TP1 hit", "stopped out", past-tense, etc. Add your own phrases for channels with custom wording.</td>
+          </tr>
+          <tr>
+            <td>Broker symbol suffix</td>
+            <td>Tell Bridge your broker's symbol suffix (e.g. <code>m</code>, <code>.pro</code>). Auto-detected from the connected EA when possible.</td>
+          </tr>
+          <tr>
+            <td>Signal history audit</td>
+            <td>Last 200 messages through the pipeline. Click a row to copy the raw signal text. Filter by Delivered / Queued / Rejected.</td>
+          </tr>
+          <tr>
+            <td>Auto-start with Windows</td>
+            <td>Optional &mdash; Bridge starts on boot and reconnects Telegram automatically.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
