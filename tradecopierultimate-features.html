@@ -388,6 +388,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 200px; }
     <div class="chip-rail" id="chip-rail">
       <a href="#sources"   class="chip" data-keys="signal sources telegram bot discord webhook bridge ingestion">Signal Sources</a>
       <a href="#lots"      class="chip" data-keys="lot sizing risk fixed percent multiplier max trim">Lot Sizing &amp; Risk</a>
+      <a href="#per-symbol-lots" class="chip" data-keys="per symbol lots overrides xauusd eurusd gbpusd visual editor configure modal">Per-Symbol Lots</a>
       <a href="#sigtp"     class="chip" data-keys="sigtp multi tp split tp1 tp2 tp3 distribution allocation legs">Multi-TP Splitting</a>
       <a href="#partial"   class="chip" data-keys="partial close auto profit lock pip milestone breakeven">Partial Close</a>
       <a href="#trail"     class="chip" data-keys="trailing stop trail breakeven distance step">Trailing Stop</a>
@@ -477,6 +478,43 @@ html { scroll-behavior: smooth; scroll-padding-top: 200px; }
           </tbody>
         </table>
       </div>
+    </div>
+  </section>
+
+
+  <!-- 2b. PER-SYMBOL LOT OVERRIDES -->
+  <section class="tcu-section" id="per-symbol-lots">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// 02b · Per-symbol lot overrides</span>
+      <h2 class="sec-title">Different lot per <em>symbol</em>, no rebuild.</h2>
+      <div class="sec-rule"></div>
+      <p class="sec-sub">Some symbols carry more risk than others. Trade XAUUSD at 0.15, GBPUSDm at 0.50, AUDUSDm at 2.00 — all from one EA, all from a visual editor. Symbols you don't list keep using your Global Lot Mode.</p>
+    </div>
+    <div class="feat-twocol">
+      <div class="feat-text">
+        <h3>Add, tune, reorder — no input strings to memorize</h3>
+        <p class="lead">The <strong style="color: var(--white);">Lots</strong> tab now ships with a <strong style="color: var(--white);">Configure</strong> button that opens a dedicated overrides panel. Type a symbol, click Add — TCU validates against MarketWatch and rejects typos before the entry is saved. Suffixed brokers (<code>EURUSDm</code>, <code>XAUUSD.pro</code>) are matched automatically; the panel shows both the typed name and the broker-resolved one so you always know what got matched.</p>
+        <p>Each row has direct <strong style="color: var(--white);">+ / -</strong> nudges (using your broker's <code>SYMBOL_VOLUME_STEP</code>) AND an editable lot field — click, type, press Enter and the value is normalized + saved instantly. <strong style="color: var(--white);">↑ / ↓</strong> arrows reorder rows; the first matching entry wins, so order = priority. <strong style="color: var(--white);">×</strong> removes a row. No save buttons, no settings dialog, no restart.</p>
+        <p>The Lots tab itself shows a live preview of up to ten overrides directly under the Configure button so you can see what's set without opening the modal. The panel footer shows <code>N / 20 active overrides</code> at all times.</p>
+        <p style="color: var(--muted);"><strong style="color: var(--teal);">New in v6.00 —</strong> previously per-symbol lots existed only as a comma-separated input string. The visual editor is fully backward compatible: any settings you saved with the old text-field syntax (<code>EURUSD=0.05, XAUUSD=0.03</code>) load identically.</p>
+        <table class="inputs-table">
+          <thead><tr><th>Behavior</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td>MarketWatch validation</td><td class="muted">Symbols not in your MarketWatch are rejected at Add time with a clear banner — never silently ignored.</td></tr>
+            <tr><td>Suffix tolerance</td><td class="muted">Type <code>XAUUSD</code>, EA matches your broker's <code>XAUUSD.m</code> or <code>XAUUSD.pro</code> automatically. Resolved name shown in parens.</td></tr>
+            <tr><td>Cap</td><td class="muted">Hard cap of 20 entries. The 21st add attempt banners "Max 20 entries reached".</td></tr>
+            <tr><td>Lot step</td><td class="muted">+ / − buttons step by the broker's <code>SYMBOL_VOLUME_STEP</code> (usually 0.01, sometimes 0.001).</td></tr>
+            <tr><td>Direct edit</td><td class="muted">Click any lot value, type, press Enter. Auto-normalized to step + clamped to broker volume min/max + Max Lot.</td></tr>
+            <tr><td>Reorder</td><td class="muted">↑ / ↓ change priority. First matching entry wins on the runtime hot path.</td></tr>
+            <tr><td>Live preview</td><td class="muted">Lots tab shows up to 10 overrides (with broker-resolved names) under the Configure button.</td></tr>
+            <tr><td>Persistence</td><td class="muted">Saved as <code>EURUSD=0.05, XAUUSD=0.03</code> string in the same settings file as every other input. Restart-safe.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figure class="feat-shot">
+        <img src="assets/tcu/tcu-per-symbol-lots.png" alt="Per-symbol lot overrides modal: Add field, three rows (GBPUSDm 0.50, XAUUSDm 0.15, AUDUSDm 2.00) with reorder, +/-, edit, remove buttons" loading="lazy" width="772" height="752" style="max-width: 100%; height: auto;">
+        <figcaption>// Per-Sym Lots · modal + live preview</figcaption>
+      </figure>
     </div>
   </section>
 
