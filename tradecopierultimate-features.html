@@ -372,45 +372,89 @@ html { scroll-behavior: smooth; scroll-padding-top: 200px; }
 
   <!-- HERO -->
   <section class="tcu-hero">
-    <div class="page-hero-eyebrow">Feature deep-dive · v6.00</div>
+    <div class="page-hero-eyebrow">Feature deep-dive · v6.30</div>
     <h1 class="page-hero-h1">Every feature, <em>explained</em>.</h1>
     <p class="page-hero-desc" style="margin-top: 16px;">
-      Walk through every Trade Copier Ultimate module — what it does, when to turn it on, what to set, and what you'll see on the panel. Use the index below to jump to any feature.
+      Walk through every Trade Copier Ultimate v6.30 module — what it does, when to turn it on, what to set, and what you'll see on the panel. Use the index below to jump to any feature.
     </p>
     <div class="tcu-hero-ctas">
-      <a href="tradecopierultimate.html" class="btn btn-ghost">← New here? Setup guide</a>
+      <a href="tradecopierultimate.html" class="btn btn-ghost">← Setup guide</a>
       <a href="https://www.mql5.com/en/market/product/164907" target="_blank" rel="noopener" class="btn btn-primary">Buy on MQL5 →</a>
     </div>
   </section>
 
   <!-- STICKY FEATURE INDEX -->
   <nav class="feature-index" aria-label="Features">
-    <input type="search" id="feature-search" class="feature-index-search" placeholder="Search features…  (try 'partial' or 'prop')" aria-label="Search features">
+    <input type="search" id="feature-search" class="feature-index-search" placeholder="Search features… (try 'partial' or 'prop')" aria-label="Search features">
     <div class="chip-rail" id="chip-rail">
-      <a href="#sources"   class="chip" data-keys="signal sources telegram bot discord webhook bridge ingestion">Signal Sources</a>
-      <a href="#lots"      class="chip" data-keys="lot sizing risk fixed percent multiplier max trim">Lot Sizing &amp; Risk</a>
-      <a href="#per-symbol-lots" class="chip" data-keys="per symbol lots overrides xauusd eurusd gbpusd visual editor configure modal">Per-Symbol Lots</a>
-      <a href="#sigtp"     class="chip" data-keys="sigtp multi tp split tp1 tp2 tp3 distribution allocation legs">Multi-TP Splitting</a>
-      <a href="#partial"   class="chip" data-keys="partial close auto profit lock pip milestone breakeven">Partial Close</a>
-      <a href="#trail"     class="chip" data-keys="trailing stop trail breakeven distance step">Trailing Stop</a>
-      <a href="#autosltp"  class="chip" data-keys="auto sl tp fallback custom keywords stop loss take profit">Auto SL / TP</a>
-      <a href="#trademgmt" class="chip" data-keys="trade management modify reverse pending expiry cooldown opposite close all command">Trade Management</a>
-      <a href="#filters"   class="chip" data-keys="filter spread time whitelist blacklist duplicate armour entry guard">Filters &amp; Armour</a>
-      <a href="#news"      class="chip" data-keys="news pause calendar high impact medium currencies events">News Pause</a>
-      <a href="#prop"      class="chip" data-keys="prop firm beginner safe daily loss cap max positions">Prop / Safety Mode</a>
-      <a href="#local"     class="chip" data-keys="local copier master slave ea to ea internal csv">Local Copier</a>
-      <a href="#broadcast" class="chip" data-keys="telegram broadcast forward channel send tag suffix">Telegram Broadcast</a>
-      <a href="#alerts"    class="chip" data-keys="alerts push email sound monitor trade orders">Alerts &amp; Monitor</a>
-      <a href="#system"    class="chip" data-keys="system diagnostic log report magic number symbol suffix">System / Diagnostics</a>
+      <a href="#home"      class="chip" data-keys="home dashboard status ping">Home</a>
+      <a href="#copier"    class="chip" data-keys="copier global magic slip max deviation">Copier</a>
+      <a href="#sources"   class="chip" data-keys="signal sources telegram bot discord webhook bridge ingestion">Source</a>
+      <a href="#lots"      class="chip" data-keys="lot sizing risk fixed percent multiplier max trim per symbol override">Lots</a>
+      <a href="#sigtp"     class="chip" data-keys="sigtp multi tp split tp1 tp2 tp3 distribution allocation legs">SigTP</a>
+      <a href="#partial"   class="chip" data-keys="partial close auto profit lock pip milestone breakeven">Partial</a>
+      <a href="#trail"     class="chip" data-keys="trailing stop trail breakeven distance step">Trail</a>
+      <a href="#autosltp"  class="chip" data-keys="auto sl tp fallback custom keywords stop loss take profit">Auto SL/TP</a>
+      <a href="#trade"     class="chip" data-keys="trade management modify reverse pending expiry cooldown opposite close all command">Trade</a>
+      <a href="#filter"    class="chip" data-keys="filter spread time whitelist blacklist duplicate armour entry guard">Filter</a>
+      <a href="#prop"      class="chip" data-keys="prop firm beginner safe daily loss cap equity rules">Prop</a>
+      <a href="#news"      class="chip" data-keys="news pause calendar high impact medium currencies events">News</a>
+      <a href="#alerts"    class="chip" data-keys="alerts push email sound monitor telegram discord">Alerts</a>
+      <a href="#system"    class="chip" data-keys="system diagnostic log report magic number symbol suffix reset">System</a>
     </div>
     <div class="feature-index-empty" id="chip-empty">// No features match — try a different keyword</div>
   </nav>
 
+  <!-- 1. HOME -->
+  <section class="tcu-section" id="home">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// 01 · Home</span>
+      <h2 class="sec-title">Live <em>Dashboard</em>.</h2>
+      <div class="sec-rule"></div>
+      <p class="sec-sub">The command centre for your EA. See connection statuses, active positions, daily counters, and system health at a glance.</p>
+    </div>
+    <div class="feat-twocol">
+      <div class="feat-text">
+        <h3>Your operational overview</h3>
+        <p class="lead">The Home tab is where you monitor the pulse of the EA.</p>
+        <p><strong style="color: var(--white);">System Status</strong> — Watch the Telegram, Discord, and Bridge connection lights. Green means you are actively receiving data. Ping times show your broker latency.</p>
+        <p><strong style="color: var(--white);">Daily Metrics</strong> — See how many signals were parsed, accepted, or rejected today. Track your daily PnL and win rate directly on the panel.</p>
+        <p><strong style="color: var(--white);">Active Positions</strong> — A condensed table showing exactly what the EA currently manages, complete with floating PnL and active TP/SL levels.</p>
+      </div>
+      <figure class="feat-shot">
+        <img src="assets/tcu/tcu-tab-home.png" alt="Home tab displaying system status, ping, daily metrics and active positions" loading="lazy" width="366" height="627">
+        <figcaption>// Home tab</figcaption>
+      </figure>
+    </div>
+  </section>
 
-  <!-- 1. SIGNAL SOURCES -->
+  <!-- 2. COPIER -->
+  <section class="tcu-section" id="copier">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// 02 · Copier</span>
+      <h2 class="sec-title">Core <em>Settings</em>.</h2>
+      <div class="sec-rule"></div>
+      <p class="sec-sub">Define the fundamental execution parameters, including global slippage, magic number assignment, and account protection.</p>
+    </div>
+    <div class="feat-twocol flip">
+      <figure class="feat-shot">
+        <img src="assets/tcu/tcu-tab-copier.png" alt="Copier tab showing magic number, slippage settings, and global limits" loading="lazy" width="366" height="627">
+        <figcaption>// Copier tab</figcaption>
+      </figure>
+      <div class="feat-text">
+        <h3>Fundamental execution control</h3>
+        <p class="lead">Set the boundaries for how the EA interacts with your broker.</p>
+        <p><strong style="color: var(--white);">Magic Number</strong> — Crucial for isolating TCU's trades from your manual trades or other EAs. TCU will only ever modify or close trades matching this magic number.</p>
+        <p><strong style="color: var(--white);">Max Slippage</strong> — Protect yourself from poor execution. If the broker slippage exceeds your threshold (in points), the trade request is aborted.</p>
+        <p><strong style="color: var(--white);">Max Spread</strong> — A global safety net to prevent entering the market during extreme volatility or session rollovers.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. SOURCE -->
   <section class="tcu-section" id="sources">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 01 · Signal sources</span>
+      <span class="sec-tag">// 03 · Source</span>
       <h2 class="sec-title">Run <em>three sources</em> in parallel.</h2>
       <div class="sec-rule"></div>
       <p class="sec-sub">Telegram Bot API, Discord webhook, and Bridge mode can all be ON at the same time. Every signal that arrives is parsed by the same engine — duplicates across sources are de-duped automatically.</p>
@@ -421,109 +465,42 @@ html { scroll-behavior: smooth; scroll-padding-top: 200px; }
         <p class="lead">Pick whichever channels carry your signals. Most buyers run Telegram + Bridge so they're covered for both public and private channels.</p>
         <p><strong style="color: var(--white);">Telegram Bot API</strong> — paste your <code>Bot Token</code> from <a href="https://t.me/BotFather" target="_blank" rel="noopener" style="color: var(--teal);">@BotFather</a> and the <code>Chat ID</code> of the channel/group your provider posts in. The bot must be added to the channel as admin. Free, native, no extra software.</p>
         <p><strong style="color: var(--white);">Discord Mode</strong> — paste a <code>Discord Webhook URL</code> for the channel you want to read. Works on any free Discord server. Polls every <code>Discord Poll sec</code> seconds.</p>
-        <p><strong style="color: var(--white);">Bridge Mode</strong> — runs the Navigator Command Center app on your PC. Lets you read <em>private</em> Telegram channels (where bots can't be added). The EA polls <code>http://127.0.0.1:&lt;port&gt;</code> — nothing leaves your machine. <a href="https://github.com/navigatoralgo/navigatoralgo.github.io/releases/latest/download/Bridge.exe" style="color: var(--teal);">Download Bridge v6.00 →</a></p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>EnableBotAPIMode</td><td class="muted">Master switch for Telegram Bot. <code>OFF</code> by default.</td></tr>
-            <tr><td>TelegramBotToken</td><td class="muted">Token from @BotFather. Keep secret — anyone with it can read your channels.</td></tr>
-            <tr><td>TelegramChatID</td><td class="muted">Chat/channel ID. Use <a href="https://t.me/userinfobot" target="_blank" rel="noopener" style="color: var(--teal);">@userinfobot</a> or the IDBot.</td></tr>
-            <tr><td>TelegramPollSeconds</td><td class="muted">How often to poll the Bot API. Default <code>3</code>s.</td></tr>
-            <tr><td>EnableDiscordMode</td><td class="muted">Master switch for Discord webhook reader.</td></tr>
-            <tr><td>DiscordWebhookURL</td><td class="muted">Webhook URL of the Discord channel.</td></tr>
-            <tr><td>DiscordPollSeconds</td><td class="muted">Discord poll interval. Default <code>5</code>s.</td></tr>
-            <tr><td>EnableBridgeMode</td><td class="muted">Master switch for Bridge app reader.</td></tr>
-            <tr><td>BridgePort</td><td class="muted">Local HTTP port the Bridge app listens on. Default <code>5555</code>.</td></tr>
-            <tr><td>BridgePollMs</td><td class="muted">Bridge poll interval in milliseconds. Default <code>1000</code>.</td></tr>
-          </tbody>
-        </table>
+        <p><strong style="color: var(--white);">Bridge Mode</strong> — runs the NTS Super Bridge app on your PC. Lets you read <em>private</em> Telegram channels. The EA polls <code>http://127.0.0.1:&lt;port&gt;</code> — nothing leaves your machine. <a href="bridge.html" style="color: var(--teal);">View Bridge Docs →</a></p>
       </div>
       <figure class="feat-shot">
-        <img src="assets/tcu/tcu-source-all.png" alt="Source tab with Telegram Bot, Bridge, and Discord all enabled simultaneously" loading="lazy" width="366" height="627">
-        <figcaption>// Source tab · all 3 sources ON</figcaption>
+        <img src="assets/tcu/tcu-tab-source.png" alt="Source tab with Telegram Bot, Bridge, and Discord inputs" loading="lazy" width="366" height="627">
+        <figcaption>// Source tab</figcaption>
       </figure>
     </div>
-    <p class="muted" style="font-size: 12.5px; margin-top: 22px; text-align: center; color: var(--muted);">Need to add the WebRequest URLs first? <a href="tradecopierultimate.html#quickstart" style="color: var(--teal);">Setup guide step 2 →</a></p>
   </section>
 
-
-  <!-- 2. LOT SIZING -->
+  <!-- 4. LOTS -->
   <section class="tcu-section" id="lots">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 02 · Lot sizing &amp; risk</span>
+      <span class="sec-tag">// 04 · Lots</span>
       <h2 class="sec-title">Four ways to <em>size</em> a trade.</h2>
       <div class="sec-rule"></div>
       <p class="sec-sub">Use Fixed for absolute control, Risk% for account-aware sizing, Multiplier to scale your provider's lot, or MarketTrade to copy exactly what the signal sends.</p>
     </div>
     <div class="feat-twocol flip">
       <figure class="feat-shot">
-        <img src="assets/tcu/tcu-lots-risk.png" alt="Lots tab with Risk% mode, default SL points, max lot, and trim-to-max action" loading="lazy" width="370" height="632">
-        <figcaption>// Lots tab · Risk% mode</figcaption>
+        <img src="assets/tcu/tcu-tab-lots.png" alt="Lots tab with Risk% mode, default SL points, max lot, and per-symbol settings" loading="lazy" width="370" height="632">
+        <figcaption>// Lots tab</figcaption>
       </figure>
       <div class="feat-text">
         <h3>Pick a lot mode that matches your style</h3>
         <p class="lead">Risk% is the safest choice for prop firms and growing accounts. The EA reads your account balance, the signal's SL distance, and computes a lot size that risks exactly your <code>Risk %</code> if SL hits.</p>
         <p>If a signal arrives without an SL, the EA falls back to <code>Default SL points</code> for the risk math — so even SL-less signals get sized sanely.</p>
         <p><strong style="color: var(--white);">Over Max Action</strong> matters: if the computed lot exceeds <code>Max Lot</code>, you can either <code>TRIM TO MAX</code> (open at the cap) or <code>SKIP</code> (refuse the trade). Trim is the default — never skip a signal silently unless you know why.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>LotMode</td><td class="muted"><code>FIXED</code> · <code>RISK_PERCENT</code> · <code>MULTIPLIER</code> · <code>MARKET</code></td></tr>
-            <tr><td>FixedLotSize</td><td class="muted">Used in FIXED mode. Default <code>0.01</code>.</td></tr>
-            <tr><td>RiskPercent</td><td class="muted">% of balance risked per trade in RISK mode. Default <code>1.0</code>.</td></tr>
-            <tr><td>DefaultSLPoints</td><td class="muted">Used for risk math when signal has no SL. Default <code>500</code>.</td></tr>
-            <tr><td>MaxLotSize</td><td class="muted">Hard cap on calculated lot. Default <code>10.0</code>.</td></tr>
-            <tr><td>SkipIfLotOverMax</td><td class="muted"><code>OFF</code> = trim to max. <code>ON</code> = skip the signal entirely.</td></tr>
-            <tr><td>MaxOpenPositions</td><td class="muted">Cap on concurrent open trades from this EA. Default <code>20</code>.</td></tr>
-            <tr><td>MaxTradesPerMinute</td><td class="muted">Circuit breaker against runaway signal storms. <code>0</code> = unlimited.</td></tr>
-          </tbody>
-        </table>
+        <p><strong style="color: var(--white);">Per-Symbol Overrides</strong> — Need XAUUSD at 0.15 lots but EURUSD at 0.5? Use the built-in <strong>Configure</strong> button to launch the visual lot-editor modal without messing with comma-separated text strings.</p>
       </div>
     </div>
   </section>
 
-
-  <!-- 2b. PER-SYMBOL LOT OVERRIDES -->
-  <section class="tcu-section" id="per-symbol-lots">
-    <div class="tcu-section-head">
-      <span class="sec-tag">// 02b · Per-symbol lot overrides</span>
-      <h2 class="sec-title">Different lot per <em>symbol</em>, no rebuild.</h2>
-      <div class="sec-rule"></div>
-      <p class="sec-sub">Some symbols carry more risk than others. Trade XAUUSD at 0.15, GBPUSDm at 0.50, AUDUSDm at 2.00 — all from one EA, all from a visual editor. Symbols you don't list keep using your Global Lot Mode.</p>
-    </div>
-    <div class="feat-twocol">
-      <div class="feat-text">
-        <h3>Add, tune, reorder — no input strings to memorize</h3>
-        <p class="lead">The <strong style="color: var(--white);">Lots</strong> tab now ships with a <strong style="color: var(--white);">Configure</strong> button that opens a dedicated overrides panel. Type a symbol, click Add — TCU validates against MarketWatch and rejects typos before the entry is saved. Suffixed brokers (<code>EURUSDm</code>, <code>XAUUSD.pro</code>) are matched automatically; the panel shows both the typed name and the broker-resolved one so you always know what got matched.</p>
-        <p>Each row has direct <strong style="color: var(--white);">+ / -</strong> nudges (using your broker's <code>SYMBOL_VOLUME_STEP</code>) AND an editable lot field — click, type, press Enter and the value is normalized + saved instantly. <strong style="color: var(--white);">↑ / ↓</strong> arrows reorder rows; the first matching entry wins, so order = priority. <strong style="color: var(--white);">×</strong> removes a row. No save buttons, no settings dialog, no restart.</p>
-        <p>The Lots tab itself shows a live preview of up to ten overrides directly under the Configure button so you can see what's set without opening the modal. The panel footer shows <code>N / 20 active overrides</code> at all times.</p>
-        <p style="color: var(--muted);"><strong style="color: var(--teal);">New in v6.00 —</strong> previously per-symbol lots existed only as a comma-separated input string. The visual editor is fully backward compatible: any settings you saved with the old text-field syntax (<code>EURUSD=0.05, XAUUSD=0.03</code>) load identically.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Behavior</th><th>What it does</th></tr></thead>
-          <tbody>
-            <tr><td>MarketWatch validation</td><td class="muted">Symbols not in your MarketWatch are rejected at Add time with a clear banner — never silently ignored.</td></tr>
-            <tr><td>Suffix tolerance</td><td class="muted">Type <code>XAUUSD</code>, EA matches your broker's <code>XAUUSD.m</code> or <code>XAUUSD.pro</code> automatically. Resolved name shown in parens.</td></tr>
-            <tr><td>Cap</td><td class="muted">Hard cap of 20 entries. The 21st add attempt banners "Max 20 entries reached".</td></tr>
-            <tr><td>Lot step</td><td class="muted">+ / − buttons step by the broker's <code>SYMBOL_VOLUME_STEP</code> (usually 0.01, sometimes 0.001).</td></tr>
-            <tr><td>Direct edit</td><td class="muted">Click any lot value, type, press Enter. Auto-normalized to step + clamped to broker volume min/max + Max Lot.</td></tr>
-            <tr><td>Reorder</td><td class="muted">↑ / ↓ change priority. First matching entry wins on the runtime hot path.</td></tr>
-            <tr><td>Live preview</td><td class="muted">Lots tab shows up to 10 overrides (with broker-resolved names) under the Configure button.</td></tr>
-            <tr><td>Persistence</td><td class="muted">Saved as <code>EURUSD=0.05, XAUUSD=0.03</code> string in the same settings file as every other input. Restart-safe.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <figure class="feat-shot">
-        <img src="assets/tcu/tcu-per-symbol-lots.png" alt="Per-symbol lot overrides modal: Add field, three rows (GBPUSDm 0.50, XAUUSDm 0.15, AUDUSDm 2.00) with reorder, +/-, edit, remove buttons" loading="lazy" width="772" height="752" style="max-width: 100%; height: auto;">
-        <figcaption>// Per-Sym Lots · modal + live preview</figcaption>
-      </figure>
-    </div>
-  </section>
-
-
-  <!-- 3. MULTI-TP SPLITTING -->
+  <!-- 5. SIGTP -->
   <section class="tcu-section" id="sigtp">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 03 · Multi-TP splitting</span>
+      <span class="sec-tag">// 05 · SigTP</span>
       <h2 class="sec-title">One signal, <em>three trades</em>, three TPs.</h2>
       <div class="sec-rule"></div>
       <p class="sec-sub">When your signal has TP1 / TP2 / TP3, TCU opens three separate trades, each with its own TP. Lot size is split per the <code>Lot Distribution</code> percentages.</p>
@@ -534,82 +511,40 @@ html { scroll-behavior: smooth; scroll-padding-top: 200px; }
         <p class="lead">A signal like <code>BUY GOLD 2050 / TP 2055 2060 2070 / SL 2045</code> with Risk% sizing producing <code>1.0</code> lot becomes three trades: <code>0.40 / 0.30 / 0.30</code> using the default <code>40,30,30</code> distribution. Each trade closes independently when its own TP is hit.</p>
         <p>Optionally the EA can move SL to breakeven on every position once TP1 closes — turn on <code>SL → BE on TP1</code>. After TP2 closes, you can ratchet again with <code>SL → TP1 on TP2</code>. That's the classic "lock profit, ride the rest" pattern automated.</p>
         <p>Pending orders (BUY LIMIT etc.) get the same split treatment when <code>Pending Multi-TP</code> is on — the limit order is placed three times at the same entry, each leg with its own TP.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>EnableMultiTP</td><td class="muted">Master switch. <code>ON</code> by default.</td></tr>
-            <tr><td>MaxTPTargets</td><td class="muted">How many TPs to extract from a signal (1–3).</td></tr>
-            <tr><td>LotDistribution</td><td class="muted">Volume split per leg, comma-separated. e.g. <code>40,30,30</code>.</td></tr>
-            <tr><td>EnablePendingMultiTP</td><td class="muted">Apply same split to BUY/SELL LIMIT/STOP signals.</td></tr>
-            <tr><td>TGMoveSLBreakevenTP1</td><td class="muted">Move all open SLs to entry once TP1 closes.</td></tr>
-            <tr><td>TGMoveSLToTP1OnTP2</td><td class="muted">Move all open SLs to TP1 price once TP2 closes.</td></tr>
-            <tr><td>TGBreakevenExtraPips</td><td class="muted">Extra cushion above entry for the BE move.</td></tr>
-          </tbody>
-        </table>
       </div>
       <figure class="feat-shot">
-        <img src="assets/tcu/tcu-sigtp-loaded.png" alt="SigTP tab — Multi-TP split ON, allocation 40/30/30, BE moves enabled" loading="lazy" width="367" height="634">
-        <figcaption>// SigTP tab · 40/30/30 split</figcaption>
+        <img src="assets/tcu/tcu-tab-sigtp.png" alt="SigTP tab — Multi-TP split ON, allocation 40/30/30, BE moves enabled" loading="lazy" width="367" height="634">
+        <figcaption>// SigTP tab</figcaption>
       </figure>
     </div>
-
-    <figure class="action-shot">
-      <img src="assets/tcu/tcu-action-multitp.png" alt="MT5 chart showing three child trades from one Multi-TP signal — 0.4/0.3/0.3 lots, three TPs, Trade Monitor and Alerts panel visible" loading="lazy">
-      <figcaption>// One signal landed → three trades opened (0.4 + 0.3 + 0.3 lots), three TPs, Trade Monitor + Alerts</figcaption>
-    </figure>
-
-    <div class="signal-example">
-<span class="sigl">// Example signal text the EA accepts</span>
-BUY GOLD 2050.00
-SL: 2045.00
-TP1: 2055.00
-TP2: 2060.00
-TP3: 2070.00</div>
   </section>
 
-
-  <!-- 4. PARTIAL CLOSE -->
+  <!-- 6. PARTIAL -->
   <section class="tcu-section" id="partial">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 04 · Partial close · Auto profit lock</span>
+      <span class="sec-tag">// 06 · Partial close</span>
       <h2 class="sec-title">Take some off, <em>let the rest run</em>.</h2>
       <div class="sec-rule"></div>
       <p class="sec-sub">Auto-close a percentage (or fixed lot count) at pip milestones. Optionally move SL to breakeven, TP1, or TP2 as each milestone hits.</p>
     </div>
     <div class="feat-twocol flip">
       <figure class="feat-shot">
-        <img src="assets/tcu/tcu-partial.png" alt="Partial tab — TP1 at 20 pips with breakeven move, TP2 at 40 pips moving SL to TP1" loading="lazy" width="368" height="628">
-        <figcaption>// Partial tab · 4 milestones, lots or %</figcaption>
+        <img src="assets/tcu/tcu-tab-partial.png" alt="Partial tab — TP1 at 20 pips with breakeven move, TP2 at 40 pips moving SL to TP1" loading="lazy" width="368" height="628">
+        <figcaption>// Partial tab</figcaption>
       </figure>
       <div class="feat-text">
         <h3>Up to four pip-based milestones</h3>
         <p class="lead">Configure four levels (<code>TP1</code>–<code>TP4</code>): the pip distance at which the partial fires, and either a percentage or a fixed lot count to close. Only filled levels run — leave the rest at zero.</p>
         <p><strong style="color: var(--white);">Move SL when partials hit.</strong> The most common pattern: TP1 at +20 pips closes 50%, then SL jumps to entry (breakeven). TP2 at +40 pips closes another 50%, SL ratchets to TP1 price. Now you have a position that mathematically can't lose, riding free.</p>
         <p><strong style="color: var(--white);">Partials Scope</strong> — set to <code>AUTO</code> if you also use Multi-TP splitting. AUTO means partials only run on plain (non-split) trades, so they don't double up. Set to <code>ALL</code> to apply partials to every position the EA tracks.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>EnablePartialClose</td><td class="muted">Master switch. <code>OFF</code> by default.</td></tr>
-            <tr><td>PartialCloseMode</td><td class="muted"><code>PERCENTAGE</code> or <code>LOTS</code>.</td></tr>
-            <tr><td>PartialScope</td><td class="muted"><code>AUTO</code> ignores Multi-TP split trades. <code>ALL</code> includes them.</td></tr>
-            <tr><td>PartialTP1Pips / Lots / %</td><td class="muted">First milestone trigger and close size.</td></tr>
-            <tr><td>PartialTP2 / TP3 / TP4</td><td class="muted">Up to four levels in total.</td></tr>
-            <tr><td>PartialMoveSLBreakeven</td><td class="muted">Move SL to entry after TP1 fills.</td></tr>
-            <tr><td>PartialMoveSLToTP1</td><td class="muted">Move SL to TP1 price after TP2 fills.</td></tr>
-            <tr><td>PartialMoveSLToTP2</td><td class="muted">Move SL to TP2 price after TP3 fills.</td></tr>
-            <tr><td>PartialBEExtraPips</td><td class="muted">Cushion above entry on the BE move.</td></tr>
-          </tbody>
-        </table>
       </div>
     </div>
-    <div class="video-slot">// <strong>Video walkthrough coming soon</strong> — 60 sec showing TP1 fire and SL jump to BE</div>
   </section>
 
-
-  <!-- 5. TRAILING STOP -->
+  <!-- 7. TRAIL -->
   <section class="tcu-section" id="trail">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 05 · Trailing stop</span>
+      <span class="sec-tag">// 07 · Trailing stop</span>
       <h2 class="sec-title">Lock profit, <em>then ride</em>.</h2>
       <div class="sec-rule"></div>
       <p class="sec-sub">Pip-based trailing that activates when a position is in profit. Optional automatic move-to-breakeven the moment trailing kicks in.</p>
@@ -620,37 +555,25 @@ TP3: 2070.00</div>
         <p class="lead">Once a position is up by <code>Trail Start</code> pips, the EA starts trailing the SL <code>Trail Distance</code> pips behind price. The SL only moves on every <code>Trail Step</code> pips of new high — so a noisy market doesn't waste broker requests.</p>
         <p>If <code>Move To Breakeven</code> is ON, the moment trailing activates the SL also jumps to entry plus <code>BE Buffer pips</code>. From that moment on the trade can't lose, regardless of trail distance.</p>
         <p class="muted">Trailing only touches positions opened by this EA's magic number — your manual trades are never modified.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>EnableTrailingStop</td><td class="muted">Master switch.</td></tr>
-            <tr><td>TrailStartPips</td><td class="muted">Profit needed before trailing activates. Default <code>10</code>.</td></tr>
-            <tr><td>TrailDistancePips</td><td class="muted">How close SL follows price. Default <code>5</code>.</td></tr>
-            <tr><td>TrailStepPips</td><td class="muted">Min pip step before SL is moved again. Default <code>1</code>.</td></tr>
-            <tr><td>TrailMoveToBreakeven</td><td class="muted">Jump SL to entry+buffer when trailing starts.</td></tr>
-            <tr><td>BreakevenBufferPips</td><td class="muted">Extra pips above entry for the BE move.</td></tr>
-          </tbody>
-        </table>
       </div>
       <figure class="feat-shot">
-        <img src="assets/tcu/tcu-trail.png" alt="Trail tab — Trailing Stop ON, start 10 pips, distance 5 pips, breakeven move ON" loading="lazy" width="363" height="628">
-        <figcaption>// Trail tab · 10 / 5 / 1 + BE</figcaption>
+        <img src="assets/tcu/tcu-tab-trail.png" alt="Trail tab — Trailing Stop ON, start 10 pips, distance 5 pips, breakeven move ON" loading="lazy" width="363" height="628">
+        <figcaption>// Trail tab</figcaption>
       </figure>
     </div>
   </section>
 
-
-  <!-- 6. AUTO SL/TP -->
+  <!-- 8. AUTO SL/TP -->
   <section class="tcu-section" id="autosltp">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 06 · Auto SL / TP &amp; custom keywords</span>
+      <span class="sec-tag">// 08 · Auto SL / TP</span>
       <h2 class="sec-title">Fill the gaps when the signal <em>doesn't</em>.</h2>
       <div class="sec-rule"></div>
       <p class="sec-sub">Add a fallback SL/TP if the signal didn't include them, plus parse non-standard keyword names from foreign-language or shorthand signal channels.</p>
     </div>
     <div class="feat-twocol flip">
       <figure class="feat-shot">
-        <img src="assets/tcu/tcu-autosltp.png" alt="Auto SL/TP tab — fallback SL/TP pips, custom SL keywords STOP STOPLOSS, custom TP keywords TP TAKEPROFIT" loading="lazy" width="367" height="632">
+        <img src="assets/tcu/tcu-tab-autosltp.png" alt="Auto SL/TP tab — fallback SL/TP pips, custom SL/TP keywords" loading="lazy" width="367" height="632">
         <figcaption>// Auto SL/TP tab</figcaption>
       </figure>
       <div class="feat-text">
@@ -658,27 +581,14 @@ TP3: 2070.00</div>
         <p class="lead"><strong style="color: var(--white);">Auto SL / Auto TP</strong> — when ON, any signal that arrives without an SL gets <code>Fallback SL pips</code> applied automatically. Same for TP. Use this for channels that send "BUY EURUSD" with nothing else and expect the EA to handle it.</p>
         <p><strong style="color: var(--white);">Custom SL/TP keywords</strong> — some channels write <code>RISKAT 1.0850</code> instead of <code>SL 1.0850</code>. Add <code>RISKAT</code> to the SL keyword list and the parser starts recognising it. Comma-separated: <code>STOP,STOPLOSS,RISKAT</code>.</p>
         <p>The <code>BE Buffer pips</code> field at the bottom is shared with the trailing module — it's the cushion above entry used by every "move to breakeven" trigger across all features.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>Auto SL</td><td class="muted">Apply fallback SL when signal has none.</td></tr>
-            <tr><td>Fallback SL pips</td><td class="muted">SL distance applied when no SL in signal.</td></tr>
-            <tr><td>Auto TP</td><td class="muted">Apply fallback TP when signal has none.</td></tr>
-            <tr><td>Fallback TP pips</td><td class="muted">TP distance applied when no TP in signal.</td></tr>
-            <tr><td>EnableCustomSLTPKeywords</td><td class="muted">Master switch for custom keyword matching.</td></tr>
-            <tr><td>CustomSLKeywords</td><td class="muted">e.g. <code>STOP,STOPLOSS,RISKAT</code></td></tr>
-            <tr><td>CustomTPKeywords</td><td class="muted">e.g. <code>TP,TAKEPROFIT,TARGET</code></td></tr>
-          </tbody>
-        </table>
       </div>
     </div>
   </section>
 
-
-  <!-- 7. TRADE MANAGEMENT -->
-  <section class="tcu-section" id="trademgmt">
+  <!-- 9. TRADE -->
+  <section class="tcu-section" id="trade">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 07 · Trade execution &amp; commands</span>
+      <span class="sec-tag">// 09 · Trade execution</span>
       <h2 class="sec-title">How the EA <em>handles</em> every signal.</h2>
       <div class="sec-rule"></div>
       <p class="sec-sub">From pendings to reverse-signal mode to "close all" command parsing — this is where you tune the execution behaviour.</p>
@@ -691,54 +601,25 @@ TP3: 2070.00</div>
         <p><strong style="color: var(--white);">Opposite Action</strong> — what to do when a BUY signal arrives while a SELL is open: <code>DO NOTHING</code> (default), <code>CLOSE OPPOSITE</code>, or <code>CLOSE ALL</code>. Pick CLOSE OPPOSITE if your provider treats new signals as flip commands.</p>
         <p><strong style="color: var(--white);">Modify Existing</strong> — when ON, a same-direction same-symbol signal updates the SL/TP of the open position instead of stacking a second trade. Cleaner for swing-trader providers.</p>
         <p><strong style="color: var(--white);">Cooldown min</strong> — minimum minutes between accepting two same-direction signals on the same symbol. Cuts noise without disabling duplicates entirely.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>ArmExecution</td><td class="muted">Master kill-switch. <code>OFF</code> = parse but don't trade.</td></tr>
-            <tr><td>ReverseSignal</td><td class="muted">Flip BUY ↔ SELL for every signal.</td></tr>
-            <tr><td>CopySL / CopyTP</td><td class="muted">Whether to honour SL/TP from the signal text.</td></tr>
-            <tr><td>OppositeAction</td><td class="muted"><code>DO_NOTHING</code> · <code>CLOSE_OPPOSITE</code> · <code>CLOSE_ALL</code></td></tr>
-            <tr><td>EnablePendingOrders</td><td class="muted">Accept BUY/SELL LIMIT/STOP signals.</td></tr>
-            <tr><td>EnablePendingExpiry</td><td class="muted">Auto-delete unfilled pendings after N hours.</td></tr>
-            <tr><td>PendingExpiryHours</td><td class="muted">Pending expiry window. Default <code>24</code>.</td></tr>
-            <tr><td>ModifySLTPIfPositionExists</td><td class="muted">Update existing position SL/TP instead of stacking.</td></tr>
-            <tr><td>Cooldown min</td><td class="muted">Min minutes between same-direction signals.</td></tr>
-            <tr><td>Min Same Pips</td><td class="muted">Min pip difference required for repeat signals.</td></tr>
-            <tr><td>EnableCommandReplies</td><td class="muted">React to "move sl", "close all", etc.</td></tr>
-            <tr><td>EnableKeywordReplace</td><td class="muted">Pre-process signal text. e.g. <code>Stoploss=SL</code></td></tr>
-          </tbody>
-        </table>
       </div>
       <figure class="feat-shot">
-        <img src="assets/tcu/tcu-trade.png" alt="Trade tab — full execution settings, pending expiry, modify existing, cooldown" loading="lazy" width="367" height="633">
+        <img src="assets/tcu/tcu-tab-trade.png" alt="Trade tab — full execution settings, pending expiry, modify existing, cooldown" loading="lazy" width="367" height="633">
         <figcaption>// Trade tab</figcaption>
       </figure>
     </div>
-
-    <figure class="action-shot">
-      <img src="assets/tcu/tcu-action-closeall.png" alt="Home tab after a CLOSE ALL command — 3 positions closed, alert popup confirms" loading="lazy">
-      <figcaption>// "CLOSE ALL" command from Telegram → 3 positions closed → alert fired</figcaption>
-    </figure>
-
-    <div class="signal-example">
-<span class="sigl">// Example command-reply messages the EA understands</span>
-move sl entry          <span class="sigl">// jumps SL to breakeven on every open position</span>
-move sl to breakeven   <span class="sigl">// same as above (alias)</span>
-close all              <span class="sigl">// closes every position the EA opened</span></div>
   </section>
 
-
-  <!-- 8. FILTERS & ARMOUR -->
-  <section class="tcu-section" id="filters">
+  <!-- 10. FILTER -->
+  <section class="tcu-section" id="filter">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 08 · Filters &amp; entry armour</span>
-      <h2 class="sec-title">Block bad signals <em>before</em> they hit your account.</h2>
+      <span class="sec-tag">// 10 · Filters</span>
+      <h2 class="sec-title">Block bad signals <em>before</em> they hit.</h2>
       <div class="sec-rule"></div>
       <p class="sec-sub">Spread filter, time window, whitelist/blacklist, skip-keywords, duplicate detection, and Entry Armour. Layer them — every filter is checked in order.</p>
     </div>
     <div class="feat-twocol flip">
       <figure class="feat-shot">
-        <img src="assets/tcu/tcu-panel-filter.png" alt="Filter tab with duplicate filter, spread filter, whitelist, blacklist, skip keywords, and Entry Armour" loading="lazy" width="370" height="630">
+        <img src="assets/tcu/tcu-tab-filter-1.png" alt="Filter tab with duplicate filter, spread filter, whitelist, blacklist, skip keywords" loading="lazy" width="370" height="630">
         <figcaption>// Filter tab</figcaption>
       </figure>
       <div class="feat-text">
@@ -747,278 +628,99 @@ close all              <span class="sigl">// closes every position the EA opened
         <p><strong style="color: var(--white);">Spread filter</strong> — refuses trades when current spread exceeds <code>Max Spread points</code>. Useful around news and session opens.</p>
         <p><strong style="color: var(--white);">Time filter</strong> — only accept signals between <code>Start</code> and <code>End</code> server time (e.g. <code>08:00–22:00</code>). Avoid the rollover spread spike.</p>
         <p><strong style="color: var(--white);">Whitelist / Blacklist</strong> — restrict to a list of symbols, or block a list. Useful for "Telegram says XAUUSD or nothing" or "never trade USDTRY no matter what".</p>
-        <p><strong style="color: var(--white);">Skip keywords</strong> — drop any signal containing words like <code>test</code>, <code>cancel</code>, <code>delete</code>. Stops your provider's "test123" message from firing a real trade.</p>
-        <p><strong style="color: var(--white);">Entry Armour</strong> — refuses any signal missing required fields (direction, symbol, and either an SL, TP, or explicit entry). Strongly recommended ON for prop accounts. Without armour, a malformed signal could open an SL-less position.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>EnableDuplicateFilter</td><td class="muted">Block repeat signals. <strong>Strongly recommend ON.</strong></td></tr>
-            <tr><td>EnableSpreadFilter / MaxSpreadPoints</td><td class="muted">Refuse if spread &gt; X.</td></tr>
-            <tr><td>EnableTimeFilter / StartHour / EndHour</td><td class="muted">Only trade in your window.</td></tr>
-            <tr><td>EnableWhitelistFilter / Whitelist</td><td class="muted">Comma-separated symbols, e.g. <code>XAUUSD,EURUSD</code>.</td></tr>
-            <tr><td>EnableBlacklistFilter / Blacklist</td><td class="muted">Symbols you'll never accept.</td></tr>
-            <tr><td>SkipKeywords</td><td class="muted">e.g. <code>test,demo,delete,cancel</code>.</td></tr>
-            <tr><td>RequireEntryArmour</td><td class="muted">Reject signals without the required fields.</td></tr>
-            <tr><td>SkipSignalWithoutSL</td><td class="muted">Refuse SL-less signals entirely. ON for prop.</td></tr>
-            <tr><td>SkipSignalWithoutTP</td><td class="muted">Refuse TP-less signals entirely.</td></tr>
-          </tbody>
-        </table>
+        <p><strong style="color: var(--white);">Skip keywords</strong> — drop any signal containing words like <code>test</code>, <code>cancel</code>, <code>delete</code>.</p>
+        <p><strong style="color: var(--white);">Entry Armour</strong> — refuses any signal missing required fields (direction, symbol, and either an SL, TP, or explicit entry). Strongly recommended ON for prop accounts.</p>
       </div>
     </div>
   </section>
 
+  <!-- 11. PROP -->
+  <section class="tcu-section" id="prop">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// 11 · Prop Firm</span>
+      <h2 class="sec-title">Protect your <em>funded accounts</em>.</h2>
+      <div class="sec-rule"></div>
+      <p class="sec-sub">Hard guardrails that enforce max daily loss limits and automatically close out trades if a prop firm rule is approaching violation.</p>
+    </div>
+    <div class="feat-twocol">
+      <div class="feat-text">
+        <h3>Built-in equity protection</h3>
+        <p class="lead">Prop firm accounts live and die by daily drawdown rules. TCU manages this for you.</p>
+        <p><strong style="color: var(--white);">Daily Loss Cap</strong> — Define your maximum allowed daily loss as a percentage of your starting balance (e.g., 4.5% to stay safely under a 5% limit). If this limit is hit, the EA immediately closes all its open trades and refuses any new entries until the next server day.</p>
+        <p><strong style="color: var(--white);">Safe Mode</strong> — Engage Prop Safe Mode to automatically tighten lot sizing and increase filtering strictness when the account enters drawdown, ensuring you don't aggressively revenge-trade back into a violation.</p>
+      </div>
+      <figure class="feat-shot">
+        <img src="assets/tcu/tcu-tab-prop-1.png" alt="Prop tab showing daily loss caps and safety toggles" loading="lazy" width="366" height="627">
+        <figcaption>// Prop tab</figcaption>
+      </figure>
+    </div>
+  </section>
 
-  <!-- 9. NEWS PAUSE -->
+  <!-- 12. NEWS -->
   <section class="tcu-section" id="news">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 09 · News pause engine</span>
+      <span class="sec-tag">// 12 · News Pause</span>
       <h2 class="sec-title">Stand down around <em>news events</em>.</h2>
       <div class="sec-rule"></div>
       <p class="sec-sub">Reads the MT5 economic calendar and pauses new entries during the impact window. Open trades are not affected.</p>
     </div>
-    <div class="feat-twocol">
+    <div class="feat-twocol flip">
+      <figure class="feat-shot">
+        <img src="assets/tcu/tcu-tab-news.png" alt="News tab with impact filter, currencies, before/after minutes, and upcoming events list" loading="lazy" width="365" height="626">
+        <figcaption>// News tab</figcaption>
+      </figure>
       <div class="feat-text">
         <h3>Filter by impact and currency</h3>
         <p class="lead">Pick which currencies to watch (defaults to majors), which impact levels matter (High, Medium, or both), and how many minutes before/after each event to pause. The EA loads the calendar at startup and refreshes on demand.</p>
         <p>Look at the <strong style="color: var(--white);">Upcoming Events</strong> list at the bottom of the tab — that's the live calendar. The Loaded counter shows how many events match your filter for today.</p>
         <p class="muted">Pause only blocks <em>new entries</em>. Existing positions, trailing, partials, and TPs all keep running. If you need a hard stop including managing open trades, use Prop Mode's daily-loss cap instead.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>EnableNewsPause</td><td class="muted">Master switch.</td></tr>
-            <tr><td>NewsPauseBeforeMinutes</td><td class="muted">Block entries N min before event.</td></tr>
-            <tr><td>NewsPauseAfterMinutes</td><td class="muted">Resume entries N min after event.</td></tr>
-            <tr><td>NewsPauseHighImpact</td><td class="muted">Include high-impact events.</td></tr>
-            <tr><td>NewsPauseMediumImpact</td><td class="muted">Include medium-impact events.</td></tr>
-            <tr><td>NewsPauseCurrencies</td><td class="muted">Comma list, e.g. <code>USD,EUR,GBP,JPY</code>.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <figure class="feat-shot">
-        <img src="assets/tcu/tcu-news.png" alt="News tab with impact filter, currencies, before/after minutes, and upcoming events list" loading="lazy" width="365" height="626">
-        <figcaption>// News tab · 11 events loaded</figcaption>
-      </figure>
-    </div>
-  </section>
-
-
-  <!-- 10. PROP MODE -->
-  <section class="tcu-section" id="prop">
-    <div class="tcu-section-head">
-      <span class="sec-tag">// 10 · Prop firm mode &amp; beginner safe</span>
-      <h2 class="sec-title">One toggle. <em>Prop-firm rules</em> applied.</h2>
-      <div class="sec-rule"></div>
-      <p class="sec-sub">Prop Firm Mode forces a stricter set of safety rules globally. Beginner Safe Mode is an even stricter set of caps for first-time users.</p>
-    </div>
-    <div class="feat-twocol flip">
-      <figure class="feat-shot">
-        <img src="assets/tcu/tcu-prop.png" alt="Prop tab — Prop Firm Mode ON, Require SL/TP, Max Open Positions 2, Daily Loss caps, Beginner Safe ON" loading="lazy" width="368" height="626">
-        <figcaption>// Prop tab · header pill turns gold</figcaption>
-      </figure>
-      <div class="feat-text">
-        <h3>Prop Firm Mode forces every safety rule on</h3>
-        <p class="lead">Turn this ON for any FTMO / The Funded Trader / MFF / E8 / etc. account. The header pill turns <strong style="color: var(--gold);">PROP</strong> gold and the EA stops accepting signals that could violate prop rules:</p>
-        <ul style="margin: 8px 0 14px 0; padding-left: 18px; color: var(--text); font-size: 14px; line-height: 1.7;">
-          <li>Forces <code>Require SL</code> — no SL-less trades, ever.</li>
-          <li>Caps <code>Max Open Positions</code> at the value you set (e.g. 2 for tighter prop accounts).</li>
-          <li>Hard daily-loss limits in both <code>%</code> and <code>$</code> terms — once hit, ALL trading stops for the day. EA keeps running, just refuses new entries.</li>
-          <li>Limits same-symbol stacking and trade frequency.</li>
-          <li>Forces the spread filter on so you don't get filled at slippage prop firms hate.</li>
-        </ul>
-        <p><strong style="color: var(--white);">Beginner Safe Mode</strong> is a separate, stricter overlay: max 2 positions, max 1 trade per minute, max spread ≤30 points. Turn this on for the first week of using the EA on a real account.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>PropFirmMode</td><td class="muted">Master toggle. Forces all the rules below.</td></tr>
-            <tr><td>Require SL / TP</td><td class="muted">Refuse signals missing either.</td></tr>
-            <tr><td>Max Open Positions</td><td class="muted">Tight cap. Prop accounts often need 1–3.</td></tr>
-            <tr><td>Max Trades / min</td><td class="muted">Throttle for trade-frequency rules.</td></tr>
-            <tr><td>Daily Loss %</td><td class="muted">Halt all trading at this % of starting balance.</td></tr>
-            <tr><td>Daily Loss $</td><td class="muted">Halt all trading at this dollar drawdown.</td></tr>
-            <tr><td>Spread Filter / Max Spread pts</td><td class="muted">Forced ON in prop mode.</td></tr>
-            <tr><td>BeginnerSafeMode</td><td class="muted">Even stricter overlay for first-time users.</td></tr>
-          </tbody>
-        </table>
       </div>
     </div>
   </section>
 
-
-  <!-- 11. LOCAL COPIER -->
-  <section class="tcu-section" id="local">
-    <div class="tcu-section-head">
-      <span class="sec-tag">// 11 · Local copier · MT5 → MT5</span>
-      <h2 class="sec-title">Copy trades between <em>two MT5 terminals</em>.</h2>
-      <div class="sec-rule"></div>
-      <p class="sec-sub">Run TCU on your master account, run a second instance on your slave account, both in the same Common folder. Trades sync via a shared CSV file in milliseconds.</p>
-    </div>
-    <div class="feat-twocol">
-      <div class="feat-text">
-        <h3>Master / Slave roles</h3>
-        <p class="lead">Set <code>CopierMode = MASTER</code> on the source MT5 (the one your provider sends signals to). Set <code>CopierMode = SLAVE</code> on every target MT5 you want to copy into. Both must use the same <code>CopierFileName</code>.</p>
-        <p>The slave can use its own lot mode — copy master's lot exactly, multiply it, use a fixed lot, or risk a percentage of its own balance. Different brokers and account sizes get different sizing automatically.</p>
-        <p><strong style="color: var(--white);">Auto-close</strong> means when the master closes a position (TP/SL/manual), the slave closes its mirror immediately. Critical for prop slaves that must mirror exits exactly.</p>
-        <p class="muted">Same PC only. For cross-PC copying, use one MT5 with the Bridge app or have the master forward signals via Telegram Broadcast (next section).</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>CopierMode</td><td class="muted"><code>DISABLED</code> · <code>MASTER</code> · <code>SLAVE</code></td></tr>
-            <tr><td>CopierFileName</td><td class="muted">Shared CSV. Must match on master + all slaves.</td></tr>
-            <tr><td>CopierAutoClose</td><td class="muted">Slave closes when master closes.</td></tr>
-            <tr><td>CopierPollMs</td><td class="muted">Scan speed in ms. Default <code>50</code>.</td></tr>
-            <tr><td>CopierLotMode</td><td class="muted"><code>COPY</code> · <code>FIXED</code> · <code>MULTIPLIER</code> · <code>RISK%</code></td></tr>
-            <tr><td>CopierMaxLot</td><td class="muted">Hard cap on slave lots.</td></tr>
-          </tbody>
-        </table>
-        <p style="margin-top: 14px; font-size: 13px;"><a href="tradecopierultimate.html#local" style="color: var(--teal);">See the full master/slave screenshot on the setup page →</a></p>
-      </div>
-      <figure class="feat-shot">
-        <img src="assets/tcu/tcu-local-copier.png" alt="Two MT5 terminals running master and slave with synchronized trades" loading="lazy">
-        <figcaption>// Master + slave on one PC</figcaption>
-      </figure>
-    </div>
-  </section>
-
-
-  <!-- 12. TELEGRAM BROADCAST -->
-  <section class="tcu-section" id="broadcast">
-    <div class="tcu-section-head">
-      <span class="sec-tag">// 12 · Telegram broadcast</span>
-      <h2 class="sec-title">Forward your trades to <em>your own channel</em>.</h2>
-      <div class="sec-rule"></div>
-      <p class="sec-sub">Every trade the EA opens or closes can be pushed to a Telegram channel — useful for your own followers, or to log activity to a private channel you can read on mobile.</p>
-    </div>
-    <div class="feat-twocol flip">
-      <div class="feat-text">
-        <h3>Two ways to broadcast</h3>
-        <p class="lead">Use the <strong>same bot</strong> you use for receiving (simpler), or a <strong>different sending bot</strong> if you want to keep "read" and "write" identities separate. Most signal-channel runners use a separate bot so the source bot doesn't appear to be posting in your output channel.</p>
-        <p><strong style="color: var(--white);">TelegramSendTag</strong> prefixes every message — default <code>[TCU]</code>. Set this to your channel name to brand the messages. <strong style="color: var(--white);">TelegramSendSuffix</strong> appends custom text to every broadcast (e.g. "@your_channel — copy trades from us").</p>
-        <p class="muted">Forwarding only fires for trades opened or closed by THIS EA's magic number — your manual trades are never broadcast.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>EnableTelegramSend</td><td class="muted">Master switch for forwarding.</td></tr>
-            <tr><td>TelegramSendTag</td><td class="muted">Prefix on every broadcast. Default <code>[TCU]</code>.</td></tr>
-            <tr><td>TelegramSendSuffix</td><td class="muted">Custom text appended (channel name, hashtag).</td></tr>
-            <tr><td>UseSeparateSendBot</td><td class="muted">Use a different bot for sending vs reading.</td></tr>
-            <tr><td>SendBotToken</td><td class="muted">Bot token for sending (if separate).</td></tr>
-            <tr><td>SendChatID</td><td class="muted">Chat/channel ID where to broadcast.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="signal-example" style="margin-top: 14px;">
-<span class="sigl">// What a forwarded message looks like in your channel</span>
-[TCU] BUY GOLD 2050.50
-SL: 2045.00
-TP: 2055.00
-Lot: 0.40
-@your_channel</div>
-    </div>
-    <div class="video-slot">// <strong>Video walkthrough coming soon</strong> — broadcasting to a private logging channel</div>
-  </section>
-
-
-  <!-- 13. ALERTS & MONITOR -->
+  <!-- 13. ALERTS -->
   <section class="tcu-section" id="alerts">
     <div class="tcu-section-head">
-      <span class="sec-tag">// 13 · Alerts &amp; trade monitor</span>
-      <h2 class="sec-title">Know what the EA is <em>doing</em>.</h2>
+      <span class="sec-tag">// 13 · Alerts</span>
+      <h2 class="sec-title">Keep an eye on <em>everything</em>.</h2>
       <div class="sec-rule"></div>
-      <p class="sec-sub">Every trade event fires a native MT5 alert. The Trade Monitor popup gives you a live list of every position the EA is tracking, with one-click access to details.</p>
-    </div>
-
-    <figure class="action-shot">
-      <img src="assets/tcu/tcu-action-multitp.png" alt="Trade Monitor popup with three open positions, alert popup with live event log" loading="lazy">
-      <figcaption>// Trade Monitor + Alert log · everything the EA is tracking, live</figcaption>
-    </figure>
-
-    <div class="feat-text" style="margin-top: 22px; max-width: 720px; margin-left: auto; margin-right: auto;">
-      <p>Click <strong style="color: var(--white);">Orders</strong> in the panel header to open the Trade Monitor. It lists every position opened by THIS EA's magic number, grouped by source channel. Click a row → detail popup with ticket, source, open price, SL, flags (<code>MTP</code>, <code>PART</code>, <code>TRAIL</code>, <code>BE</code>), and timestamps.</p>
-      <p>Native MT5 alerts fire for: signal received, signal filtered (with reason), trade opened, trade closed, partial close, trailing activation, news pause, daily loss cap hit, errors. Open the Terminal → Alerts tab to see the running log. Push notifications and email work too — configure them in MT5's <code>Tools → Options → Notifications</code>.</p>
-    </div>
-  </section>
-
-
-  <!-- 14. SYSTEM / DIAG -->
-  <section class="tcu-section" id="system">
-    <div class="tcu-section-head">
-      <span class="sec-tag">// 14 · System &amp; diagnostics</span>
-      <h2 class="sec-title">Coexistence, <em>logging</em>, profile control.</h2>
-      <div class="sec-rule"></div>
-      <p class="sec-sub">Magic number, symbol-suffix mapping, diagnostic logging, and settings persistence. The mostly-ignored tab that becomes critical when something goes wrong.</p>
+      <p class="sec-sub">Get instantly notified when the EA takes action. Push notifications to your phone, email alerts, and local sounds.</p>
     </div>
     <div class="feat-twocol">
       <div class="feat-text">
-        <h3>What lives in System tab</h3>
-        <p><strong style="color: var(--white);">Magic Number</strong> — every trade the EA places is tagged with this number. Change it ONLY if you run multiple TCU instances on the same account (give each a unique magic). Otherwise leave at <code>333333</code>.</p>
-        <p><strong style="color: var(--white);">Symbol Suffix</strong> — if your broker uses <code>EURUSDm</code> or <code>EURUSD.cash</code>, set <code>m</code> or <code>.cash</code> here. The EA appends it to every signal symbol automatically. Saves you setting up <code>CustomMappings</code> for every pair.</p>
-        <p><strong style="color: var(--white);">Diagnostic Log</strong> — when ON, every signal, parse decision, filter check, and trade attempt is written to <code>MQL5/Files/Common/TCU_STRESS_Log.txt</code>. Send this file to support and we can replay your exact session. Costs ~5 KB per signal — fine to leave on permanently.</p>
-        <p><strong style="color: var(--white);">Report Log</strong> — separate human-readable activity report. Auto-purges entries older than <code>Report Purge Days</code>.</p>
-        <p class="muted">Every panel change auto-saves the moment you press <code>Enter</code> — there's no "save" button. Settings survive MT5 restarts. The EA always reboots in DISARMED state regardless of how it was last set, so a crash never resumes live trading without your explicit ARM click.</p>
-        <table class="inputs-table">
-          <thead><tr><th>Input</th><th>What it controls</th></tr></thead>
-          <tbody>
-            <tr><td>MagicNumber</td><td class="muted">EA's tag on every trade. Default <code>333333</code>.</td></tr>
-            <tr><td>SymbolSuffix</td><td class="muted">Append to every signal symbol (e.g. <code>m</code>, <code>.cash</code>).</td></tr>
-            <tr><td>CustomMappings</td><td class="muted">Per-symbol overrides. e.g. <code>GOLD=XAUUSD,SILVER=XAGUSD</code></td></tr>
-            <tr><td>EnableDiagLog</td><td class="muted">Full signal trace log. Recommended ON.</td></tr>
-            <tr><td>DiagLogFileName</td><td class="muted">Log filename in MQL5/Files/Common.</td></tr>
-            <tr><td>EnableReportLog</td><td class="muted">Activity report file.</td></tr>
-            <tr><td>ReportPurgeDays</td><td class="muted">Auto-prune old report entries.</td></tr>
-          </tbody>
-        </table>
+        <h3>Customizable notifications</h3>
+        <p class="lead">You don't need to stare at the chart. Tell TCU exactly what events should trigger an alert.</p>
+        <p><strong style="color: var(--white);">Alert Types</strong> — Choose between MT5 Terminal Popups, Push Notifications (to the MT5 mobile app), Email, or simple local sound alerts.</p>
+        <p><strong style="color: var(--white);">Event Triggers</strong> — Independently toggle alerts for New Trades, Closed Trades, Modified SL/TPs, Rejected Signals, and Daily Goal hits.</p>
+        <p>The EA will format a clean, readable message detailing the symbol, action, lot size, and price for every notification.</p>
       </div>
       <figure class="feat-shot">
-        <img src="assets/tcu/tcu-system.png" alt="System tab — Magic Number, Diagnostic Log, Report Log, Symbol Suffix" loading="lazy" width="368" height="630">
-        <figcaption>// System tab</figcaption>
+        <img src="assets/tcu/tcu-tab-alerts.png" alt="Alerts tab showing toggle switches for different notification types" loading="lazy" width="366" height="627">
+        <figcaption>// Alerts tab</figcaption>
       </figure>
     </div>
   </section>
 
-
-  <!-- DISCLAIMER -->
-  <section class="tcu-section">
+  <!-- 14. SYSTEM -->
+  <section class="tcu-section" id="system">
     <div class="tcu-section-head">
-      <span class="sec-tag">// Always demo first</span>
-      <h2 class="sec-title">Test on demo. <em>Every time.</em></h2>
+      <span class="sec-tag">// 14 · System</span>
+      <h2 class="sec-title">Diagnostics &amp; <em>Overrides</em>.</h2>
       <div class="sec-rule"></div>
+      <p class="sec-sub">Fine-tune the EA's internal behaviour, enable advanced logging, or reset state.</p>
     </div>
-    <div class="disclaimer">
-      Trade Copier Ultimate is an <strong>execution utility</strong>. It does not generate trading signals or analysis. Every feature on this page makes the EA more capable — it does not make the underlying signals more profitable.<br><br>
-      <strong>Always test on a demo account before going live.</strong> Behaviour differs between Hedging and Netting accounts; broker symbol suffixes differ; some brokers ban scalping or partial closes. Verify the feature works on your specific broker before risking capital.<br><br>
-      Past performance of any signal source does not guarantee future results. Demo versions from MQL5 run only inside the Strategy Tester — for end-to-end live testing on a demo broker, use the paid version on a demo MT5 login.
-    </div>
-  </section>
-
-
-  <!-- CROSS-LINKS -->
-  <section class="tcu-section">
-    <div class="tcu-section-head">
-      <span class="sec-tag">// Keep going</span>
-      <h2 class="sec-title">Where <em>next?</em></h2>
-      <div class="sec-rule"></div>
-    </div>
-    <div class="cross-grid">
-      <a class="cross-card" href="tradecopierultimate.html">
-        <div class="cross-card-tag">Setup &amp; Support</div>
-        <div class="cross-card-title">First-time setup guide</div>
-        <div class="cross-card-desc">5-step quick-start, signal-format reference, troubleshooting FAQ. Start here if you haven't installed yet.</div>
-      </a>
-      <a class="cross-card" href="https://www.mql5.com/en/market/product/164907" target="_blank" rel="noopener">
-        <div class="cross-card-tag">Buy on MQL5</div>
-        <div class="cross-card-title">Trade Copier Ultimate · v6.00</div>
-        <div class="cross-card-desc">$50 one-time. MT5 only. 7-day free demo available on the product page.</div>
-      </a>
-      <a class="cross-card" href="https://t.me/Navigatoralgo_bot" target="_blank" rel="noopener">
-        <div class="cross-card-tag">Get help</div>
-        <div class="cross-card-title">Support bot — Telegram</div>
-        <div class="cross-card-desc">Send your account number, broker, and the issue. Fastest way to reach us.</div>
-      </a>
-      <a class="cross-card" href="https://t.me/navigatoralgo" target="_blank" rel="noopener">
-        <div class="cross-card-tag">Updates</div>
-        <div class="cross-card-title">News &amp; releases channel</div>
-        <div class="cross-card-desc">Version releases, breaking changes, prop-firm-friendly setups.</div>
-      </a>
+    <div class="feat-twocol flip">
+      <figure class="feat-shot">
+        <img src="assets/tcu/tcu-tab-system.png" alt="System tab showing logging levels, diagnostic tools, and state resets" loading="lazy" width="366" height="627">
+        <figcaption>// System tab</figcaption>
+      </figure>
+      <div class="feat-text">
+        <h3>Under the hood</h3>
+        <p class="lead">The System tab exposes the EA's brain for advanced users and troubleshooting.</p>
+        <p><strong style="color: var(--white);">Diagnostic Logging</strong> — Enable verbose logging to see exactly how TCU parses a specific signal string. Essential if you're writing custom keywords and need to debug why a signal was rejected.</p>
+        <p><strong style="color: var(--white);">Symbol Mapping overrides</strong> — Force the EA to map "GOLD" to "XAUUSD.pro" if your broker uses unusual naming conventions that the auto-mapper fails to catch.</p>
+        <p><strong style="color: var(--white);">State Reset</strong> — Clear the EA's internal memory (daily counters, active partial queues, etc.) without having to restart the terminal or detach the EA.</p>
+      </div>
     </div>
   </section>
 
