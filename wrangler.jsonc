@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "navigatoralgo",
+  "name": "navigatoralgomain",
   "compatibility_date": "2026-04-19",
   "observability": {
     "enabled": true
