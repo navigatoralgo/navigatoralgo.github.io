@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>NTS Super Bridge — Navigator Algo</title>
+<meta name="description" content="The companion app for Trade Copier Ultimate. Route Telegram and Discord signals locally.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://navigatoralgo.com/tradecopierultimate.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://navigatoralgo.com/tradecopierultimate.html">
+<meta property="og:title" content="Trade Copier Ultimate — Setup &amp; Support · Navigator Algo">
+<meta property="og:description" content="Setup, signal-format reference, and troubleshooting for Trade Copier Ultimate v6.00 — multi-source signal execution engine for MT5.">
+<meta property="og:image" content="https://navigatoralgo.com/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Trade Copier Ultimate — Setup &amp; Support · Navigator Algo">
+<meta name="twitter:description" content="Setup, signal-format reference, and troubleshooting for Trade Copier Ultimate v6.00 — multi-source signal execution engine for MT5.">
+<meta name="twitter:image" content="https://navigatoralgo.com/logo.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Trade Copier Ultimate",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "MetaTrader 5",
+  "softwareVersion": "6.00",
+  "url": "https://navigatoralgo.com/tradecopierultimate.html",
+  "description": "Multi-source signal execution engine for MT5. Receives trade signals from Telegram, Discord, or a Bridge app and copies trades between local MT5 terminals.",
+  "offers": {
+    "@type": "Offer",
+    "price": "50",
+    "priceCurrency": "USD",
+    "url": "https://www.mql5.com/en/market/product/164907",
+    "availability": "https://schema.org/InStock"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Navigator Trading Systems",
+    "url": "https://navigatoralgo.com/"
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+.tcu-shell {
+  position: relative; z-index: 1;
+  max-width: 1080px; margin: 0 auto;
+  overflow-x: hidden;
+  padding: 172px 48px 40px;
+}
+.tcu-hero {
+  text-align: center; margin-bottom: 48px;
+}
+.tcu-hero .page-hero-h1 { font-size: clamp(36px, 6vw, 68px); }
+
+/* Version banner */
+.tcu-version-banner {
+  background: linear-gradient(135deg, rgba(0,212,200,0.06), rgba(240,165,0,0.04));
+  border: 1px solid rgba(0,212,200,0.22);
+  border-radius: 18px;
+  padding: 16px 22px;
+  margin: 24px auto 0;
+  max-width: 720px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+  text-align: center;
+}
+.tcu-version-banner strong { color: var(--teal); font-weight: 700; }
+
+/* CTA cluster under hero */
+.tcu-hero-ctas {
+  margin-top: 36px;
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+}
+
+/* Section titles centred and consistent */
+.tcu-section { margin-top: 64px; }
+.tcu-section-head {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.tcu-section-head .sec-tag { display: block; margin-bottom: 10px; }
+.tcu-section-head .sec-title { font-size: clamp(22px, 3vw, 34px); }
+.tcu-section-head .sec-rule {
+  margin: 14px auto 0;
+  max-width: 220px;
+  background: linear-gradient(90deg, transparent, rgba(0,212,200,0.4), transparent);
+}
+
+/* Step list (5 quick-start steps) */
+.step-list {
+  margin: 24px 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.step-list li {
+  counter-increment: step;
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 18px;
+  padding: 24px 28px 24px 80px;
+  position: relative;
+  margin-bottom: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  font-size: 14.5px;
+}
+.step-list li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 24px; top: 22px;
+  font-family: var(--font-head);
+  font-size: 22px; font-weight: 900;
+  color: var(--teal);
+  letter-spacing: -0.02em;
+}
+.step-list li strong { color: var(--white); font-weight: 700; }
+.step-list li code {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--teal);
+  background: rgba(0,212,200,0.06);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,212,200,0.12);
+}
+
+/* URL list inside steps */
+.url-list {
+  background: rgba(8,11,14,0.6);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--teal);
+  letter-spacing: 0.02em;
+  overflow-x: auto;
+  margin-top: 8px;
+  line-height: 1.9;
+}
+
+/* Bridge download card (placeholder) */
+.bridge-card {
+  background: var(--panel);
+  border: 1px solid rgba(240,165,0,0.22);
+  border-radius: 28px;
+  padding: 40px 36px;
+  box-shadow: 0 30px 60px rgba(240,165,0,0.04);
+  text-align: center;
+}
+.bridge-tag {
+  font-family: var(--font-ui);
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.bridge-name {
+  font-family: var(--font-head);
+  font-size: 24px; font-weight: 800;
+  color: var(--white);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.bridge-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 auto 26px;
+  max-width: 620px;
+}
+.bridge-coming {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--gold);
+  background: rgba(240,165,0,0.07);
+  border: 1px solid rgba(240,165,0,0.28);
+  padding: 14px 28px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+.bridge-meta {
+  margin-top: 22px;
+  font-family: var(--font-ui);
+  font-size: 10px; letter-spacing: 0.08em;
+  color: var(--muted); text-transform: uppercase;
+}
+
+/* Mode + feature tables */
+.tcu-table-wrap {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 22px;
+  padding: 6px;
+  overflow-x: auto;
+}
+.tcu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  color: var(--text);
+}
+.tcu-table th, .tcu-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(36,48,64,0.5);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.55;
+}
+.tcu-table thead th {
+  font-family: var(--font-ui);
+  font-size: 10px; letter-spacing: 0.12em;
+  color: var(--teal); text-transform: uppercase;
+  background: rgba(0,212,200,0.04);
+  border-bottom: 1px solid rgba(0,212,200,0.18);
+  font-weight: 700;
+}
+.tcu-table tr:last-child td { border-bottom: none; }
+.tcu-table td code {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--teal);
+  background: rgba(0,212,200,0.06);
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,212,200,0.12);
+  white-space: nowrap;
+}
+.tcu-table td:first-child {
+  color: var(--white);
+  font-weight: 600;
+  font-family: var(--font-head);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Feature grid (3-column safety / management) */
+.feat-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.feat-card {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 18px;
+  padding: 22px 22px;
+}
+.feat-card-title {
+  font-family: var(--font-head);
+  font-size: 13px; font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+  letter-spacing: -0.005em;
+}
+.feat-card-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* FAQ */
+.faq-item {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 10px;
+}
+.faq-item summary {
+  font-family: var(--font-head);
+  font-size: 15px; font-weight: 700;
+  color: var(--white);
+  cursor: pointer;
+  list-style: none;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+';
+  font-family: var(--font-ui);
+  font-size: 20px;
+  color: var(--teal);
+  margin-left: 12px;
+  transition: transform 0.2s;
+}
+.faq-item[open] summary::after { content: '−'; }
+.faq-item .faq-body {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.faq-item .faq-body code {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--teal);
+  background: rgba(0,212,200,0.06);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,212,200,0.12);
+}
+
+/* Warning + info boxes */
+.warn-box {
+  background: rgba(240,165,0,0.06);
+  border: 1px solid rgba(240,165,0,0.22);
+  border-radius: 18px;
+  padding: 22px 26px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.75;
+}
+.warn-box strong { color: var(--gold); font-weight: 700; }
+.info-box {
+  background: rgba(0,212,200,0.04);
+  border: 1px solid rgba(0,212,200,0.16);
+  border-radius: 18px;
+  padding: 22px 26px;
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.75;
+}
+
+/* Disclaimer block */
+.disclaimer {
+  background: rgba(8,11,14,0.6);
+  border: 1px solid rgba(36,48,64,0.7);
+  border-radius: 18px;
+  padding: 22px 26px;
+  font-size: 13px;
+  color: var(--muted2);
+  line-height: 1.7;
+}
+.disclaimer strong { color: var(--text); font-weight: 700; }
+
+/* Support panel */
+.support-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.support-card {
+  background: var(--panel);
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 18px;
+  padding: 24px 26px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.support-card:hover {
+  border-color: rgba(0,212,200,0.32);
+  transform: translateY(-2px);
+}
+.support-card-title {
+  font-family: var(--font-head);
+  font-size: 14px; font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.support-card-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* Screenshot frames */
+.shot-figure {
+  margin: 18px auto 6px;
+  text-align: center;
+}
+.shot-figure img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 14px;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.32);
+  background: #0d141e;
+}
+.shot-figure figcaption {
+  font-family: var(--font-ui);
+  font-size: 10.5px; letter-spacing: 0.06em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 12px;
+}
+.shot-narrow img { max-width: min(320px, 100%); }
+.shot-medium img { max-width: min(540px, 100%); }
+.shot-wide   img { max-width: 100%; }
+
+/* Hero panel composite */
+.hero-shots {
+  display: flex; gap: 18px; justify-content: center;
+  flex-wrap: wrap;
+  margin: 36px auto 0;
+  max-width: 920px;
+}
+.hero-shots .shot-figure {
+  margin: 0;
+  flex: 0 0 auto;
+  max-width: 280px;
+}
+.hero-shots .shot-figure img {
+  max-width: 280px;
+  border-radius: 12px;
+}
+
+/* Panel tab gallery */
+.panel-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.panel-gallery .shot-figure { margin: 0; }
+.panel-gallery .shot-figure img {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 14px;
+}
+.panel-gallery figcaption {
+  font-size: 10px;
+  margin-top: 10px;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .panel-gallery { grid-template-columns: repeat(2, 1fr); }
+  .hero-shots .shot-figure { max-width: 240px; }
+  .hero-shots .shot-figure img { max-width: 240px; }
+}
+@media (max-width: 600px) {
+  .panel-gallery { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .feat-grid { grid-template-columns: repeat(2, 1fr); }
+  .support-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .tcu-shell { padding: 154px 20px 40px; }
+  .step-list li { padding: 22px 20px 22px 66px; font-size: 13.5px; }
+  .step-list li::before { left: 18px; font-size: 20px; }
+  .feat-grid { grid-template-columns: 1fr; }
+  .tcu-table td, .tcu-table th { padding: 12px 14px; font-size: 12.5px; }
+  .tcu-table td:first-child { white-space: normal; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark" width="340" height="227">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="signal-copier.html">Signal Copier</a></li>
+    <li><a href="receiver-download.html">Free Receiver</a></li>
+    <li><a href="tradecopierultimate.html">Trade Copier Ultimate</a></li>
+    <li><a href="bridge.html" class="current">NTS Super Bridge</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li id="nav-auth-slot"><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
+    <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
+  </ul>
+</nav>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">SUPPORT &amp; SETUP</span></div>
+  <div class="status-item">TRADE COPIER ULTIMATE v6.00</div>
+  <div class="status-item">MT5 ONLY</div>
+  <div class="status-item">TELEGRAM · DISCORD · BRIDGE · LOCAL</div>
+  <div class="status-item">DISARMED BY DEFAULT</div>
+</div>
+
+<main class="tcu-shell">
+<!-- BRIDGE APP -->
+  <section class="tcu-section" id="bridge">
+    <div class="tcu-section-head">
+      <span class="sec-tag">// Windows Desktop App</span>
+      <h1 class="page-hero-h1" style="margin-top: 10px;">NTS Super <em>Bridge</em>.</h1>
+      <div class="sec-rule"></div>
+    </div>
+
+    <div class="bridge-card">
+      <div class="bridge-tag">// Companion App · Windows · v6.00</div>
+      <div class="bridge-name">Navigator Command Center · Bridge v6.00</div>
+      <p class="bridge-desc">
+        The Bridge is a small Windows app that runs on the same PC as your MT5. It logs into your Telegram account (read-only via MTProto) so it can read <strong>private channels</strong> the Bot API can't reach, then routes per-account groups to the right MT5 terminal. Trade Copier Ultimate connects to it on <code style="color: var(--teal); background: rgba(0,212,200,0.08); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(0,212,200,0.18);">http://127.0.0.1:&lt;port&gt;</code> &mdash; nothing ever leaves your machine.
+      </p>
+      <a href="https://github.com/navigatoralgo/navigatoralgo.github.io/releases/latest/download/Bridge.exe" id="bridge-download-btn"
+         class="btn btn-primary"
+         style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase;">
+        <span style="font-size: 16px;">↓</span> Download Bridge v6.00
+      </a>
+      <div class="bridge-meta">
+        Free · Windows 10/11 · No install required &mdash; unzip and run.
+      </div>
+    </div>
+
+    <div class="warn-box" style="margin-top: 18px;">
+      <strong>You don't need the Bridge for most setups.</strong>
+      Bot API mode is enough for any Telegram channel where you can make your bot an admin (most public/group channels), and Discord mode handles webhooks directly. The Bridge is the answer only if your provider broadcasts in a private Telegram channel you can't bot-admin, or if you want one PC to route signals from multiple Telegram accounts to multiple MT5 terminals at once.
+    </div>
+
+    <h3 style="margin: 36px 0 8px; font-family: var(--font-head); font-size: 18px; color: var(--white); letter-spacing: -0.01em;">What it looks like</h3>
+    <p style="margin: 0 0 18px; color: var(--muted); font-size: 13.5px; line-height: 1.7; max-width: 760px;">
+      Six screens cover the entire workflow: connect Telegram once, pick which groups feed signals, assign per-group routing to one or many MT5 accounts, then watch the live signal pipeline.
+    </p>
+
+        <div class="panel-gallery">
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-dashboard-1.png" alt="Bridge Dashboard — Live status" loading="lazy">
+        <figcaption>// Dashboard · live status</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-dashboard-2.png" alt="Bridge Dashboard — Live Feed Logs" loading="lazy">
+        <figcaption>// Dashboard · live feed logs</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-telegram-setup.png" alt="Telegram Setup" loading="lazy">
+        <figcaption>// Telegram Setup</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-telegram-groups.png" alt="Telegram Groups" loading="lazy">
+        <figcaption>// Telegram Groups</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-discord-setup.png" alt="Discord Setup" loading="lazy">
+        <figcaption>// Discord Setup</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-mt5-accounts.png" alt="MT5 Accounts" loading="lazy">
+        <figcaption>// MT5 Accounts</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-routing.png" alt="Routing" loading="lazy">
+        <figcaption>// Routing</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-signal-formats-1.png" alt="Signal Formats" loading="lazy">
+        <figcaption>// Signal Formats · rules</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-signal-formats-2.png" alt="Signal Formats edit" loading="lazy">
+        <figcaption>// Signal Formats · rewrite</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-signal-history.png" alt="Signal History" loading="lazy">
+        <figcaption>// Signal History</figcaption>
+      </figure>
+    </div>
+
+    <div class="tcu-section-head" style="margin-top: 64px;">
+      <span class="sec-tag">// Installation</span>
+      <h2 class="sec-title">Windows <em>SmartScreen</em>.</h2>
+      <div class="sec-rule"></div>
+    </div>
+    <p style="margin: 0 0 18px; color: var(--muted); font-size: 13.5px; line-height: 1.7; max-width: 760px; text-align: center; margin-left: auto; margin-right: auto;">
+      Because the Bridge is a new executable downloaded from the internet, Windows SmartScreen may flag it. Click "More info" and then "Run anyway" to bypass this warning. The app is completely local and open-source on GitHub.
+    </p>
+    <div class="panel-gallery" style="grid-template-columns: repeat(2, 1fr); max-width: 800px; margin: 0 auto;">
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-smartscreen-1.png" alt="Windows SmartScreen" loading="lazy">
+        <figcaption>// Click 'More info'</figcaption>
+      </figure>
+      <figure class="shot-figure">
+        <img src="assets/bridge/bridge-smartscreen-2.png" alt="Windows SmartScreen Run Anyway" loading="lazy">
+        <figcaption>// Click 'Run anyway'</figcaption>
+      </figure>
+    </div>
+
+
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand">
+        <img src="logo.png" alt="Navigator Algo" class="footer-brand-logo" width="510" height="340">
+      </div>
+      <div class="footer-brand-sub">// navigatoralgo.com · Professional MT5 Trading Systems</div>
+      <p class="footer-brand-desc">Nine professional Expert Advisors for MetaTrader 5. Built for funded account traders, signal traders, manual traders, and everyone in between.</p>
+      <p class="footer-brand-legal"><strong>Navigator Algo</strong> and the <strong>Navigator Algo</strong> logo are proprietary brand assets of Navigator Trading Systems. Unauthorized use, reproduction, or imitation is prohibited.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Paid Tools</h4>
+      <a href="https://www.mql5.com/en/market/product/170008" target="_blank">Trigger Pro</a>
+      <a href="tradecopierultimate.html">Trade Copier Ultimate</a>
+      <a href="https://www.mql5.com/en/market/product/163674" target="_blank">Prop Firm Protector</a>
+    </div>
+    <div class="footer-col">
+      <h4>Free Tools</h4>
+      <a href="https://www.mql5.com/en/market/product/165390" target="_blank">NTS Local Copier</a>
+      <a href="https://www.mql5.com/en/market/product/163764" target="_blank">Trade Journal Ultimate</a>
+      <a href="https://www.mql5.com/en/market/product/165793" target="_blank">Multi Pair Scanner</a>
+      <a href="https://www.mql5.com/en/market/product/163692" target="_blank">Protector Basic</a>
+      <a href="https://www.mql5.com/en/market/product/165896" target="_blank">Trade Assistant</a>
+      <a href="https://www.mql5.com/en/market/product/168242" target="_blank">MT4 Slave Plugin</a>
+    </div>
+    <div class="footer-col">
+      <h4>Signal Copier</h4>
+      <a href="signal-copier.html">Product page</a>
+      <a href="receiver-download.html">Partner Receiver</a>
+      <a href="dashboard.html">Provider Dashboard</a>
+      <a href="signin.html">Sign in</a>
+      <a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank">MQL5 Store</a>
+    </div>
+    <div class="footer-col">
+      <h4>Community &amp; Support</h4>
+      <a href="https://t.me/navigatoralgo" target="_blank" rel="noopener">Telegram channel (updates)</a>
+      <a href="https://t.me/Navigatoralgo_bot" target="_blank" rel="noopener">Support bot @Navigatoralgo_bot</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; 2026 Navigator Trading Systems · All rights reserved · navigatoralgo.com · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="refund.html">Refunds</a></div>
+    <div class="footer-sys">
+      <span class="status-dot"></span> ALL SYSTEMS OPERATIONAL
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="assets/nav-auth.js"></script>
+</body>
+</html>

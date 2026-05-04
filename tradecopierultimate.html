@@ -467,6 +467,7 @@
     <li><a href="signal-copier.html">Signal Copier</a></li>
     <li><a href="receiver-download.html">Free Receiver</a></li>
     <li><a href="tradecopierultimate.html" class="current">Trade Copier Ultimate</a></li>
+    <li><a href="bridge.html">NTS Super Bridge</a></li>
     <li><a href="dashboard.html">Dashboard</a></li>
     <li id="nav-auth-slot"><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
     <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
@@ -575,28 +576,28 @@
 
     <div class="panel-gallery">
       <figure class="shot-figure">
-        <img src="assets/tcu/tcu-panel-armed-source.png" alt="Source tab — Telegram Bot, Bridge, and Discord toggles" loading="lazy" width="366" height="629">
+        <img src="assets/tcu/tcu-tab-source.png" alt="Source tab — Telegram Bot, Bridge, and Discord toggles" loading="lazy">
         <figcaption>// Source · pick your input</figcaption>
       </figure>
       <figure class="shot-figure">
-        <img src="assets/tcu/tcu-panel-lots.png" alt="Lots tab — Lot Mode, Fixed Lot, Risk %, Max Lot, Over Max Action" loading="lazy" width="367" height="630">
+        <img src="assets/tcu/tcu-tab-lots.png" alt="Lots tab — Lot Mode, Fixed Lot, Risk %, Max Lot, Over Max Action" loading="lazy">
         <figcaption>// Lots · sizing and risk caps</figcaption>
       </figure>
       <figure class="shot-figure">
-        <img src="assets/tcu/tcu-panel-filter.png" alt="Filter tab — Duplicate Filter, Spread Filter, Slippage settings" loading="lazy" width="368" height="627">
+        <img src="assets/tcu/tcu-tab-filter-1.png" alt="Filter tab — Duplicate Filter, Spread Filter, Slippage settings" loading="lazy">
         <figcaption>// Filter · safety toggles</figcaption>
       </figure>
       <figure class="shot-figure">
-        <img src="assets/tcu/tcu-panel-sigtp.png" alt="SigTP tab — Multi-TP split with Lot Distribution percentages" loading="lazy" width="369" height="628">
+        <img src="assets/tcu/tcu-tab-sigtp.png" alt="SigTP tab — Multi-TP split with Lot Distribution percentages" loading="lazy">
         <figcaption>// SigTP · multi-TP allocation</figcaption>
       </figure>
       <figure class="shot-figure">
-        <img src="assets/tcu/tcu-panel-livesignal.png" alt="Home tab — ARMED, Bridge ONLINE :5555, signals parsed, last signal and filter reason" loading="lazy" width="358" height="623">
+        <img src="assets/tcu/tcu-tab-home.png" alt="Home tab — ARMED, Bridge ONLINE :5555, signals parsed, last signal and filter reason" loading="lazy">
         <figcaption>// Home · live status &amp; last signal</figcaption>
       </figure>
       <figure class="shot-figure">
-        <img src="assets/tcu/tcu-panel-disarmed.png" alt="Home tab — DISARMED state at first attach, no signals fire until ARM" loading="lazy" width="360" height="625">
-        <figcaption>// Home · DISARMED at first attach</figcaption>
+        <img src="assets/tcu/tcu-tab-prop-2-safe.png" alt="Prop tab — SAFE state with Beginner Safe ON" loading="lazy">
+        <figcaption>// Prop · SAFE mode enabled</figcaption>
       </figure>
     </div>
   </section>
@@ -630,36 +631,24 @@
       Bot API mode is enough for any Telegram channel where you can make your bot an admin (most public/group channels), and Discord mode handles webhooks directly. The Bridge is the answer only if your provider broadcasts in a private Telegram channel you can't bot-admin, or if you want one PC to route signals from multiple Telegram accounts to multiple MT5 terminals at once.
     </div>
 
-    <h3 style="margin: 36px 0 8px; font-family: var(--font-head); font-size: 18px; color: var(--white); letter-spacing: -0.01em;">What it looks like</h3>
+    <h3 style="margin: 36px 0 8px; font-family: var(--font-head); font-size: 18px; color: var(--white); letter-spacing: -0.01em;">A standalone execution hub</h3>
     <p style="margin: 0 0 18px; color: var(--muted); font-size: 13.5px; line-height: 1.7; max-width: 760px;">
-      Six screens cover the entire workflow: connect Telegram once, pick which groups feed signals, assign per-group routing to one or many MT5 accounts, then watch the live signal pipeline.
+      The Bridge handles all the heavy lifting of parsing signals, rewriting formats, and managing multi-account fan-out. Learn more about its features on the dedicated documentation page.
     </p>
 
-    <div class="panel-gallery">
+    <div class="panel-gallery" style="grid-template-columns: repeat(2, 1fr); max-width: 900px; margin: 0 auto 32px;">
       <figure class="shot-figure">
-        <img src="assets/bridge/bridge-dashboard-running.png" alt="Bridge Dashboard — RUNNING with uptime, Telegram + HTTP endpoints online, assigned groups list, today's signal counters" loading="lazy" width="1024" height="697">
-        <figcaption>// Dashboard · live status &amp; counters</figcaption>
+        <img src="assets/bridge/bridge-dashboard-1.png" alt="Bridge Dashboard" loading="lazy">
+        <figcaption>// Live signal pipeline</figcaption>
       </figure>
       <figure class="shot-figure">
-        <img src="assets/bridge/bridge-telegram-setup.png" alt="Bridge Telegram Setup — API ID, API Hash, phone number, HTTP server port and EA polling URL" loading="lazy" width="1024" height="697">
-        <figcaption>// Telegram Setup · MTProto + HTTP</figcaption>
+        <img src="assets/bridge/bridge-signal-formats-2.png" alt="Bridge Signal Formats" loading="lazy">
+        <figcaption>// Format rewriting rules</figcaption>
       </figure>
-      <figure class="shot-figure">
-        <img src="assets/bridge/bridge-telegram-groups.png" alt="Bridge Telegram Groups — list of assigned groups with checkboxes and copy ID buttons" loading="lazy" width="1024" height="697">
-        <figcaption>// Groups · pick which channels feed signals</figcaption>
-      </figure>
-      <figure class="shot-figure">
-        <img src="assets/bridge/bridge-mt5-accounts.png" alt="Bridge MT5 Accounts — XM, Fusion Markets, Raw Trading shown as separate accounts, each with its own group assignment" loading="lazy" width="1024" height="697">
-        <figcaption>// MT5 Accounts · per-account group routing</figcaption>
-      </figure>
-      <figure class="shot-figure">
-        <img src="assets/bridge/bridge-routing.png" alt="Bridge Routing — duplicate filter toggle, routing keywords, skip keywords, broker symbol suffix" loading="lazy" width="1024" height="697">
-        <figcaption>// Routing · filters &amp; keywords</figcaption>
-      </figure>
-      <figure class="shot-figure">
-        <img src="assets/bridge/bridge-signal-history.png" alt="Bridge Signal History — last 200 messages with timestamps, source group, signal text, lane, delivery status" loading="lazy" width="1024" height="697">
-        <figcaption>// Signal History · full audit trail</figcaption>
-      </figure>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 48px;">
+      <a href="bridge.html" class="btn btn-ghost" style="padding: 12px 28px; font-size: 13px;">View Full Bridge Documentation →</a>
     </div>
 
     <div class="tcu-table-wrap" style="margin-top: 22px;">
