@@ -397,6 +397,26 @@
 .shot-medium img { max-width: min(540px, 100%); }
 .shot-wide   img { max-width: 100%; }
 
+/* Full-width feature images */
+.feat-full {
+  margin: 24px auto 64px;
+  max-width: 900px;
+  text-align: center;
+}
+.feat-full img {
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(36,48,64,0.72);
+  border-radius: 14px;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.32);
+}
+.feat-full figcaption {
+  font-family: var(--font-ui);
+  font-size: 11px; letter-spacing: 0.06em;
+  color: var(--muted); text-transform: uppercase;
+  margin-top: 14px;
+}
+
 /* Hero panel composite */
 .hero-shots {
   display: flex; gap: 18px; justify-content: center;
@@ -512,156 +532,173 @@
       Bot API mode is enough for any Telegram channel where you can make your bot an admin (most public/group channels), and Discord mode handles webhooks directly. The Bridge is the answer only if your provider broadcasts in a private Telegram channel you can't bot-admin, or if you want one PC to route signals from multiple Telegram accounts to multiple MT5 terminals at once.
     </div>
 
-        <!-- 1. DASHBOARD -->
+    <!-- 1. DASHBOARD -->
     <section class="tcu-section" id="dashboard">
       <div class="tcu-section-head">
         <span class="sec-tag">// 01 · Dashboard</span>
         <h2 class="sec-title">The Live <em>Pipeline</em>.</h2>
         <div class="sec-rule"></div>
       </div>
-      <div class="feat-twocol">
-        <div class="feat-text">
-          <h3>Real-time visibility</h3>
-          <p class="lead">The Dashboard is your operational command center. Watch signals arrive, get parsed, and be routed to your MT5 terminals in real-time.</p>
-          <p><strong style="color: var(--white);">Live Status</strong> — Monitor your Bridge uptime, Telegram MTProto client connection, and the local HTTP server status at a glance.</p>
-          <p><strong style="color: var(--white);">Feed Logs</strong> — The real-time console shows exactly what the Bridge is doing: connecting to groups, receiving messages, matching format profiles, and rejecting duplicates.</p>
-        </div>
-        <figure class="feat-shot">
-          <img src="assets/bridge/bridge-dashboard-1.png" alt="Bridge Dashboard live status" loading="lazy" width="366">
-          <figcaption>// Live Status</figcaption>
-        </figure>
+      <div class="feat-text" style="max-width: 760px; margin: 0 auto; text-align: center;">
+        <p class="lead" style="margin-bottom: 24px;">The Dashboard is your operational command center. Watch signals arrive, get parsed, and be routed to your MT5 terminals in real-time.</p>
+        <p>Monitor your Bridge uptime, Telegram MTProto client connection, and local HTTP server status at a glance. The real-time console shows exactly what the Bridge is doing: connecting to groups, receiving messages, parsing formats, and maintaining SQLite queues.</p>
       </div>
-      <div class="feat-twocol flip" style="margin-top: 48px;">
-        <figure class="feat-shot">
-          <img src="assets/bridge/bridge-dashboard-2.png" alt="Bridge Dashboard live feed logs" loading="lazy" width="366">
-          <figcaption>// Live Feed Logs</figcaption>
-        </figure>
-        <div class="feat-text">
-          <h3>Deep diagnostic logging</h3>
-          <p class="lead">Never guess why a signal was missed. The Live Feed outputs detailed execution steps for every single message.</p>
-          <p>See exactly which Telegram group sent the message, which format profile the Bridge used to parse it, and whether it was successfully placed onto the HTTP queue for MT5 to pick up.</p>
-        </div>
-      </div>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-dashboard.png" alt="Bridge v7 Dashboard" loading="lazy">
+        <figcaption>// Real-time Logging & Diagnostics</figcaption>
+      </figure>
     </section>
 
     <!-- 2. SOURCES -->
     <section class="tcu-section" id="sources">
       <div class="tcu-section-head">
-        <span class="sec-tag">// 02 · Connecting Sources</span>
+        <span class="sec-tag">// 02 · Signal Sources</span>
         <h2 class="sec-title">Ingest from <em>anywhere</em>.</h2>
         <div class="sec-rule"></div>
       </div>
-      <div class="feat-twocol">
-        <div class="feat-text">
-          <h3>Telegram MTProto & Discord</h3>
-          <p class="lead">Connect the Bridge to your own Telegram account to read private channels, or set up a Discord webhook receiver.</p>
-          <p><strong style="color: var(--white);">Telegram Setup</strong> — Enter your API ID and Hash (from my.telegram.org) and log in with your phone number. The Bridge acts as a read-only client, pulling messages from any group you are a member of—including private VIP channels where bots are banned.</p>
-          <p><strong style="color: var(--white);">Group Selection</strong> — Once connected, the Bridge lists every Telegram group you're in. Simply toggle the switches for the channels you want to monitor. You can even assign custom display names.</p>
-          <p><strong style="color: var(--white);">Discord Webhooks</strong> — Prefer Discord? Provide the Bridge with a webhook URL and it will listen for incoming payloads, seamlessly converting them into MT5-ready signals.</p>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 24px;">
-          <figure class="feat-shot">
-            <img src="assets/bridge/bridge-telegram-setup.png" alt="Telegram Setup" loading="lazy" width="366">
-            <figcaption>// Telegram API Auth</figcaption>
-          </figure>
-          <figure class="feat-shot">
-            <img src="assets/bridge/bridge-telegram-groups.png" alt="Telegram Groups" loading="lazy" width="366">
-            <figcaption>// Channel Selection</figcaption>
-          </figure>
-        </div>
+      <div class="feat-text" style="max-width: 760px; margin: 0 auto; text-align: center;">
+        <p class="lead" style="margin-bottom: 24px;">Connect the Bridge to your own Telegram account to read private VIP channels, or use Discord webhooks.</p>
+        <p>The Bridge acts as a read-only Telegram client, pulling messages from any group you are a member of. It lists every group you're in—simply select which channels forward signals to MT5. You can also enforce <strong style="color: var(--white);">Allowed Sender IDs</strong> to block spam in public channels and enable <strong style="color: var(--white);">Reply Context Tracking</strong> for advanced trade management.</p>
       </div>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-sources.png" alt="Telegram MTProto Sources" loading="lazy">
+        <figcaption>// Telegram API Auth & Settings</figcaption>
+      </figure>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-groups.png" alt="Telegram Groups Selection" loading="lazy">
+        <figcaption>// Visual Channel Selection</figcaption>
+      </figure>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-discord.png" alt="Discord Bot Integration" loading="lazy">
+        <figcaption>// Discord Bot Integration</figcaption>
+      </figure>
     </section>
 
     <!-- 3. MT5 FAN-OUT -->
     <section class="tcu-section" id="fanout">
       <div class="tcu-section-head">
-        <span class="sec-tag">// 03 · MT5 Account Fan-Out</span>
+        <span class="sec-tag">// 03 · MT5 Fan-Out</span>
         <h2 class="sec-title">One Bridge, <em>Many Terminals</em>.</h2>
         <div class="sec-rule"></div>
       </div>
-      <div class="feat-twocol flip">
-        <figure class="feat-shot">
-          <img src="assets/bridge/bridge-mt5-accounts.png" alt="MT5 Accounts routing" loading="lazy" width="366">
-          <figcaption>// MT5 Account Routing</figcaption>
-        </figure>
-        <div class="feat-text">
-          <h3>Route specific groups to specific accounts</h3>
-          <p class="lead">The Bridge doesn't just broadcast blindly. It acts as a smart router between your Telegram channels and your MT5 terminals.</p>
-          <p><strong style="color: var(--white);">Register Accounts</strong> — Add your MT5 account numbers directly into the Bridge UI.</p>
-          <p><strong style="color: var(--white);">Selective Routing</strong> — Want your high-risk "Gold VIP" Telegram signals to only go to your personal $500 account, while the conservative "Forex Safe" signals go to your $100k Prop Firm account? You can do that. Assign specific Telegram groups to specific MT5 accounts with a single click.</p>
-        </div>
+      <div class="feat-text" style="max-width: 760px; margin: 0 auto; text-align: center;">
+        <p class="lead" style="margin-bottom: 24px;">Route specific Telegram groups to specific MT5 accounts automatically.</p>
+        <p>The Bridge acts as a smart router. Assign your high-risk "Gold VIP" signals to your personal account, while conservative signals go to your Prop Firm account. In v7, you can also enable <strong style="color: var(--white);">Daily Drawdown Auto-Stop</strong> on a per-account basis—the Bridge will automatically halt signal delivery if your equity drops beyond your configured threshold.</p>
       </div>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-accounts.png" alt="MT5 Accounts & Drawdown Protection" loading="lazy">
+        <figcaption>// Per-Account Routing & Drawdown Protection</figcaption>
+      </figure>
     </section>
 
-    <!-- 4. ROUTING & FILTERS -->
+    <!-- 4. PROP SAFE -->
+    <section class="tcu-section" id="propsafe">
+      <div class="tcu-section-head">
+        <span class="sec-tag">// 04 · Prop Firm Safe Mode</span>
+        <h2 class="sec-title">Trade invisibly, <em>pass challenges</em>.</h2>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="feat-text" style="max-width: 760px; margin: 0 auto; text-align: center;">
+        <p class="lead" style="margin-bottom: 24px;">Modify signals before they reach your EA to reduce the risk of being flagged as a copy trader.</p>
+        <p>Configure protections globally or override them per-account. Features include <strong style="color: var(--white);">Comment Stealth</strong> to strip signal references, <strong style="color: var(--white);">Randomised Entry Delays</strong> to prevent microsecond-perfect execution footprints, and <strong style="color: var(--white);">SL / TP Variation</strong> to slightly randomize target levels so your trades don't exactly match hundreds of others.</p>
+      </div>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-propsafe-1.png" alt="Prop Safe Mode Global Defaults" loading="lazy">
+        <figcaption>// Prop Safe Mode Configurations</figcaption>
+      </figure>
+    </section>
+
+    <!-- 5. ROUTING & FILTERS -->
     <section class="tcu-section" id="routing">
       <div class="tcu-section-head">
-        <span class="sec-tag">// 04 · Routing & Filters</span>
+        <span class="sec-tag">// 05 · Routing & Filters</span>
         <h2 class="sec-title">Block the noise, <em>pass the signal</em>.</h2>
         <div class="sec-rule"></div>
       </div>
-      <div class="feat-twocol">
-        <div class="feat-text">
-          <h3>Pre-processing at the edge</h3>
-          <p class="lead">Clean up your provider's mess before it ever reaches your EA.</p>
-          <p><strong style="color: var(--white);">Duplicate Filter</strong> — If a provider forwards the exact same signal into three different VIP rooms, the Bridge catches it. It caches the signal hash for 60 seconds and drops any identical copies, ensuring your EA only executes once.</p>
-          <p><strong style="color: var(--white);">Skip Keywords</strong> — Some providers post chatty updates like "Running in profit!" or "TP1 smashed". Add words like <code>running</code>, <code>hit</code>, or <code>smashed</code> to the skip list, and the Bridge will instantly discard those messages without bothering the EA.</p>
-          <p><strong style="color: var(--white);">Lane Routing</strong> — Advanced users can use Lane tags (e.g., <code>#copier</code>) to separate different signal types (like market execution vs pendings) if the provider supports it.</p>
-        </div>
-        <figure class="feat-shot">
-          <img src="assets/bridge/bridge-routing.png" alt="Bridge Routing and Filters" loading="lazy" width="366">
-          <figcaption>// Routing & Filters</figcaption>
-        </figure>
+      <div class="feat-text" style="max-width: 760px; margin: 0 auto; text-align: center;">
+        <p class="lead" style="margin-bottom: 24px;">Clean up your provider's mess before it ever reaches your EA.</p>
+        <p>Configure <strong style="color: var(--white);">Duplicate Filters</strong> to drop identical copied signals within a time window, use <strong style="color: var(--white);">Skip Keywords</strong> for rejecting chatty updates, and restrict trading to specific <strong style="color: var(--white);">Session Days/Times</strong>. The Bridge also features <strong style="color: var(--white);">Weekend Close Protection</strong> to automatically send a CLOSE ALL command hours before the Friday market close, protecting you from weekend gap risk.</p>
       </div>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-routing.png" alt="Routing Keywords and Overrides" loading="lazy">
+        <figcaption>// Routing & Symbol Aliases</figcaption>
+      </figure>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-filters.png" alt="Advanced Filters and Weekend Close Protection" loading="lazy">
+        <figcaption>// Time Filters & Weekend Protection</figcaption>
+      </figure>
     </section>
 
-    <!-- 5. FORMAT PROFILES -->
+    <!-- 6. NEWS CALENDAR -->
+    <section class="tcu-section" id="news">
+      <div class="tcu-section-head">
+        <span class="sec-tag">// 06 · News Calendar</span>
+        <h2 class="sec-title">Built-in <em>ForexFactory Integration</em>.</h2>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="feat-text" style="max-width: 760px; margin: 0 auto; text-align: center;">
+        <p class="lead" style="margin-bottom: 24px;">Automatically protect your capital from high-impact volatility.</p>
+        <p>The Bridge constantly fetches the live ForexFactory calendar. You can configure it to automatically pause all signal processing <code>X</code> minutes before high or medium-impact events for specific currencies. The visual calendar lets you explicitly block or unblock specific news releases on the fly.</p>
+      </div>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-news.png" alt="News Calendar Integration" loading="lazy">
+        <figcaption>// Live ForexFactory Calendar</figcaption>
+      </figure>
+    </section>
+
+    <!-- 7. FORMAT PROFILES -->
     <section class="tcu-section" id="formats">
       <div class="tcu-section-head">
-        <span class="sec-tag">// 05 · Format Rewriting</span>
+        <span class="sec-tag">// 07 · Format Rewriting</span>
         <h2 class="sec-title">Teach the Bridge to speak <em>any language</em>.</h2>
         <div class="sec-rule"></div>
       </div>
-      <div class="feat-twocol flip">
-        <div style="display: flex; flex-direction: column; gap: 24px;">
-          <figure class="feat-shot">
-            <img src="assets/bridge/bridge-signal-formats-1.png" alt="Signal Formats list" loading="lazy" width="366">
-            <figcaption>// Format Profiles</figcaption>
-          </figure>
-          <figure class="feat-shot">
-            <img src="assets/bridge/bridge-signal-formats-2.png" alt="Signal Formats editor" loading="lazy" width="366">
-            <figcaption>// Profile Editor</figcaption>
-          </figure>
-        </div>
-        <div class="feat-text">
-          <h3>Fix bad signal formats automatically</h3>
-          <p class="lead">Not every provider sends clean, EA-friendly signals. The new Per-Channel Format Profile system solves this by letting you define "find and replace" rules for specific Telegram groups.</p>
-          <p><strong style="color: var(--white);">Context-Aware Rewriting</strong> — If a provider writes <code>Target: 2050</code> instead of <code>TP: 2050</code>, create a rule to replace <code>Target:</code> with <code>TP:</code>. The Bridge applies this rule the millisecond the message arrives.</p>
-          <p><strong style="color: var(--white);">Per-Channel Specificity</strong> — You can assign these profiles globally, or tie them exclusively to specific Telegram Channel IDs. This prevents a rule meant for Provider A from accidentally corrupting the signals of Provider B.</p>
-          <p><strong style="color: var(--white);">Built-in Tester</strong> — Not sure if your rule works? Use the built-in signal tester to paste a raw message and see exactly how the Bridge will rewrite it before it hits your MT5.</p>
-        </div>
+      <div class="feat-text" style="max-width: 760px; margin: 0 auto; text-align: center;">
+        <p class="lead" style="margin-bottom: 24px;">Fix bad signal formats automatically using Per-Channel Profiles.</p>
+        <p>If a provider writes <code>Target: 2050</code> instead of <code>TP: 2050</code>, create a rule to replace it. The Bridge applies this rule the millisecond the message arrives, normalizing it before it hits the Copier EA.</p>
       </div>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-formats.png" alt="Signal Format Profiles" loading="lazy">
+        <figcaption>// Keyword Normalization Profiles</figcaption>
+      </figure>
     </section>
 
-    <!-- 6. HISTORY -->
+    <!-- 8. REPLY COMMANDS -->
+    <section class="tcu-section" id="replies">
+      <div class="tcu-section-head">
+        <span class="sec-tag">// 08 · Reply Commands</span>
+        <h2 class="sec-title">Manage trades via <em>Telegram Replies</em>.</h2>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="feat-text" style="max-width: 760px; margin: 0 auto; text-align: center;">
+        <p class="lead" style="margin-bottom: 24px;">Turn your provider's commentary into actionable MT5 commands.</p>
+        <p>When a provider replies to a signal with "close half" or "move sl to entry", the Bridge detects the phrase, looks up the original trade ticket from the replied message, and instantly sends a precise modification command to your MT5 EA. Enable or disable command categories to prevent false triggers.</p>
+      </div>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-reply.png" alt="Reply Command Settings" loading="lazy">
+        <figcaption>// Reply Command Categories</figcaption>
+      </figure>
+    </section>
+
+    <!-- 9. HISTORY -->
     <section class="tcu-section" id="history">
       <div class="tcu-section-head">
-        <span class="sec-tag">// 06 · History Audit</span>
+        <span class="sec-tag">// 09 · History Audit</span>
         <h2 class="sec-title">A complete <em>Audit Trail</em>.</h2>
         <div class="sec-rule"></div>
       </div>
-      <div class="feat-twocol">
-        <div class="feat-text">
-          <h3>Full transparency</h3>
-          <p class="lead">The Bridge keeps a running log of the last 200 messages processed through the pipeline.</p>
-          <p><strong style="color: var(--white);">Delivery Status</strong> — Instantly see if a message was <code>Delivered</code> to the EA queue, <code>Rejected</code> by a filter, or marked as a <code>Duplicate</code>.</p>
-          <p><strong style="color: var(--white);">Raw Text Access</strong> — Click on any row to view and copy the raw signal text. This is invaluable for debugging why a signal failed to execute in MT5—you can see exactly what the provider sent versus what the EA received.</p>
-        </div>
-        <figure class="feat-shot">
-          <img src="assets/bridge/bridge-signal-history.png" alt="Signal History Audit Trail" loading="lazy" width="366">
-          <figcaption>// History Audit</figcaption>
-        </figure>
+      <div class="feat-text" style="max-width: 760px; margin: 0 auto; text-align: center;">
+        <p class="lead" style="margin-bottom: 24px;">The Bridge keeps a complete ledger of every signal and trade.</p>
+        <p>The Signal History tab lists all processed messages. New in v7 is the <strong style="color: var(--white);">Signal Timeline</strong>: click any signal to see a chronological breakdown of when it was received, when trades were opened, when reply commands were processed, and when the ticket was finally closed in MT5.</p>
       </div>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-history-timeline.png" alt="Signal Timeline Audit" loading="lazy">
+        <figcaption>// Signal Timeline Lifecycle</figcaption>
+      </figure>
+      <figure class="feat-full">
+        <img src="assets/bridge/bridge-v7-history.png" alt="Signal History Ledger" loading="lazy">
+        <figcaption>// Signal History Ledger</figcaption>
+      </figure>
     </section>
 
     <div class="tcu-section-head" style="margin-top: 64px;">
