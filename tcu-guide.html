@@ -208,6 +208,10 @@
         <li style="padding-left: 15px;"><a href="#tab-copier" class="docs-sidebar-link">Copier &amp; Trade</a></li>
         <li style="padding-left: 15px;"><a href="#tab-lots" class="docs-sidebar-link">Lots &amp; Risk Sizing</a></li>
         <li><a href="#trade-mgmt" class="docs-sidebar-link">2. Trade Management</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-autosltp" class="docs-sidebar-link">Auto SL/TP</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-sigtp" class="docs-sidebar-link">Signal TP (SigTP)</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-trail" class="docs-sidebar-link">Trailing Stop</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-partials" class="docs-sidebar-link">Partial Close</a></li>
         <li><a href="#protection" class="docs-sidebar-link">3. Protection &amp; Filtering</a></li>
         <li><a href="#system" class="docs-sidebar-link">4. System &amp; Alerts</a></li>
       </ul>
@@ -330,7 +334,37 @@
 
     <section id="trade-mgmt" class="docs-section">
       <h1 class="docs-title">2. Trade Management</h1>
-      <p class="docs-text">Details coming soon...</p>
+      <p class="docs-text">This section covers how the EA manages trades after they are opened, including stop losses, take profits, trailing stops, and partial closures.</p>
+
+      <div class="docs-step" style="margin-top: 32px;">
+        <h3 id="tab-autosltp">Auto SL/TP</h3>
+        <p class="docs-text">The <strong>Auto SL/TP</strong> tab acts as a fallback mechanism. If a signal arrives without a Stop Loss or Take Profit, the EA can automatically inject one based on fixed points. It can also skip dangerous signals completely if they lack a Stop Loss.</p>
+        <!-- Placeholder for Auto SL/TP screenshot -->
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="tab-sigtp">Signal TP (SigTP)</h3>
+        <p class="docs-text">If your signal provider sends multiple targets (e.g., TP1, TP2, TP3), the <strong>SigTP</strong> tab handles them. By enabling <strong>Multi-TP Split</strong>, the EA will split the trade into multiple smaller orders (one for each TP) and distribute the lots according to your percentage allocation.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/sigtp_tab.png" alt="Signal TP Tab" style="max-width: 320px;">
+        </div>
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="tab-trail">Trailing Stop</h3>
+        <p class="docs-text">The <strong>Trail</strong> tab allows you to lock in profits automatically. Define when the trail starts (in pips) and how closely it follows the price. You can also automatically move the Stop Loss to Break-Even (plus a buffer) once the trail starts.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/trail_tab.png" alt="Trailing Stop Tab" style="max-width: 320px;">
+        </div>
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="tab-partials">Partial Close</h3>
+        <p class="docs-text">The <strong>Partials</strong> tab lets you close portions of a trade at specific pip milestones instead of relying on fixed TP prices. For example, you can tell the EA to close 20% of the trade at +10 pips and automatically move the SL to break-even.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/partial_tab.png" alt="Partials Tab" style="max-width: 320px;">
+        </div>
+      </div>
     </section>
 
     <section id="protection" class="docs-section">
