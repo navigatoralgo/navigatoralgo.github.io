@@ -193,17 +193,26 @@
   <!-- Sidebar -->
   <aside class="docs-sidebar">
     <input type="text" class="docs-search" id="searchInput" placeholder="Search guides...">
-    
-    <div class="docs-nav-header">Getting Started</div>
-    <ul class="docs-nav">
-      <li><a href="#quickstart" class="active">Quick Start Setup</a></li>
-      <li><a href="#attachea">1. Attaching the EA</a></li>
-      <li><a href="#webrequest">2. Web Request URLs</a></li>
-      <li><a href="#bridge">3. Bridge Setup</a></li>
-      <li><a href="#groups">4. Group Selection</a></li>
-    </ul>
+        <h4 class="docs-sidebar-category">GETTING STARTED</h4>
+      <ul class="docs-sidebar-list">
+        <li><a href="#quickstart" class="docs-sidebar-link active">Quick Start Setup</a></li>
+        <li style="padding-left: 15px;"><a href="#attachea" class="docs-sidebar-link">2. Attach the EA</a></li>
+        <li style="padding-left: 15px;"><a href="#start-bridge" class="docs-sidebar-link">5. Start the Bridge</a></li>
+        <li style="padding-left: 15px;"><a href="#groups" class="docs-sidebar-link">4. Group Selection</a></li>
+      </ul>
 
-    <div class="docs-nav-header">Troubleshooting</div>
+      <h4 class="docs-sidebar-category">EA DEEP DIVE</h4>
+      <ul class="docs-sidebar-list">
+        <li><a href="#core-config" class="docs-sidebar-link">1. Core Configuration</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-home" class="docs-sidebar-link">Home &amp; Source</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-copier" class="docs-sidebar-link">Copier &amp; Trade</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-lots" class="docs-sidebar-link">Lots &amp; Risk Sizing</a></li>
+        <li><a href="#trade-mgmt" class="docs-sidebar-link">2. Trade Management</a></li>
+        <li><a href="#protection" class="docs-sidebar-link">3. Protection &amp; Filtering</a></li>
+        <li><a href="#system" class="docs-sidebar-link">4. System &amp; Alerts</a></li>
+      </ul>
+
+      <h4 class="docs-sidebar-category">TROUBLESHOOTING</h4>
     <ul class="docs-nav">
       <li><a href="#error-10021">Error 10021 (Disabled Instruments)</a></li>
       <li><a href="#common">Other Common Errors</a></li>
@@ -284,6 +293,54 @@
           <div class="docs-img-caption">// Step 7: EA Armed and taking multiple signals</div>
         </div>
       </div>
+    </section>
+
+    <section id="core-config" class="docs-section">
+      <h1 class="docs-title">1. Core Configuration</h1>
+      <p class="docs-text">This section covers the fundamental settings required to get Trade Copier Ultimate parsing signals and opening trades correctly.</p>
+
+      <div class="docs-step" style="margin-top: 32px;">
+        <h3 id="tab-home">Home &amp; Source Tabs</h3>
+        <p class="docs-text">The <strong>Home</strong> tab serves as your main dashboard, displaying live status, connection state, and the last parsed signal. The <strong>Source</strong> tab is where you configure your input method (Bridge vs Webhook).</p>
+        <div class="docs-img-container" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
+          <img src="assets/docs/Screenshot 2026-06-12 122106.png" alt="Home Tab" style="max-width: 320px;">
+          <img src="assets/docs/Screenshot 2026-06-12 122043.png" alt="Source Tab" style="max-width: 320px;">
+        </div>
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="tab-copier">Copier &amp; Trade Tabs</h3>
+        <p class="docs-text">The <strong>Copier</strong> tab is extremely powerful, allowing you to use the EA as a local MT4/MT5-to-MT5 copier. You can set it to <strong>MASTER</strong> to broadcast trades, or <strong>SLAVE</strong> to receive them locally. The <strong>Trade</strong> tab covers execution details like copying SL/TP, reversing signals, and handling pending orders.</p>
+        
+        <div class="docs-img-container" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
+          <img src="assets/docs/copier_tab_slave.png" alt="Copier Tab Slave Mode" style="max-width: 320px;">
+          <img src="assets/docs/trade_tab.png" alt="Trade Tab" style="max-width: 320px;">
+        </div>
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="tab-lots">Lots &amp; Risk Sizing</h3>
+        <p class="docs-text">Manage your risk directly from the <strong>Lots</strong> tab. You can set a global lot size, use a percentage of your equity, or define per-symbol overrides for specific pairs.</p>
+        <div class="docs-img-container" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
+          <img src="assets/docs/Screenshot 2026-06-12 123313.png" alt="Lots Tab" style="max-width: 320px;">
+          <img src="assets/docs/Screenshot 2026-06-12 123403.png" alt="Per-Symbol Overrides" style="max-width: 480px;">
+        </div>
+      </div>
+    </section>
+
+    <section id="trade-mgmt" class="docs-section">
+      <h1 class="docs-title">2. Trade Management</h1>
+      <p class="docs-text">Details coming soon...</p>
+    </section>
+
+    <section id="protection" class="docs-section">
+      <h1 class="docs-title">3. Protection &amp; Filtering</h1>
+      <p class="docs-text">Details coming soon...</p>
+    </section>
+
+    <section id="system" class="docs-section">
+      <h1 class="docs-title">4. System &amp; Alerts</h1>
+      <p class="docs-text">Details coming soon...</p>
     </section>
 
     <section id="error-10021" class="docs-section">
