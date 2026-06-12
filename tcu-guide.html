@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Trade Copier Ultimate Guide · Navigator Algo</title>
+<meta name="description" content="Full setup guide, troubleshooting, and support documentation for Trade Copier Ultimate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css?v=2">
+<style>
+/* Documentation Layout */
+.docs-layout {
+  display: flex;
+  max-width: 1400px;
+  margin: 120px auto 40px;
+  padding: 0 48px;
+  gap: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar Navigation */
+.docs-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 140px;
+  height: calc(100vh - 160px);
+  overflow-y: auto;
+  padding-right: 20px;
+}
+.docs-search {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--panel);
+  border: 1px solid rgba(0,212,200,0.22);
+  border-radius: 12px;
+  color: var(--white);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  margin-bottom: 24px;
+  outline: none;
+}
+.docs-search:focus {
+  border-color: var(--teal);
+}
+.docs-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.docs-nav li {
+  margin-bottom: 8px;
+}
+.docs-nav a {
+  display: block;
+  padding: 8px 12px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14.5px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.docs-nav a:hover, .docs-nav a.active {
+  background: rgba(0,212,200,0.06);
+  color: var(--teal);
+  font-weight: 600;
+}
+.docs-nav-header {
+  font-family: var(--font-head);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--white);
+  margin: 24px 0 12px 12px;
+  font-weight: 700;
+}
+
+/* Main Content */
+.docs-content {
+  flex-grow: 1;
+  max-width: 860px;
+  padding-bottom: 100px;
+}
+.docs-section {
+  margin-bottom: 64px;
+  scroll-margin-top: 140px;
+}
+.docs-title {
+  font-family: var(--font-head);
+  font-size: 36px;
+  color: var(--white);
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+.docs-subtitle {
+  font-family: var(--font-head);
+  font-size: 24px;
+  color: var(--white);
+  margin-top: 48px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(36,48,64,0.72);
+}
+.docs-text {
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+.docs-text strong {
+  color: var(--white);
+}
+
+/* Photo Frames */
+.docs-img-container {
+  margin: 32px 0;
+  text-align: center;
+}
+.docs-img-container img {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(36,48,64,0.72);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+}
+.docs-img-caption {
+  margin-top: 12px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Alert Boxes */
+.docs-alert {
+  background: rgba(240,165,0,0.06);
+  border-left: 4px solid var(--gold);
+  padding: 16px 24px;
+  border-radius: 0 12px 12px 0;
+  margin: 24px 0;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.docs-alert strong {
+  color: var(--gold);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .docs-layout {
+    flex-direction: column;
+    padding: 0 24px;
+  }
+  .docs-sidebar {
+    width: 100%;
+    position: static;
+    height: auto;
+    border-bottom: 1px solid rgba(36,48,64,0.72);
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="Navigator Algo" class="nav-logo-mark" width="340" height="227">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="signal-copier.html">Signal Copier</a></li>
+    <li><a href="receiver-download.html">Free Receiver</a></li>
+    <li><a href="tradecopierultimate.html">Trade Copier Ultimate</a></li>
+    <li><a href="bridge.html">NTS Super Bridge</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li id="nav-auth-slot"><a href="signin.html" class="nav-btn-ghost">Sign in</a></li>
+    <li><a href="https://www.mql5.com/en/users/janithasandu/seller" target="_blank" class="nav-btn">MQL5 Store →</a></li>
+  </ul>
+</nav>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> <span class="val-teal">SUPPORT HUB</span></div>
+  <div class="status-item">TRADE COPIER ULTIMATE FULL GUIDE</div>
+</div>
+
+<main class="docs-layout">
+  <!-- Sidebar -->
+  <aside class="docs-sidebar">
+    <input type="text" class="docs-search" id="searchInput" placeholder="Search guides...">
+    
+    <div class="docs-nav-header">Getting Started</div>
+    <ul class="docs-nav">
+      <li><a href="#quickstart" class="active">Quick Start Setup</a></li>
+      <li><a href="#attachea">1. Attaching the EA</a></li>
+      <li><a href="#webrequest">2. Web Request URLs</a></li>
+      <li><a href="#bridge">3. Bridge Setup</a></li>
+      <li><a href="#groups">4. Group Selection</a></li>
+    </ul>
+
+    <div class="docs-nav-header">Troubleshooting</div>
+    <ul class="docs-nav">
+      <li><a href="#error-10021">Error 10021 (Disabled Instruments)</a></li>
+      <li><a href="#common">Other Common Errors</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <article class="docs-content">
+    
+    <section id="quickstart" class="docs-section">
+      <h1 class="docs-title">Quick Start Setup Guide</h1>
+      <p class="docs-text">Follow this step-by-step guide to get your Trade Copier Ultimate connected and executing your first signal within minutes.</p>
+      
+      <!-- Photos will be added here -->
+    </section>
+
+    <section id="error-10021" class="docs-section">
+      <h2 class="docs-subtitle">Error 10021: Disabled Instruments</h2>
+      <p class="docs-text">If you see <strong>Error 10021</strong> in your MT5 Experts tab, it means MT5 is rejecting the trade because the broker has disabled trading on that specific symbol suffix.</p>
+      
+      <div class="docs-alert">
+        <strong>How to fix:</strong> Open your MT5 Market Watch and ensure you are using the correct symbol with the correct suffix for your account type (e.g., EURUSD.m instead of EURUSD).
+      </div>
+      
+      <!-- Photos will be added here -->
+    </section>
+
+  </article>
+</main>
+
+<script>
+  // Simple search filtering
+  document.getElementById('searchInput').addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    const links = document.querySelectorAll('.docs-nav a');
+    
+    links.forEach(link => {
+      if(link.textContent.toLowerCase().includes(term)) {
+        link.parentElement.style.display = 'block';
+      } else {
+        link.parentElement.style.display = 'none';
+      }
+    });
+  });
+
+  // Sticky auth check
+  const token = localStorage.getItem('nts_token');
+  if (token) {
+    document.getElementById('nav-auth-slot').innerHTML = '<a href="dashboard.html" class="nav-btn-ghost">Dashboard</a>';
+  }
+</script>
+
+</body>
+</html>
