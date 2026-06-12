@@ -213,6 +213,9 @@
         <li style="padding-left: 15px;"><a href="#tab-trail" class="docs-sidebar-link">Trailing Stop</a></li>
         <li style="padding-left: 15px;"><a href="#tab-partials" class="docs-sidebar-link">Partial Close</a></li>
         <li><a href="#protection" class="docs-sidebar-link">3. Protection &amp; Filtering</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-filter" class="docs-sidebar-link">Filters &amp; Safety</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-news" class="docs-sidebar-link">News Pause</a></li>
+        <li style="padding-left: 15px;"><a href="#tab-prop" class="docs-sidebar-link">Prop Firm Mode</a></li>
         <li><a href="#system" class="docs-sidebar-link">4. System &amp; Alerts</a></li>
       </ul>
 
@@ -339,7 +342,9 @@
       <div class="docs-step" style="margin-top: 32px;">
         <h3 id="tab-autosltp">Auto SL/TP</h3>
         <p class="docs-text">The <strong>Auto SL/TP</strong> tab acts as a fallback mechanism. If a signal arrives without a Stop Loss or Take Profit, the EA can automatically inject one based on fixed points. It can also skip dangerous signals completely if they lack a Stop Loss.</p>
-        <!-- Placeholder for Auto SL/TP screenshot -->
+        <div class="docs-img-container">
+          <img src="assets/docs/autosltp_tab.png" alt="Auto SL/TP Tab" style="max-width: 320px;">
+        </div>
       </div>
 
       <div class="docs-step" style="margin-top: 48px;">
@@ -369,7 +374,27 @@
 
     <section id="protection" class="docs-section">
       <h1 class="docs-title">3. Protection &amp; Filtering</h1>
-      <p class="docs-text">Details coming soon...</p>
+      <p class="docs-text">Protect your account from bad signals, extreme market conditions, and duplicate trades. This section covers the Filter, News, and Prop Firm tabs.</p>
+
+      <div class="docs-step" style="margin-top: 32px;">
+        <h3 id="tab-filter">Filters &amp; Safety</h3>
+        <p class="docs-text">The <strong>Filter</strong> tab contains multiple pages of safety checks (use the Next/Previous buttons at the bottom). You can filter trades by maximum spread, slippage, time of day, whitelist/blacklist specific symbols, and prevent duplicate trades or same-direction signals within a cooldown period.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/filter_tab.png" alt="Filters &amp; Safety Tab" style="max-width: 320px;">
+        </div>
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="tab-news">News Pause</h3>
+        <p class="docs-text">Details coming soon...</p>
+        <!-- Placeholder for News screenshot -->
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="tab-prop">Prop Firm Mode</h3>
+        <p class="docs-text">Details coming soon...</p>
+        <!-- Placeholder for Prop screenshot -->
+      </div>
     </section>
 
     <section id="system" class="docs-section">
