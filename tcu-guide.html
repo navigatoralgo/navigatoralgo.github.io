@@ -217,7 +217,55 @@
       <h1 class="docs-title">Quick Start Setup Guide</h1>
       <p class="docs-text">Follow this step-by-step guide to get your Trade Copier Ultimate connected and executing your first signal within minutes.</p>
       
-      <!-- Photos will be added here -->
+      <div class="docs-step" style="margin-top: 32px;">
+        <h3>1. Download & Install the Bridge</h3>
+        <p class="docs-text">First, download the NTS Super Bridge from the main website. Run the installer and complete the setup.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/Screenshot 2026-06-12 121606.png" alt="Download Bridge">
+          <div class="docs-img-caption">// Step 1: Download Bridge App</div>
+        </div>
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="attachea">2. Attach the EA & WebRequest</h3>
+        <p class="docs-text">Open MT5, drag the Trade Copier Ultimate EA onto a chart, and allow AutoTrading. Ensure you have added <code>http://localhost:5555</code> or your specific WebRequest URL in the MT5 Options -> Expert Advisors tab.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/Screenshot 2026-06-12 122001.png" alt="Attach EA">
+          <div class="docs-img-caption">// Step 2: Attach EA and allow AutoTrading</div>
+        </div>
+        <p class="docs-text">Go to the <strong>Source</strong> tab in the EA and ensure <strong>Bridge Mode</strong> is set to <strong>ON</strong> and listening on port <code>5555</code>.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/Screenshot 2026-06-12 122043.png" alt="EA Source Settings" style="max-width: 400px;">
+        </div>
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="bridge">3. Log in to Telegram on Bridge</h3>
+        <p class="docs-text">Open the NTS Bridge app, go to <strong>Signal Sources</strong>, and log in to your Telegram account using your phone number and the code sent to your Telegram app.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/Screenshot 2026-06-12 122735.png" alt="Telegram Login">
+          <div class="docs-img-caption">// Step 3: Telegram Account Linked</div>
+        </div>
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="groups">4. Fetch Groups & Select</h3>
+        <p class="docs-text">Navigate to the <strong>Telegram Groups</strong> tab in the Bridge. Click <strong>Fetch from Telegram</strong> to load your chats. Select the groups you want to forward signals from and click <strong>Save Now</strong>.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/Screenshot 2026-06-12 122811.png" alt="Fetch Telegram Groups">
+          <div class="docs-img-caption">// Step 4: Assign Groups to Copier</div>
+        </div>
+      </div>
+
+      <div class="docs-step" style="margin-top: 48px;">
+        <h3 id="lots">5. Set Up Lot Size (Per-Symbol)</h3>
+        <p class="docs-text">Back in the MT5 EA, navigate to the <strong>Lots</strong> tab. Here you can configure specific lot sizes per symbol (e.g., Gold vs Forex pairs) using the <strong>Per-Sym Lots</strong> feature.</p>
+        <div class="docs-img-container" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
+          <img src="assets/docs/Screenshot 2026-06-12 123313.png" alt="Lots Tab" style="max-width: 320px;">
+          <img src="assets/docs/Screenshot 2026-06-12 123403.png" alt="Per-Symbol Overrides" style="max-width: 480px;">
+        </div>
+        <div class="docs-img-caption" style="text-align: center;">// Step 5: Configure Per-Symbol Lot Overrides</div>
+      </div>
     </section>
 
     <section id="error-10021" class="docs-section">
