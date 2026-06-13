@@ -309,17 +309,15 @@
   <!-- Main Content (Full Width) -->
   <article class="docs-content" style="width: 100%;">
     
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
-      <div class="top-nav-tabs" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">
-        <button class="top-tab-btn active" data-view="view-quickstart">Quick Setup</button>
-        <button class="top-tab-btn" data-view="view-deepdive">EA Deep Dive</button>
-        <button class="top-tab-btn" data-view="view-bridge">Bridge Deep Dive</button>
-        <button class="top-tab-btn" data-view="view-errors">Common Errors</button>
-      </div>
+    <div class="top-nav-tabs">
+      <button class="top-tab-btn active" data-view="view-quickstart">Quick Setup</button>
+      <button class="top-tab-btn" data-view="view-deepdive">EA Deep Dive</button>
+      <button class="top-tab-btn" data-view="view-bridge">Bridge Deep Dive</button>
+      <button class="top-tab-btn" data-view="view-errors">Common Errors</button>
+    </div>
 
-      <div class="docs-search" style="margin-bottom: 0;">
-        <input type="text" id="globalSearch" placeholder="Search guides..." style="background: rgba(36,48,64,0.5); border: 1px solid rgba(0,212,200,0.2); border-radius: 8px; padding: 10px 16px; color: var(--white); font-family: var(--font-ui); width: 250px; outline: none;">
-      </div>
+    <div style="margin-bottom: 32px;">
+      <input type="text" id="globalSearch" class="docs-search" placeholder="Search guides..." style="width: 300px; margin-bottom: 0; background: rgba(36,48,64,0.3);">
     </div>
 
     <div id="view-quickstart" class="main-view active">
