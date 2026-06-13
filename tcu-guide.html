@@ -373,6 +373,12 @@
       <div class="docs-step" style="margin-top: 48px;">
         <h3 id="tab-lots">Lots &amp; Risk Sizing</h3>
         <p class="docs-text">Manage your risk directly from the <strong>Lots</strong> tab. You can set a global lot size, use a percentage of your equity, or define per-symbol overrides for specific pairs.</p>
+        
+        <ul style="color: var(--text); line-height: 1.8; margin-bottom: 20px;">
+          <li><strong>Lot Mode:</strong> Select how you want to size your trades. Options include <code>FIXED</code> (e.g., always 0.01 lots), <code>RISK %</code> (e.g., risk 1% of account balance based on SL distance), and <code>MULTIPLIER</code> (multiply the signal provider's lot size by a given factor).</li>
+          <li><strong>Max Lot:</strong> Set a hard ceiling on the maximum lot size allowed. If a signal tries to open a larger trade, the <strong>Over Max Action</strong> will dictate whether the EA should trim the lot size to match your limit, or simply ignore the signal entirely.</li>
+          <li><strong>Per-Sym Lots:</strong> Click the blue Configure button to set custom sizing rules for specific symbols. For example, you can set XAUUSD to always trade 0.05 Fixed, while all other Forex pairs follow a 1% Risk rule.</li>
+        </ul>
         <div class="docs-img-container" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
           <img src="assets/docs/Screenshot 2026-06-12 123313.png" alt="Lots Tab" style="max-width: 320px;">
           <img src="assets/docs/Screenshot 2026-06-12 123403.png" alt="Per-Symbol Overrides" style="max-width: 480px;">
@@ -439,7 +445,13 @@
 
       <div class="docs-step" style="margin-top: 48px;">
         <h3 id="tab-prop">Prop Firm Mode</h3>
-        <p class="docs-text">Built specifically for funded accounts, the <strong>Prop Firm Protection</strong> mode enforces strict risk rules. It can require every trade to have a Stop Loss, enforce a maximum daily loss limit (in % or $), and completely halt trading if you hit your drawdown limit to protect your account.</p>
+        <p class="docs-text">Built specifically for funded accounts, the <strong>Prop Firm Protection</strong> mode enforces strict risk rules. It can completely halt trading if you hit your drawdown limit to protect your account.</p>
+
+        <ul style="color: var(--text); line-height: 1.8; margin-bottom: 20px;">
+          <li><strong>Daily DD Limit (% or $):</strong> Set your firm's maximum daily drawdown. If your floating equity drops below this threshold (calculated daily based on the starting equity), the EA will automatically close all open trades and disarm the copier to prevent further losses.</li>
+          <li><strong>Require Stop Loss:</strong> If enabled, the EA will refuse to execute any signal that does not include a Stop Loss, ensuring a rogue trade cannot blow your account.</li>
+          <li><strong>Max Open Trades:</strong> Restrict the maximum number of simultaneous open positions to prevent over-exposure.</li>
+        </ul>
         <div class="docs-img-container">
           <img src="assets/docs/prop_tab.png" alt="Prop Firm Protection Tab" style="max-width: 320px;">
         </div>
