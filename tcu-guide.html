@@ -430,7 +430,162 @@
       </div>
     </section>
 
+    <section id="interactive-ea" class="docs-section">
+      <h1 class="docs-title">Interactive EA Interface</h1>
+      <p class="docs-text">Click the tabs below to explore the detailed settings and learn exactly how each feature works.</p>
 
+      <div class="ea-window">
+        <div class="ea-header">
+          <div class="ea-title">TRADE COPIER ULTIMATE</div>
+          <div class="ea-armed">ARMED</div>
+        </div>
+        
+        <div class="ea-tabs-container">
+          <div class="ea-tabs-row">
+            <button class="ea-tab-btn active" data-tab="tab-home">Home</button>
+            <button class="ea-tab-btn" data-tab="tab-source">Source</button>
+            <button class="ea-tab-btn" data-tab="tab-copier">Copier</button>
+            <button class="ea-tab-btn" data-tab="tab-lots">Lots</button>
+            <button class="ea-tab-btn" data-tab="tab-filter">Filter</button>
+          </div>
+          <div class="ea-tabs-row">
+            <button class="ea-tab-btn" data-tab="tab-trade">Trade</button>
+            <button class="ea-tab-btn" data-tab="tab-autosltp">Auto SL/TP</button>
+            <button class="ea-tab-btn" data-tab="tab-sigtp">SigTP</button>
+            <button class="ea-tab-btn" data-tab="tab-trail">Trail</button>
+            <button class="ea-tab-btn" data-tab="tab-news">News</button>
+          </div>
+          <div class="ea-tabs-row">
+            <button class="ea-tab-btn" data-tab="tab-partial">Partial</button>
+            <button class="ea-tab-btn" data-tab="tab-alerts">Alerts</button>
+            <button class="ea-tab-btn" data-tab="tab-prop">Prop</button>
+            <button class="ea-tab-btn" data-tab="tab-system">System</button>
+          </div>
+        </div>
+        
+        <div class="ea-content-area">
+          <div id="tab-home" class="ea-tab-content active">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Home Dashboard</h3>
+            <p class="docs-text">The <strong>Home</strong> tab serves as your main dashboard, displaying live status, connection state, and the last parsed signal.</p>
+            <div class="docs-img-container"><img src="assets/docs/Screenshot 2026-06-12 122106.png" alt="Home Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-source" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Signal Source</h3>
+            <p class="docs-text">The <strong>Source</strong> tab is where you configure your input method. By default, it uses the Bridge, but you can also configure it to listen to direct Webhooks.</p>
+            <div class="docs-img-container"><img src="assets/docs/Screenshot 2026-06-12 122043.png" alt="Source Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-copier" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Copier Mode</h3>
+            <p class="docs-text">The <strong>Copier</strong> tab allows you to use the EA as a local MT4/MT5-to-MT5 copier. Set it to <strong>MASTER</strong> to broadcast trades, or <strong>SLAVE</strong> to receive them locally.</p>
+            <div class="docs-img-container"><img src="assets/docs/copier_tab_slave.png" alt="Copier Tab Slave Mode" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-lots" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Lots &amp; Risk Sizing</h3>
+            <p class="docs-text">Manage your risk directly from the <strong>Lots</strong> tab. You can set a global lot size, use a percentage of your equity, or define per-symbol overrides for specific pairs.</p>
+            <ul style="color: var(--text); line-height: 1.8; margin-bottom: 20px;">
+              <li><strong>Lot Mode:</strong> Select how you want to size your trades. Options include <code>FIXED</code>, <code>RISK %</code>, and <code>MULTIPLIER</code>.</li>
+              <li><strong>Max Lot:</strong> Set a hard ceiling on the maximum lot size allowed.</li>
+              <li><strong>Per-Sym Lots:</strong> Set custom sizing rules for specific symbols. For example, set XAUUSD to 0.05 Fixed, while Forex pairs follow a 1% Risk rule.</li>
+            </ul>
+            <div class="docs-img-container" style="display: flex; gap: 20px; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
+              <img src="assets/docs/Screenshot 2026-06-12 123313.png" alt="Lots Tab" style="max-width: 320px;">
+              <img src="assets/docs/Screenshot 2026-06-12 123403.png" alt="Per-Symbol Overrides" style="max-width: 480px;">
+            </div>
+          </div>
+
+          <div id="tab-filter" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Filters &amp; Safety</h3>
+            <p class="docs-text">The <strong>Filter</strong> tab contains multiple pages of safety checks. You can filter trades by maximum spread, slippage, whitelist specific symbols, and prevent duplicate trades within a cooldown period.</p>
+            <div class="docs-img-container"><img src="assets/docs/filter_tab.png" alt="Filters Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-trade" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Trade Execution</h3>
+            <p class="docs-text">The <strong>Trade</strong> tab covers execution details like copying SL/TP from the signal, reversing signals, and handling pending orders.</p>
+            <div class="docs-img-container"><img src="assets/docs/trade_tab.png" alt="Trade Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-autosltp" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Auto SL/TP Fallback</h3>
+            <p class="docs-text">If a signal arrives without a Stop Loss or Take Profit, the EA can automatically inject one based on fixed points. It can also skip dangerous signals completely if they lack a Stop Loss.</p>
+            <div class="docs-img-container"><img src="assets/docs/autosltp_tab.png" alt="Auto SL/TP Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-sigtp" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Signal TP (SigTP)</h3>
+            <p class="docs-text">If your provider sends multiple targets (TP1, TP2, TP3), the <strong>SigTP</strong> tab handles them. By enabling <strong>Multi-TP Split</strong>, the EA splits the trade into multiple smaller orders and distributes the lots.</p>
+            <div class="docs-img-container"><img src="assets/docs/sigtp_tab.png" alt="SigTP Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-trail" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Trailing Stop</h3>
+            <p class="docs-text">Lock in profits automatically. Define when the trail starts (in pips) and how closely it follows the price. You can also automatically move the Stop Loss to Break-Even once the trail starts.</p>
+            <div class="docs-img-container"><img src="assets/docs/trail_tab.png" alt="Trailing Stop Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-news" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">News Pause</h3>
+            <p class="docs-text">Connects directly to the economic calendar. It automatically pauses new trades around high or medium impact news events for specific currencies.</p>
+            <div class="docs-img-container"><img src="assets/docs/news_tab.png" alt="News Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-partial" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Partial Close</h3>
+            <p class="docs-text">Close portions of a trade at specific pip milestones instead of relying on fixed TP prices. For example, close 20% of the trade at +10 pips and automatically move the SL to break-even.</p>
+            <div class="docs-img-container"><img src="assets/docs/partial_tab.png" alt="Partial Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-alerts" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Alerts &amp; Broadcast</h3>
+            <p class="docs-text">Controls local popup and sound notifications. You can also enable <strong>Telegram Broadcast</strong> to forward the trades you receive to your own Telegram channel.</p>
+            <div class="docs-img-container"><img src="assets/docs/alerts_tab.png" alt="Alerts Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-prop" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">Prop Firm Protection</h3>
+            <p class="docs-text">Built specifically for funded accounts to enforce strict risk rules.</p>
+            <ul style="color: var(--text); line-height: 1.8; margin-bottom: 20px;">
+              <li><strong>Daily DD Limit (% or $):</strong> Automatically closes all open trades and disarms the copier if floating equity drops below this threshold.</li>
+              <li><strong>Require Stop Loss:</strong> Refuses to execute any signal that does not include a Stop Loss.</li>
+              <li><strong>Max Open Trades:</strong> Restricts the maximum number of simultaneous open positions.</li>
+            </ul>
+            <div class="docs-img-container"><img src="assets/docs/prop_tab.png" alt="Prop Firm Protection Tab" style="max-width: 320px;"></div>
+          </div>
+
+          <div id="tab-system" class="ea-tab-content">
+            <h3 style="color: var(--white); margin-top: 0; font-family: var(--font-head);">System Settings</h3>
+            <p class="docs-text">Configure the core engine. Set your Magic Number, enable extensive Diagnostic and Report Logs, and configure how the EA behaves when MT5 restarts.</p>
+            <div class="docs-img-container"><img src="assets/docs/system_tab.png" alt="System Tab" style="max-width: 320px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const tabBtns = document.querySelectorAll('.ea-tab-btn');
+        const tabContents = document.querySelectorAll('.ea-tab-content');
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            // Remove active from all
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+
+            // Add active to clicked
+            btn.classList.add('active');
+            const targetId = btn.getAttribute('data-tab');
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+              targetContent.classList.add('active');
+            }
+          });
+        });
+      });
+    </script>
 
     <section id="bridge-app" class="docs-section">
       <h1 class="docs-title">Bridge Application Deep Dive</h1>
