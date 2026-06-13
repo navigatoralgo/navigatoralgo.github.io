@@ -306,50 +306,20 @@
 </div>
 
 <main class="docs-layout">
-  <!-- Sidebar -->
-  <aside class="docs-sidebar">
-    <input type="text" class="docs-search" id="searchInput" placeholder="Search guides...">
-        <h4 class="docs-nav-header">GETTING STARTED</h4>
-      <ul class="docs-nav">
-        <li><a href="#quickstart" class="active">Quick Start Setup</a></li>
-        <li style="padding-left: 15px;"><a href="#attachea">Attach EA &amp; WebRequest</a></li>
-        <li style="padding-left: 15px;"><a href="#bridge">Telegram Login</a></li>
-        <li style="padding-left: 15px;"><a href="#groups">Fetch Groups</a></li>
-        <li style="padding-left: 15px;"><a href="#start-bridge">Start the Bridge</a></li>
-        <li style="padding-left: 15px;"><a href="#lots">Set Up Lot Size</a></li>
-        <li style="padding-left: 15px;"><a href="#arm-ea">Arm the EA</a></li>
-      </ul>
-
-      <h4 class="docs-nav-header">EA DEEP DIVE</h4>
-      <ul class="docs-nav">
-        <li><a href="#interactive-ea">Interactive Interface</a></li>
-      </ul>
-
-      <h4 class="docs-nav-header">BRIDGE APP</h4>
-      <ul class="docs-nav">
-        <li><a href="#bridge-app">Bridge Deep Dive</a></li>
-        <li style="padding-left: 15px;"><a href="#bridge-groups">Telegram Groups</a></li>
-        <li style="padding-left: 15px;"><a href="#bridge-prop">Prop Safe</a></li>
-        <li style="padding-left: 15px;"><a href="#bridge-accounts">MT5 Accounts</a></li>
-        <li style="padding-left: 15px;"><a href="#bridge-history">Signal History</a></li>
-      </ul>
-
-      <h4 class="docs-nav-header">TROUBLESHOOTING</h4>
-    <ul class="docs-nav">
-      <li><a href="#error-codes">Common MT5 Errors</a></li>
-      <li><a href="#error-10021">Error 10021 (Disabled)</a></li>
-      <li><a href="#common">Other Common Errors</a></li>
-    </ul>
-  </aside>
-
-  <!-- Main Content -->
-  <article class="docs-content">
+  <!-- Main Content (Full Width) -->
+  <article class="docs-content" style="width: 100%;">
     
-    <div class="top-nav-tabs">
-      <button class="top-tab-btn active" data-view="view-quickstart">Quick Setup</button>
-      <button class="top-tab-btn" data-view="view-deepdive">EA Deep Dive</button>
-      <button class="top-tab-btn" data-view="view-bridge">Bridge Deep Dive</button>
-      <button class="top-tab-btn" data-view="view-errors">Common Errors</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+      <div class="top-nav-tabs" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">
+        <button class="top-tab-btn active" data-view="view-quickstart">Quick Setup</button>
+        <button class="top-tab-btn" data-view="view-deepdive">EA Deep Dive</button>
+        <button class="top-tab-btn" data-view="view-bridge">Bridge Deep Dive</button>
+        <button class="top-tab-btn" data-view="view-errors">Common Errors</button>
+      </div>
+
+      <div class="docs-search" style="margin-bottom: 0;">
+        <input type="text" id="globalSearch" placeholder="Search guides..." style="background: rgba(36,48,64,0.5); border: 1px solid rgba(0,212,200,0.2); border-radius: 8px; padding: 10px 16px; color: var(--white); font-family: var(--font-ui); width: 250px; outline: none;">
+      </div>
     </div>
 
     <div id="view-quickstart" class="main-view active">
@@ -726,20 +696,6 @@
 </main>
 
 <script>
-  // Simple search filtering
-  document.getElementById('searchInput').addEventListener('input', function(e) {
-    const term = e.target.value.toLowerCase();
-    const links = document.querySelectorAll('.docs-nav a');
-    
-    links.forEach(link => {
-      if(link.textContent.toLowerCase().includes(term)) {
-        link.parentElement.style.display = 'block';
-      } else {
-        link.parentElement.style.display = 'none';
-      }
-    });
-  });
-
   // Sticky auth check
   const token = localStorage.getItem('nts_token');
   if (token) {
