@@ -282,7 +282,14 @@
 
       <div class="docs-step" style="margin-top: 48px;">
         <h3 id="bridge">3. Log in to Telegram on Bridge</h3>
-        <p class="docs-text">Open the NTS Bridge app, go to <strong>Signal Sources</strong>, and enter your Phone Number. Click <strong>Add Telegram / Login</strong>. You will be prompted to enter the verification code sent to your Telegram app, followed by your 2FA Cloud Password (if enabled).</p>
+        
+        <div class="docs-alert">
+          <strong>Obtaining your API ID and Hash:</strong> Before logging in, you'll need your own Telegram API credentials. Go to <a href="https://my.telegram.org" target="_blank" style="color: var(--teal);">my.telegram.org</a>, log in, and click on <strong>API development tools</strong>. Create a new application (any name will do) to reveal your <code>API ID</code> and <code>API Hash</code>. Paste these into the Bridge.
+          <br><br>
+          <em>Why do we need this?</em> Using your own API ID/Hash ensures the Bridge connects directly to Telegram servers with strictly <strong>read-only access</strong> to your messages. We do not use any middleman servers, keeping your account perfectly secure.
+        </div>
+
+        <p class="docs-text">Once your API credentials are in place, open the NTS Bridge app, go to <strong>Signal Sources</strong>, and enter your Phone Number. Click <strong>Add Telegram / Login</strong>. You will be prompted to enter the verification code sent to your Telegram app, followed by your 2FA Cloud Password (if enabled).</p>
         
         <div class="docs-img-container">
           <img src="assets/docs/tg_login_1.png" alt="Enter Phone Number in Bridge">
