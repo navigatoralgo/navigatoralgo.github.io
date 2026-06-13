@@ -163,6 +163,40 @@
     margin-bottom: 24px;
   }
 }
+/* Top Level Tabs */
+.top-nav-tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 16px;
+}
+.top-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.top-tab-btn:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--white);
+}
+.top-tab-btn.active {
+  background: var(--teal);
+  color: #000;
+}
+.main-view {
+  display: none;
+  animation: fadeIn 0.3s ease-in-out;
+}
+.main-view.active {
+  display: block;
+}
 /* EA Interactive UI */
 .ea-window {
   background: #11141a;
@@ -311,7 +345,13 @@
   <!-- Main Content -->
   <article class="docs-content">
     
-    <section id="quickstart" class="docs-section">
+    <div class="top-nav-tabs">
+      <button class="top-tab-btn active" data-view="view-quickstart">Quick Setup</button>
+      <button class="top-tab-btn" data-view="view-deepdive">EA Deep Dive</button>
+    </div>
+
+    <div id="view-quickstart" class="main-view active">
+      <section id="quickstart" class="docs-section">
       <h1 class="docs-title">Quick Start Setup Guide</h1>
       <p class="docs-text">Follow this step-by-step guide to get your Trade Copier Ultimate connected and executing your first signal within minutes.</p>
       
@@ -414,8 +454,87 @@
           <div class="docs-img-caption">// Step 7: EA Armed and taking multiple signals</div>
         </div>
       </div>
+      
+      <section id="error-codes" class="docs-section">
+      <h1 class="docs-title">Troubleshooting &amp; Common Errors</h1>
+      <p class="docs-text">If a trade fails to execute, MT5 will usually return an error code in the <strong>Experts</strong> or <strong>Journal</strong> tab. Most of these are broker-level or platform-level restrictions, not bugs in the EA. Here are the most common error codes and how to fix them:</p>
+
+      <div style="overflow-x: auto; margin-top: 32px;">
+        <table style="width: 100%; border-collapse: collapse; color: var(--white); background: rgba(36,48,64,0.3); border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,212,200,0.22);">
+          <thead>
+            <tr style="background: rgba(0,212,200,0.1); border-bottom: 1px solid rgba(0,212,200,0.22); text-align: left;">
+              <th style="padding: 16px; width: 120px;">Error Code</th>
+              <th style="padding: 16px; width: 250px;">Meaning</th>
+              <th style="padding: 16px;">How to Fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(36,48,64,0.72);">
+              <td style="padding: 16px; font-weight: bold; color: var(--gold);">10014</td>
+              <td style="padding: 16px;">Invalid Volume (Lot Size)</td>
+              <td style="padding: 16px;">The lot size sent to the broker is too small, too large, or has an invalid step. Check your <strong>Lots</strong> tab and ensure you aren't trying to send a 0.01 lot trade to a symbol that requires a minimum of 1.0 (like some indices/crypto).</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(36,48,64,0.72);">
+              <td style="padding: 16px; font-weight: bold; color: var(--gold);">10015</td>
+              <td style="padding: 16px;">Invalid Price</td>
+              <td style="padding: 16px;">Usually happens with Pending Orders if the entry price is too close to the current market price, or the market has already moved past the price.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(36,48,64,0.72);">
+              <td style="padding: 16px; font-weight: bold; color: var(--gold);">10016</td>
+              <td style="padding: 16px;">Invalid Stops (SL/TP)</td>
+              <td style="padding: 16px;">The Stop Loss or Take Profit is too close to the entry price (violating the broker's <em>StopLevel</em>). If you're copying signals with very tight stops, your broker might reject them. Check your broker's StopLevel limits.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(36,48,64,0.72);">
+              <td style="padding: 16px; font-weight: bold; color: var(--gold);">10019</td>
+              <td style="padding: 16px;">Not Enough Money</td>
+              <td style="padding: 16px;">You don't have enough free margin to open the trade. Reduce your lot sizing multiplier or deposit more funds.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(36,48,64,0.72);">
+              <td style="padding: 16px; font-weight: bold; color: var(--gold);">10021</td>
+              <td style="padding: 16px;">Trading Disabled</td>
+              <td style="padding: 16px;">The broker does not allow trading on this specific symbol. (See detailed section below on Suffixes).</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(36,48,64,0.72);">
+              <td style="padding: 16px; font-weight: bold; color: var(--gold);">10027</td>
+              <td style="padding: 16px;">AutoTrading Disabled</td>
+              <td style="padding: 16px;">You haven't clicked the <strong>Algo Trading</strong> button at the top of your MT5 terminal, or you haven't enabled "Allow Algo Trading" in the EA's Common settings.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(36,48,64,0.72);">
+              <td style="padding: 16px; font-weight: bold; color: var(--gold);">10031</td>
+              <td style="padding: 16px;">No Connection</td>
+              <td style="padding: 16px;">Your MT5 terminal has lost connection to the broker's server. Check your internet connection or rescan MT5 servers.</td>
+            </tr>
+            <tr>
+              <td style="padding: 16px; font-weight: bold; color: var(--gold);">10033</td>
+              <td style="padding: 16px;">Market Closed</td>
+              <td style="padding: 16px;">You are trying to execute a trade outside of trading hours (e.g. over the weekend or during a daily rollover break).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
+    <section id="error-10021" class="docs-section">
+      <h2 class="docs-subtitle">Error 10021: Disabled Instruments (Deep Dive)</h2>
+      <p class="docs-text">If you see <strong>Error 10021</strong> in your MT5 Experts tab, it means MT5 is rejecting the trade because the broker has disabled trading on that specific symbol suffix.</p>
+      
+      <div class="docs-alert">
+        <strong>Why this happens:</strong> Brokers often have multiple versions of the same symbol (e.g. <code>EURUSD</code>, <code>EURUSD.r</code>, <code>EURUSD.ecn</code>). The standard <code>EURUSD</code> might be visible but read-only, while the <code>.ecn</code> version is the tradable one.
+      </div>
+      
+      <p class="docs-text"><strong>How to fix it:</strong></p>
+      <ol style="color: var(--text); line-height: 1.8; margin-left: 20px; font-size: 16px;">
+        <li>Open your MT5 Market Watch (Ctrl+M).</li>
+        <li>Right-click and select <strong>Symbols</strong> (Ctrl+U).</li>
+        <li>Find the exact suffix your account type uses (e.g. <code>.ecn</code>, <code>.m</code>, <code>m</code>, etc.).</li>
+        <li>Go to the EA's <strong>System</strong> tab.</li>
+        <li>Enter that exact suffix into the <strong>Symbol Suffix</strong> field (e.g., <code>.ecn</code>) and press Enter.</li>
+      </ol>
+    </section>
+    </section>
+    </div>
+
+    <div id="view-deepdive" class="main-view">
     <section id="interactive-ea" class="docs-section">
       <h1 class="docs-title">Interactive EA Interface</h1>
       <p class="docs-text">Click the tabs below to explore the detailed settings and learn exactly how each feature works.</p>
@@ -549,29 +668,6 @@
         </div>
       </div>
     </section>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const tabBtns = document.querySelectorAll('.ea-tab-btn');
-        const tabContents = document.querySelectorAll('.ea-tab-content');
-
-        tabBtns.forEach(btn => {
-          btn.addEventListener('click', () => {
-            // Remove active from all
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-
-            // Add active to clicked
-            btn.classList.add('active');
-            const targetId = btn.getAttribute('data-tab');
-            const targetContent = document.getElementById(targetId);
-            if (targetContent) {
-              targetContent.classList.add('active');
-            }
-          });
-        });
-      });
-    </script>
 
     <section id="bridge-app" class="docs-section">
       <h1 class="docs-title">Bridge Application Deep Dive</h1>
@@ -718,6 +814,43 @@
   if (token) {
     document.getElementById('nav-auth-slot').innerHTML = '<a href="dashboard.html" class="nav-btn-ghost">Dashboard</a>';
   }
+  // Top Level Tabs Logic
+  const topTabBtns = document.querySelectorAll('.top-tab-btn');
+  const mainViews = document.querySelectorAll('.main-view');
+
+  topTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      topTabBtns.forEach(b => b.classList.remove('active'));
+      mainViews.forEach(v => v.classList.remove('active'));
+
+      btn.classList.add('active');
+      const targetId = btn.getAttribute('data-view');
+      const targetContent = document.getElementById(targetId);
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+    });
+  });
+
+  // EA Interactive UI Tabs Logic
+  const tabBtns = document.querySelectorAll('.ea-tab-btn');
+  const tabContents = document.querySelectorAll('.ea-tab-content');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Remove active from all
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+
+      // Add active to clicked
+      btn.classList.add('active');
+      const targetId = btn.getAttribute('data-tab');
+      const targetContent = document.getElementById(targetId);
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+    });
+  });
 </script>
 
 </body>
