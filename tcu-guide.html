@@ -310,15 +310,20 @@
   <!-- Main Content (Full Width) -->
   <article class="docs-content" style="width: 100%;">
     
-    <div class="top-nav-tabs">
-      <button class="top-tab-btn active" data-view="view-quickstart">Quick Setup</button>
-      <button class="top-tab-btn" data-view="view-deepdive">EA Deep Dive</button>
-      <button class="top-tab-btn" data-view="view-bridge">Bridge Deep Dive</button>
-      <button class="top-tab-btn" data-view="view-errors">Common Errors</button>
-    </div>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap;">
+      <div class="top-nav-tabs" style="margin-bottom: 0; padding-bottom: 0; border: none;">
+        <button class="top-tab-btn active" data-view="view-quickstart">Quick Setup</button>
+        <button class="top-tab-btn" data-view="view-deepdive">EA Deep Dive</button>
+        <button class="top-tab-btn" data-view="view-bridge">Bridge Deep Dive</button>
+        <button class="top-tab-btn" data-view="view-errors">Common Errors</button>
+      </div>
 
-    <div style="margin-bottom: 32px;">
-      <input type="text" id="globalSearch" class="docs-search" placeholder="Search guides..." style="width: 300px; margin-bottom: 0; background: rgba(36,48,64,0.3);">
+      <div style="position: relative;">
+        <input type="text" id="globalSearch" class="docs-search" placeholder="Search guides..." style="width: 250px; margin-bottom: 0; background: rgba(36,48,64,0.4); padding: 10px 16px;">
+        <div id="searchResults" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #11141a; border: 1px solid rgba(0,212,200,0.2); border-radius: 8px; margin-top: 8px; z-index: 100; max-height: 400px; overflow-y: auto; box-shadow: 0 16px 40px rgba(0,0,0,0.6);">
+          <!-- Search results will appear here -->
+        </div>
+      </div>
     </div>
 
     <div id="view-quickstart" class="main-view active">
@@ -739,6 +744,115 @@
       }
     });
   });
+  // Global Search Engine
+  const searchIndex = [
+    { title: "Quick Start Setup", keywords: "quick start setup guide video", view: "view-quickstart" },
+    { title: "Attach EA & WebRequest", keywords: "attach ea webrequest dll install url", view: "view-quickstart", scrollId: "attach-ea" },
+    { title: "Telegram Login", keywords: "telegram login phone number code connect", view: "view-quickstart", scrollId: "telegram-login" },
+    { title: "Fetch Groups", keywords: "fetch groups telegram channels sync", view: "view-quickstart", scrollId: "fetch-groups" },
+    { title: "Start the Bridge", keywords: "start bridge routing connected", view: "view-quickstart", scrollId: "start-bridge" },
+    { title: "Set Up Lot Size", keywords: "lot size multiplier risk balance", view: "view-quickstart", scrollId: "setup-lots" },
+    { title: "Arm the EA", taking: "arm ea armed disarmed receive signals", view: "view-quickstart", scrollId: "arm-ea" },
+    { title: "Home Dashboard", keywords: "home dashboard live status connection", view: "view-deepdive", tab: "tab-home" },
+    { title: "Source Settings", keywords: "source telegram channel format parsing string mapping", view: "view-deepdive", tab: "tab-source" },
+    { title: "Copier Settings", keywords: "copier magic number copy trade execution slippage", view: "view-deepdive", tab: "tab-copier" },
+    { title: "Lots & Risk Sizing", keywords: "lots risk sizing fixed multiplier percentage balance equity", view: "view-deepdive", tab: "tab-lots" },
+    { title: "Filters & Safety", keywords: "filter safety spread max symbol blacklist whitelist", view: "view-deepdive", tab: "tab-filter" },
+    { title: "Trade Management", keywords: "trade management close delete modify signal", view: "view-deepdive", tab: "tab-trade" },
+    { title: "Auto SL/TP", keywords: "auto sl tp stop loss take profit pips points", view: "view-deepdive", tab: "tab-autosltp" },
+    { title: "Signal TP (SigTP)", keywords: "sigtp signal tp take profit target level", view: "view-deepdive", tab: "tab-sigtp" },
+    { title: "Trailing Stop", keywords: "trail trailing stop step trigger secure breakeven", view: "view-deepdive", tab: "tab-trail" },
+    { title: "News Pause", keywords: "news pause calendar economic events high impact", view: "view-deepdive", tab: "tab-news" },
+    { title: "Partial Close", keywords: "partial close percentage lots target", view: "view-deepdive", tab: "tab-partial" },
+    { title: "Alerts & Broadcast", keywords: "alerts broadcast push notification sound email telegram channel forward", view: "view-deepdive", tab: "tab-alerts" },
+    { title: "Prop Firm Mode", keywords: "prop firm mode delay random slippage pass challenge", view: "view-deepdive", tab: "tab-prop" },
+    { title: "System Settings", keywords: "system settings global prefix suffix log report restart mode", view: "view-deepdive", tab: "tab-system" },
+    { title: "Bridge Telegram Groups", keywords: "bridge telegram groups per account route", view: "view-bridge", scrollId: "bridge-groups" },
+    { title: "Bridge Prop Safe", keywords: "bridge prop safe random delay sl tp", view: "view-bridge", scrollId: "bridge-prop" },
+    { title: "Bridge MT5 Accounts", keywords: "bridge mt5 accounts drawdown equity stop limit auto", view: "view-bridge", scrollId: "bridge-accounts" },
+    { title: "Bridge Signal History", keywords: "bridge signal history log incoming outgoing parsed", view: "view-bridge", scrollId: "bridge-history" },
+    { title: "Error 10014 (Invalid Volume)", keywords: "error 10014 invalid volume lot size step minimum", view: "view-errors", scrollId: "error-codes" },
+    { title: "Error 10015 (Invalid Price)", keywords: "error 10015 invalid price pending order close", view: "view-errors", scrollId: "error-codes" },
+    { title: "Error 10016 (Invalid Stops)", keywords: "error 10016 invalid stops sl tp stoplevel distance", view: "view-errors", scrollId: "error-codes" },
+    { title: "Error 10019 (Not Enough Money)", margin: "error 10019 not enough money margin free balance", view: "view-errors", scrollId: "error-codes" },
+    { title: "Error 10021 (Trading Disabled)", keywords: "error 10021 trading disabled symbol suffix read only ecn", view: "view-errors", scrollId: "error-10021" },
+    { title: "Error 10027 (AutoTrading Disabled)", keywords: "error 10027 autotrading disabled algo trading allowed", view: "view-errors", scrollId: "error-codes" },
+    { title: "Error 10031 (No Connection)", keywords: "error 10031 no connection terminal internet server", view: "view-errors", scrollId: "error-codes" },
+    { title: "Error 10033 (Market Closed)", keywords: "error 10033 market closed weekend break rollover", view: "view-errors", scrollId: "error-codes" }
+  ];
+
+  const searchInput = document.getElementById('globalSearch');
+  const searchResults = document.getElementById('searchResults');
+
+  searchInput.addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase().trim();
+    if (!term) {
+      searchResults.style.display = 'none';
+      return;
+    }
+
+    const matches = searchIndex.filter(item => 
+      item.title.toLowerCase().includes(term) || 
+      (item.keywords && item.keywords.toLowerCase().includes(term)) ||
+      (item.margin && item.margin.toLowerCase().includes(term)) ||
+      (item.taking && item.taking.toLowerCase().includes(term))
+    );
+
+    if (matches.length > 0) {
+      searchResults.innerHTML = matches.map((item, index) => `
+        <div class="search-result-item" data-index="${index}" style="padding: 12px 16px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--white); font-family: var(--font-ui); transition: background 0.2s;">
+          <div style="font-weight: 600;">${item.title}</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">Found in ${item.view.replace('view-', '').replace('-', ' ').toUpperCase()}</div>
+        </div>
+      `).join('');
+      searchResults.style.display = 'block';
+
+      // Attach click events
+      document.querySelectorAll('.search-result-item').forEach(el => {
+        el.addEventListener('mouseover', () => el.style.background = 'rgba(0,212,200,0.1)');
+        el.addEventListener('mouseout', () => el.style.background = 'transparent');
+        el.addEventListener('click', () => {
+          const item = matches[el.getAttribute('data-index')];
+          
+          // Switch main view
+          document.querySelector(`.top-tab-btn[data-view="${item.view}"]`).click();
+
+          // Switch EA tab if applicable
+          if (item.tab) {
+            setTimeout(() => {
+              const eaBtn = document.querySelector(`.ea-tab-btn[data-tab="${item.tab}"]`);
+              if (eaBtn) eaBtn.click();
+              // Scroll to EA window
+              document.querySelector('.ea-window').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+          }
+          
+          // Scroll to specific section if applicable
+          if (item.scrollId) {
+            setTimeout(() => {
+              const el = document.getElementById(item.scrollId);
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+          }
+
+          // Close dropdown
+          searchResults.style.display = 'none';
+          searchInput.value = '';
+        });
+      });
+    } else {
+      searchResults.innerHTML = `<div style="padding: 12px 16px; color: var(--muted); font-size: 13px;">No results found for "${term}"</div>`;
+      searchResults.style.display = 'block';
+    }
+  });
+
+  // Close dropdown on click outside
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.style.display = 'none';
+    }
+  });
+
 </script>
 
 </body>
