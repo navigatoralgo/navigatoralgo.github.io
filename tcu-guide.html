@@ -899,6 +899,10 @@ https://api.telegram.org</pre>
             <img src="assets/docs/Screenshot 2026-06-12 123611.png" alt="EA armed and receiving signals">
             <div class="docs-img-caption">When ARMED, the EA can execute accepted Bridge signals.</div>
           </div>
+          <div class="docs-img-container">
+            <img src="assets/docs/tcu-guide/ea-disarmed-state.png" alt="EA disarmed state">
+            <div class="docs-img-caption">DISARMED is not an error state. It is a safe mode that logs signals but blocks live execution.</div>
+          </div>
         </div>
       </section>
     </div>
@@ -1046,6 +1050,10 @@ https://api.telegram.org</pre>
           <li>Check Bridge Signal History first, then MT5 Experts if the trade does not open.</li>
           <li>Only add more groups, risk features, or format profiles after the simple path works.</li>
         </ol>
+        <div class="docs-img-container">
+          <img src="assets/docs/tcu-guide/ea-bridge-connected-alert.png" alt="EA connected to Bridge alert">
+          <div class="docs-img-caption">A good first test shows Bridge online on the EA panel and a connected alert from MT5.</div>
+        </div>
       </section>
     </div>
 
@@ -1080,16 +1088,19 @@ https://api.telegram.org</pre>
       <section id="bridge-groups" class="docs-section">
         <h2 class="section-title">Telegram Groups and Per-Account Routing</h2>
         <p class="docs-text">After fetching groups, select the source groups that contain signals. When multiple MT5 accounts are connected, assign each group to the correct account. If no account appears, confirm the EA is running, Bridge mode is on, and the port matches.</p>
-        <div class="docs-img-container">
-          <img src="assets/docs/bridge_groups.png" alt="Bridge Telegram Groups">
+        <div class="docs-img-row">
+          <img src="assets/docs/tcu-guide/telegram-group-one-account.png" alt="Telegram group assigned to one MT5 account">
+          <img src="assets/docs/tcu-guide/telegram-group-two-accounts.png" alt="Telegram group assigned to two MT5 accounts">
         </div>
+        <div class="docs-img-caption">The selected group badges show which MT5 accounts will receive that group's signals.</div>
       </section>
 
       <section id="bridge-accounts" class="docs-section">
         <h2 class="section-title">MT5 Accounts, Heartbeats, and Drawdown Stop</h2>
         <p class="docs-text">The Accounts page shows connected MT5 terminals, broker, account number, online state, detected suffix, and per-account protection settings. Bridge v7.24 keeps recently seen accounts visible for 24 hours so routing does not disappear after a short idle period.</p>
         <div class="docs-img-container">
-          <img src="assets/docs/bridge_accounts.png" alt="Bridge MT5 Accounts">
+          <img src="assets/docs/tcu-guide/bridge-mt5-accounts-routing.png" alt="Bridge MT5 accounts routing and drawdown controls">
+          <div class="docs-img-caption">Each connected MT5 account can have its own assigned groups and daily drawdown action.</div>
         </div>
       </section>
 
@@ -1098,6 +1109,10 @@ https://api.telegram.org</pre>
         <p class="docs-text">Different brokers name the same symbol differently: <code>XAUUSD</code>, <code>XAUUSDm</code>, <code>XAUUSD+</code>, <code>EURUSD.r</code>. Bridge detects suffixes from the EA's Market Watch list and applies the account's suffix automatically when routing.</p>
         <div class="docs-note">
           If a broker has both a naked symbol and a suffixed symbol, the EA now prioritizes configured or auto-detected suffixes before falling back to direct symbol matching. This matters for brokers where the naked symbol is visible but not tradable.
+        </div>
+        <div class="docs-img-row">
+          <img src="assets/docs/tcu-guide/market-watch-suffixes.png" alt="MT5 Market Watch showing suffixed symbols">
+          <img src="assets/docs/tcu-guide/bridge-symbol-aliases.png" alt="Bridge symbol aliases">
         </div>
         <h3 class="section-subtitle">When to Use Aliases</h3>
         <p class="docs-text">Use aliases when the provider uses a different base symbol, not just a suffix. Examples: <code>GOLD -> XAUUSD</code>, <code>US30 -> DJ30</code>, <code>OIL -> USOIL</code>. Use suffix settings when the broker adds text to the end of normal symbols.</p>
@@ -1108,6 +1123,10 @@ https://api.telegram.org</pre>
         <p class="docs-text">Bridge parses standard BUY/SELL, SL, TP, pending order, breakeven, close, and modification messages. For unusual providers, use <strong>Signal Formats</strong> and <strong>Format Lab Preset</strong> to rewrite only that provider's format before parsing.</p>
         <div class="docs-alert">
           <strong>Important:</strong> Weird formats should be added as profiles. They are not globally parsed for every channel. This prevents one provider's strange style from breaking another provider's clean signals.
+        </div>
+        <div class="docs-img-container">
+          <img src="assets/docs/tcu-guide/format-lab-main.png" alt="Bridge Signal Formats page">
+          <div class="docs-img-caption">Use Signal Formats to create profiles and test the exact Telegram text before waiting for the next live signal.</div>
         </div>
 
         <h3 class="section-subtitle">Formats That Usually Work Without a Profile</h3>
@@ -1162,6 +1181,11 @@ TP3 2385</pre>
           <li>Assign the profile to the source channel or account that uses this format. Avoid making it global unless every provider uses the same style.</li>
           <li>Save the profile, then send or wait for a new signal. Old messages already processed by duplicate filtering may not fire again.</li>
         </ol>
+        <div class="docs-img-row">
+          <img src="assets/docs/tcu-guide/format-profile-rules.png" alt="Format profile rewrite rules">
+          <img src="assets/docs/tcu-guide/format-test-parsed.png" alt="Format Lab test parsed successfully">
+        </div>
+        <div class="docs-img-caption">A good profile shows the rewrite rules, then the test output confirms the final direction, symbol, entry, SL, and TP fields.</div>
 
         <h3 class="section-subtitle">Useful Rewrite Examples</h3>
         <div class="docs-grid two">
@@ -1240,6 +1264,10 @@ Take Profit 2325</pre>
       <section id="bridge-duplicates" class="docs-section">
         <h2 class="section-title">Duplicate Filter</h2>
         <p class="docs-text">Duplicate filtering blocks repeated messages so the same signal does not open twice when it is forwarded through multiple channels or edited by the provider. Turn it off only for controlled testing. In Bridge v7.24, the duplicate filter toggle applies live without restarting Bridge.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/tcu-guide/bridge-log-duplicate-skipped.png" alt="Bridge duplicate skipped log">
+          <div class="docs-img-caption">When duplicate protection blocks a repeated signal, the live feed explains that it was skipped instead of silently doing nothing.</div>
+        </div>
       </section>
 
       <section id="bridge-history" class="docs-section">
@@ -1248,13 +1276,25 @@ Take Profit 2325</pre>
         <div class="docs-img-container">
           <img src="assets/docs/bridge_history.png" alt="Bridge Signal History">
         </div>
+        <div class="docs-img-container">
+          <img src="assets/docs/tcu-guide/bridge-log-trade-opened.png" alt="Bridge live feed showing routed and opened trade">
+          <div class="docs-img-caption">The live feed should show the path from received signal to routed account, symbol resolution, EA open, and stored ticket.</div>
+        </div>
       </section>
 
       <section id="bridge-updates" class="docs-section">
         <h2 class="section-title">Updates and Telegram Session Reset</h2>
         <p class="docs-text">Bridge checks for updates and stages them safely. When an update is ready, click restart from the Bridge UI and let the updater finish. Do not close the updater window early.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/tcu-guide/bridge-update-status.png" alt="Bridge update status">
+          <div class="docs-img-caption">The Settings page shows the current Bridge version and update status.</div>
+        </div>
         <div class="docs-alert">
           <strong>Bridge v7.24 Telegram fix:</strong> If Telegram login shows a session/schema error such as <code>too many values to unpack</code>, open <strong>Signal Sources -> Telegram MTProto</strong>, click <strong>Reset</strong>, then log in again. Newer Bridge builds reset incompatible session files more gracefully.
+        </div>
+        <div class="docs-img-container">
+          <img src="assets/docs/tcu-guide/telegram-session-reset.png" alt="Telegram MTProto reset button in Bridge">
+          <div class="docs-img-caption">Use Reset only when Telegram login/session data is broken, then authenticate again before fetching groups.</div>
         </div>
       </section>
     </div>
@@ -1273,6 +1313,11 @@ Take Profit 2325</pre>
           <div class="check-item"><span class="check-mark">7</span><div><h4>Did Broker Reject It?</h4><p>Open MT5 Experts and Journal. Broker errors like 10014, 10016, 10021, and 10027 tell you exactly what failed.</p></div></div>
           <div class="check-item"><span class="check-mark">8</span><div><h4>Is Symbol Tradable?</h4><p>Confirm Market Watch has the exact tradable broker symbol and suffix.</p></div></div>
         </div>
+        <div class="docs-img-row">
+          <img src="assets/docs/tcu-guide/ea-disarmed-state.png" alt="EA disarmed troubleshooting state">
+          <img src="assets/docs/tcu-guide/mt5-sl-sanity-rejection.png" alt="MT5 Experts SL sanity rejection">
+        </div>
+        <div class="docs-img-caption">Two common non-bug states: the EA is intentionally disarmed, or MT5/EA risk checks rejected an unsafe SL/TP setup.</div>
       </section>
 
       <section id="telegram-troubleshooting" class="docs-section">
@@ -1300,6 +1345,10 @@ Take Profit 2325</pre>
       <section id="symbol-troubleshooting" class="docs-section">
         <h2 class="section-title">Symbol, Suffix, and Error 10021</h2>
         <p class="docs-text">If Signal History shows the signal but MT5 rejects it, symbol mapping is a common cause. Open Market Watch and identify the exact tradable symbol. If the provider says <code>GOLD</code> but your broker trades <code>XAUUSD+</code>, use alias <code>GOLD -> XAUUSD</code> and suffix <code>+</code>.</p>
+        <div class="docs-img-row">
+          <img src="assets/docs/tcu-guide/market-watch-suffixes.png" alt="MT5 Market Watch suffix check">
+          <img src="assets/docs/tcu-guide/bridge-symbol-aliases.png" alt="Bridge aliases for provider symbols">
+        </div>
         <ol class="docs-list">
           <li>Open MT5 Market Watch with <strong>Ctrl+M</strong>.</li>
           <li>Right-click and choose <strong>Symbols</strong> or press <strong>Ctrl+U</strong>.</li>
@@ -1329,11 +1378,19 @@ Take Profit 2325</pre>
             </tbody>
           </table>
         </div>
+        <div class="docs-img-container">
+          <img src="assets/docs/tcu-guide/mt5-sl-sanity-rejection.png" alt="MT5 Experts rejected signal because SL was invalid">
+          <div class="docs-img-caption">Experts/Journal details usually explain whether the EA, broker, symbol, lot size, or stop distance blocked execution.</div>
+        </div>
       </section>
 
       <section id="format-troubleshooting" class="docs-section">
         <h2 class="section-title">Signal Format Problems</h2>
         <p class="docs-text">If Bridge receives a message but cannot identify direction, symbol, SL, or TP, the provider format may need a profile. Build a Format Lab preset for that channel instead of forcing global parser behavior.</p>
+        <div class="docs-img-container">
+          <img src="assets/docs/tcu-guide/format-test-unparsed.png" alt="Format Lab test passed filter but parser returned no result">
+          <div class="docs-img-caption">If the filter passes but the parser returns no recognized signal pattern, add or adjust a Format Profile.</div>
+        </div>
         <div class="docs-grid two">
           <div class="docs-card">
             <h3>Symptoms</h3>
@@ -1422,11 +1479,15 @@ Take Profit 2325</pre>
             </ul>
           </div>
         </div>
+        <div class="docs-img-container">
+          <img src="assets/docs/tcu-guide/bridge-logs-and-about.png" alt="Bridge settings, logs, and about section">
+          <div class="docs-img-caption">Open Log Folder from Bridge Settings and include the Bridge version when contacting support.</div>
+        </div>
       </section>
 
       <section id="support-message-template" class="docs-section">
         <h2 class="section-title">Support Message Template</h2>
-        <p class="docs-text">Copy this structure when opening a support case. It keeps the conversation from turning into twenty screenshots and a mystery novel. Tiny mercy for everyone involved.</p>
+        <p class="docs-text">Copy this structure when opening a support case. It gives support the full path from source message to broker response.</p>
         <pre class="code-block">Bridge version:
 EA version:
 Broker + account type:

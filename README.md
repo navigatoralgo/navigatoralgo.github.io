@@ -1,7 +1,10 @@
 # navigatoralgo.com
 
 Static marketing + provider dashboard for Navigator Algo MT5 tools.
-Deployed on Cloudflare Pages (was GitHub Pages until the Signal Copier launch).
+Deployed on Cloudflare Workers using Wrangler Assets.
+
+Important: this site does not auto-deploy from GitHub. Read
+[`DEPLOYMENT_HANDOFF.md`](DEPLOYMENT_HANDOFF.md) before deploying.
 
 ## Pages
 
@@ -62,35 +65,13 @@ For sign-in to work locally, add `localhost` to Firebase's authorized
 domains list. Magic-link redirects come back to the origin they were
 sent from, so local dev just works.
 
-## Deploying to Cloudflare Pages
+## Deployment
 
-1. [dash.cloudflare.com](https://dash.cloudflare.com) → Workers & Pages → Create → Pages → Connect to Git.
-2. Authorise the `navigatoralgo` GitHub organisation, pick this repo.
-3. Build settings:
-   - **Framework preset**: None
-   - **Build command**: *(leave empty)*
-   - **Build output directory**: `/`
-   - **Root directory**: *(leave empty)*
-4. Click Deploy. First deploy takes ~30 seconds.
-5. You get a URL like `navigatoralgo.pages.dev`. Open it — it should match the live site.
-6. In the Pages project → Custom domains → add `navigatoralgo.com` and `www.navigatoralgo.com`.
-   Cloudflare adds the DNS records automatically (only works if the domain's
-   nameservers point to Cloudflare — see next step).
+The live site is served by Cloudflare Worker `navigatoralgomain`, not GitHub
+Pages or Cloudflare Pages. A `git push` does not update production.
 
-## Migrating DNS from GitHub Pages to Cloudflare
-
-1. Cloudflare dashboard → Add a site → `navigatoralgo.com` → Free plan.
-2. Cloudflare imports existing DNS records. Verify the GitHub Pages A records
-   (`185.199.108.153` etc) are present. They stay while we migrate, no downtime.
-3. Cloudflare shows 2 nameservers like `abby.ns.cloudflare.com` / `kai.ns.cloudflare.com`.
-   Change the nameservers at your domain registrar to those 2.
-4. Wait ~5 min — a few hours for full propagation. The GitHub Pages site keeps
-   serving until Cloudflare takes over.
-5. Once propagated, attach the Pages project's custom domain (step 6 above).
-6. After 24h of verifying Cloudflare is serving correctly, disable GitHub Pages:
-   GitHub repo → Settings → Pages → Source: None.
-
-## Auto-deploy
-
-Every `git push` to `main` triggers a new Cloudflare Pages deploy.
-PRs get preview deploys at a per-PR URL — linked in the PR checks.
+Deploy manually with Wrangler from the Cloudflare account that owns the Worker
+and the `navigatoralgo.com` route. See
+[`DEPLOYMENT_HANDOFF.md`](DEPLOYMENT_HANDOFF.md) for the exact architecture,
+the `.git` asset-size bug, the current manual workaround, and the recommended
+permanent fix.
