@@ -527,7 +527,7 @@ footer {
 /* ── PAGE HERO (slim, for sub-pages) ── */
 .page-hero {
   position: relative; z-index: 1;
-  padding: 178px 48px 60px;
+  padding: 136px 48px 60px;
   text-align: center;
   max-width: 860px; margin: 0 auto;
 }
@@ -633,7 +633,7 @@ footer {
   .footer-brand-logo { width: min(100%, 280px); }
   .footer-bottom { padding: 18px; flex-direction: column; gap: 10px; text-align: center; }
   .cta-strip { padding: 56px 18px; }
-  .page-hero { padding: 124px 18px 36px; }
+  .page-hero { padding: 96px 18px 36px; }
 }
 @media (max-width: 480px) {
   .nav-logo-mark { width: min(100%, 150px); max-width: 150px; }
