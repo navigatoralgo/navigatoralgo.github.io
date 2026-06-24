@@ -454,27 +454,6 @@ body {
   color: var(--white);
   font-weight: 800;
 }
-.screenshot-placeholder {
-  border: 1px dashed rgba(240,165,0,0.58);
-  border-radius: 8px;
-  padding: 20px;
-  margin: 18px 0;
-  background:
-    linear-gradient(135deg, rgba(240,165,0,0.08), transparent 34%),
-    rgba(10,14,20,0.78);
-}
-.screenshot-placeholder strong {
-  display: block;
-  color: var(--gold);
-  font-family: var(--font-head);
-  font-size: 16px;
-  margin-bottom: 6px;
-}
-.screenshot-placeholder p {
-  color: #c9d7e4;
-  line-height: 1.65;
-  margin: 0;
-}
 .docs-list {
   color: #d3dfeb;
   line-height: 1.8;
@@ -949,7 +928,7 @@ code {
     <div id="view-quickstart" class="main-view active">
       <section id="quickstart" class="docs-section">
         <h2 class="section-title">Quick Start Setup</h2>
-        <p class="docs-text">This is the shortest reliable path for a new customer. Do the steps in order; most support issues come from skipping WebRequest, leaving the EA disarmed, or selecting Telegram groups before the MT5 account appears in Bridge.</p>
+        <p class="docs-text">This is the shortest reliable path for a new setup. Do the steps in order; most setup issues come from skipping WebRequest, leaving the EA disarmed, or selecting Telegram groups before the MT5 account appears in Bridge.</p>
 
         <div class="docs-grid">
           <div class="docs-card">
@@ -975,11 +954,11 @@ code {
 
       <section id="choose-mode" class="docs-section">
         <h2 class="section-title">Choose the Right Setup Path</h2>
-        <p class="docs-text">Beginners should start with Bridge Mode unless support gives a different instruction. Bridge Mode is the full workflow for private Telegram groups, multi-account routing, Format Lab, Bridge Prop Safe, and support diagnostics.</p>
+        <p class="docs-text">Beginners should start with Bridge Mode unless you intentionally use another source path. Bridge Mode is the full workflow for private Telegram groups, multi-account routing, Format Lab, Bridge Prop Safe, and diagnostics.</p>
         <div style="overflow-x:auto">
           <table class="reference-table">
             <thead>
-              <tr><th>Path</th><th>Use it when</th><th>Beginner setting</th><th>Support note</th></tr>
+              <tr><th>Path</th><th>Use it when</th><th>Beginner setting</th><th>Important note</th></tr>
             </thead>
             <tbody>
               <tr><td>Bridge Mode</td><td>You copy Telegram groups/channels, private sources, multiple MT5 accounts, or prop accounts.</td><td>Recommended</td><td>Needs Bridge app running, EA Bridge enabled, and <code>http://127.0.0.1</code> in WebRequest.</td></tr>
@@ -989,7 +968,7 @@ code {
           </table>
         </div>
         <div class="docs-note">
-          <strong>Out of scope for this page:</strong> the separate NTS Local Copier product. This support guide is for Trade Copier Ultimate using NTS Super Bridge.
+          <strong>Out of scope for this page:</strong> the separate NTS Local Copier product. This guide is for Trade Copier Ultimate using NTS Super Bridge.
         </div>
       </section>
 
@@ -1029,7 +1008,7 @@ https://api.telegram.org</pre>
       <section id="enable-bridge-mode" class="docs-section">
         <div class="docs-step">
           <h3>3. Enable Bridge Mode in the EA</h3>
-          <p class="docs-text">Open the EA <strong>Source</strong> tab. Turn <strong>Enable Bridge</strong> on and keep the port at <code>5555</code> unless support tells you otherwise. The Bridge and EA must use the same port.</p>
+          <p class="docs-text">Open the EA <strong>Source</strong> tab. Turn <strong>Enable Bridge</strong> on and keep the port at <code>5555</code> unless you changed the port on both Bridge and EA. The Bridge and EA must use the same port.</p>
           <div class="docs-img-container">
             <img src="assets/docs/Screenshot 2026-06-12 122043.png" alt="EA Source tab Bridge mode" style="max-width: 420px;">
           </div>
@@ -1132,7 +1111,7 @@ https://api.telegram.org</pre>
 
       <section id="interactive-ea" class="docs-section">
         <h2 class="section-title">Interactive EA Tabs</h2>
-        <p class="docs-text">Click a tab to understand the important settings and the support checks attached to each area.</p>
+        <p class="docs-text">Click a tab to understand the important settings, beginner defaults, and common reasons a signal may be blocked.</p>
 
         <div class="ea-window">
           <div class="ea-header">
@@ -1169,7 +1148,7 @@ https://api.telegram.org</pre>
                   <p class="ea-lede">This is the first screen to check before touching any advanced setting. It tells you whether the EA is armed, which source mode is active, and whether the last signal was accepted or blocked.</p>
                   <div class="ea-explain-grid">
                     <div class="ea-explain-card"><h4>Beginner default</h4><p>Use Bridge mode, keep the EA DISARMED while testing messages, then switch to ARMED only when routing, lots, and broker symbol are confirmed.</p></div>
-                    <div class="ea-explain-card"><h4>What support checks</h4><p>Screenshot the full Home tab when a trade does not open. The armed state, source state, symbol, spread, and last status usually reveal the first problem.</p></div>
+                    <div class="ea-explain-card"><h4>What to check</h4><p>Screenshot the full Home tab when a trade does not open. The armed state, source state, symbol, spread, and last status usually reveal the first problem.</p></div>
                   </div>
                   <ul class="ea-support-list">
                     <li><strong>DISARMED</strong> means the EA can receive signals but will intentionally block execution.</li>
@@ -1187,7 +1166,7 @@ https://api.telegram.org</pre>
               <div class="ea-tab-layout">
                 <div class="ea-tab-copy">
                   <h3 class="section-subtitle" style="margin-top:0">Source</h3>
-                  <p class="ea-lede">Source decides where the EA listens for signals. For this support guide, Bridge mode is the main path because it covers Telegram private groups, Discord/webhook routing, and multi-account Bridge control.</p>
+                  <p class="ea-lede">Source decides where the EA listens for signals. For this guide, Bridge mode is the main path because it covers Telegram private groups, Discord/webhook routing, and multi-account Bridge control.</p>
                   <div class="ea-explain-grid">
                     <div class="ea-explain-card"><h4>Bridge setup</h4><p>Enable Bridge, use the same local port shown in Bridge, and add <code>http://127.0.0.1</code> to MT5 WebRequest allowed URLs.</p></div>
                     <div class="ea-explain-card"><h4>Direct bot mode</h4><p>Only use Bot API mode if the Telegram bot is actually inside a bot-readable group. Private channels normally need Bridge instead.</p></div>
@@ -1214,10 +1193,9 @@ https://api.telegram.org</pre>
                     <div class="ea-explain-card"><h4>Advanced use</h4><p>MASTER/SLAVE mode is separate from Bridge routing. Mixing both can duplicate entries if you do not design the flow carefully.</p></div>
                   </div>
                   <ul class="ea-support-list">
-                    <li>If a customer says trades doubled, check whether Bridge and local copier mode are both active.</li>
+                    <li>If trades open twice, check whether Bridge and local copier mode are both active.</li>
                     <li>For the TCU Bridge guide, troubleshoot Bridge first; save the full local copier guide for a separate page.</li>
                   </ul>
-                  <div class="ea-wide-note">Recommendation: keep this tab visible in the guide, but explain that it is not needed for the normal Bridge workflow. That prevents beginners from enabling it by accident.</div>
                 </div>
                 <figure class="ea-shot-panel">
                   <img src="assets/tcu/tcu-tab-copier.png" alt="EA Copier tab">
@@ -1259,7 +1237,7 @@ https://api.telegram.org</pre>
                   <p class="ea-lede">Filters are the safety gate between a received signal and a real order. They can block bad spreads, repeated signals, wrong symbols, bad keywords, and entries that arrive too fast.</p>
                   <div class="ea-explain-grid">
                     <div class="ea-explain-card"><h4>Beginner default</h4><p>Keep strict filters simple at first: spread limit, duplicate filter, and symbol mapping. Add keywords and cooldown after basic copying works.</p></div>
-                    <div class="ea-explain-card"><h4>Support clue</h4><p>If Bridge received the message but MT5 did not trade, this tab is one of the first places to inspect.</p></div>
+                    <div class="ea-explain-card"><h4>Blocked signal clue</h4><p>If Bridge received the message but MT5 did not trade, this tab is one of the first places to inspect.</p></div>
                   </div>
                   <ul class="ea-support-list">
                     <li>Spread filter blocks entries when broker spread is above your max value.</li>
@@ -1370,7 +1348,7 @@ https://api.telegram.org</pre>
                   <p class="ea-lede">News Pause blocks new entries near selected economic events. This protects accounts from sudden spread spikes and fast broker price movement.</p>
                   <div class="ea-explain-grid">
                     <div class="ea-explain-card"><h4>Beginner default</h4><p>Keep high-impact protection enabled if you trade forex or gold and do not want entries during major releases.</p></div>
-                    <div class="ea-explain-card"><h4>Support clue</h4><p>If a valid signal skipped only during a time window, check News before assuming the parser failed.</p></div>
+                    <div class="ea-explain-card"><h4>Blocked signal clue</h4><p>If a valid signal skipped only during a time window, check News before assuming the parser failed.</p></div>
                   </div>
                   <ul class="ea-support-list">
                     <li>Match news currencies to traded symbols, for example USD news affects XAUUSD and major USD pairs.</li>
@@ -1430,7 +1408,7 @@ https://api.telegram.org</pre>
                   <p class="ea-lede">Prop Firm Protection adds hard rules for accounts that must respect daily drawdown, maximum open positions, required SL, and other challenge limits.</p>
                   <div class="ea-explain-grid">
                     <div class="ea-explain-card"><h4>Beginner default</h4><p>Only enable prop rules after you understand what each rule blocks. A safe rejection is still a rejection.</p></div>
-                    <div class="ea-explain-card"><h4>Support clue</h4><p>If missing-SL signals do not open while Prop mode is active, the EA is likely doing exactly what it was told to do.</p></div>
+                    <div class="ea-explain-card"><h4>Blocked signal clue</h4><p>If missing-SL signals do not open while Prop mode is active, the EA is likely doing exactly what it was told to do.</p></div>
                   </div>
                   <ul class="ea-support-list">
                     <li>Use Require SL for prop firms that invalidate trades without stops.</li>
@@ -1454,9 +1432,9 @@ https://api.telegram.org</pre>
               <div class="ea-tab-layout">
                 <div class="ea-tab-copy">
                   <h3 class="section-subtitle" style="margin-top:0">System</h3>
-                  <p class="ea-lede">System contains identity, diagnostics, and maintenance settings. This is where support looks when orders open with the wrong magic number, logs are missing, or broker symbol mapping needs confirmation.</p>
+                  <p class="ea-lede">System contains identity, diagnostics, and maintenance settings. Check this tab when orders open with the wrong magic number, logs are missing, or broker symbol mapping needs confirmation.</p>
                   <div class="ea-explain-grid">
-                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Do not change magic number or diagnostic settings unless the guide or support asks. Defaults are enough for most single-EA setups.</p></div>
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Do not change magic number or diagnostic settings unless you are following a specific troubleshooting step. Defaults are enough for most single-EA setups.</p></div>
                     <div class="ea-explain-card"><h4>Troubleshooting</h4><p>Enable extra diagnostics only while reproducing an issue, then turn them back down so logs stay readable.</p></div>
                   </div>
                   <ul class="ea-support-list">
@@ -1477,11 +1455,11 @@ https://api.telegram.org</pre>
 
       <section id="ea-settings-reference" class="docs-section">
         <h2 class="section-title">EA Settings Reference</h2>
-        <p class="docs-text">These are the settings support checks most often. Beginners should keep the setup simple first, then enable advanced protections one by one after the basic Bridge path works.</p>
+        <p class="docs-text">These are the settings that most often explain why a signal copied, skipped, or opened with a different size. Beginners should keep the setup simple first, then enable advanced protections one by one after the basic Bridge path works.</p>
         <div style="overflow-x:auto">
           <table class="reference-table">
             <thead>
-              <tr><th>Area</th><th>Main settings</th><th>What they control</th><th>Common support check</th></tr>
+              <tr><th>Area</th><th>Main settings</th><th>What they control</th><th>Common check</th></tr>
             </thead>
             <tbody>
               <tr><td>Source</td><td>Enable Bridge, Bridge Port, Bridge Poll</td><td>Connects the EA to local Bridge on port <code>5555</code>.</td><td>If the account is missing in Bridge, check Bridge Mode, port match, and WebRequest.</td></tr>
@@ -1491,7 +1469,7 @@ https://api.telegram.org</pre>
               <tr><td>Auto SL/TP</td><td>Fallback SL/TP pips, skip missing SL/TP</td><td>Adds safety levels when a signal does not provide them.</td><td>Fallback levels must still respect broker stop distance or MT5 returns invalid stops.</td></tr>
               <tr><td>Signal TP</td><td>Multi-TP, max targets, lot distribution, move SL after TP</td><td>Splits one signal into TP1, TP2, TP3 positions.</td><td>Only TP1-TP3 are executable signal targets in the current Bridge/EA flow.</td></tr>
               <tr><td>Prop</td><td>SL required, daily loss, max positions, same-direction block</td><td>Stops trades that could violate funded account rules.</td><td>Missing SL, drawdown hit, or same-direction exposure can intentionally block a good-looking signal.</td></tr>
-              <tr><td>System</td><td>Magic Number, diagnostics, report log, panel mode</td><td>Controls identity, logs, and panel behavior.</td><td>Enable diagnostics only while troubleshooting, then turn it off after support has the needed lines.</td></tr>
+              <tr><td>System</td><td>Magic Number, diagnostics, report log, panel mode</td><td>Controls identity, logs, and panel behavior.</td><td>Enable diagnostics only while reproducing an issue, then turn it off after you have the relevant log lines.</td></tr>
             </tbody>
           </table>
         </div>
@@ -1651,7 +1629,7 @@ https://api.telegram.org</pre>
         <div style="overflow-x:auto">
           <table class="reference-table">
             <thead>
-              <tr><th>Signal type</th><th>Supported examples</th><th>Support note</th></tr>
+              <tr><th>Signal type</th><th>Supported examples</th><th>Important note</th></tr>
             </thead>
             <tbody>
               <tr><td>Market open</td><td><code>BUY EURUSD</code>, <code>Sell Gold Now</code>, <code>BUY XAUUSD AT MARKET</code></td><td>Allowed even without SL/TP, but EA filters can still require SL or TP.</td></tr>
@@ -1844,8 +1822,8 @@ Take Profit 2325</pre>
           <img src="assets/docs/tcu-guide/telegram-session-reset.png" alt="Telegram MTProto reset button in Bridge">
           <div class="docs-img-caption">Use Reset only when Telegram login/session data is broken, then authenticate again before fetching groups.</div>
         </div>
-        <h3 class="section-subtitle">Where Support Looks for Files</h3>
-        <p class="docs-text">Most customers should use the Bridge UI buttons such as <strong>Open Log Folder</strong>. Advanced users may see Bridge data under one of these folders depending on Windows permissions:</p>
+        <h3 class="section-subtitle">Where Logs Are Stored</h3>
+        <p class="docs-text">Use the Bridge UI buttons such as <strong>Open Log Folder</strong> first. Advanced users may see Bridge data under one of these folders depending on Windows permissions:</p>
         <pre class="code-block">C:\nts_bridge
 %APPDATA%\NavigatorBridge
 %TEMP%\NavigatorBridge\logs</pre>
@@ -1901,10 +1879,6 @@ Take Profit 2325</pre>
             </ul>
           </div>
         </div>
-        <div class="screenshot-placeholder">
-          <strong>Screenshot placeholder needed</strong>
-          <p>Bridge Accounts page showing no MT5 account connected, next to the EA Source tab showing Bridge enabled and port 5555.</p>
-        </div>
       </section>
 
       <section id="telegram-troubleshooting" class="docs-section">
@@ -1947,14 +1921,10 @@ Take Profit 2325</pre>
             <ul class="docs-list">
               <li>Install or update to Bridge v7.41 or newer.</li>
               <li>Run Bridge normally and let it choose a writable data folder.</li>
-              <li>Use Bridge Settings to open logs; do not manually move session files unless support asks.</li>
+              <li>Use Bridge Settings to open logs; do not manually move session files unless you are troubleshooting a specific session or permission issue.</li>
               <li>During updates, wait for the updater/restart flow to finish before closing windows.</li>
             </ul>
           </div>
-        </div>
-        <div class="screenshot-placeholder">
-          <strong>Screenshot placeholder needed</strong>
-          <p>Bridge Settings/About area showing current version, update status, data/log folder button, and any visible update warning.</p>
         </div>
       </section>
 
@@ -2116,43 +2086,12 @@ MT5 error code, if any:
 Screenshots attached: Dashboard, Signal History, MT5 Accounts, EA Home, MT5 Experts</pre>
       </section>
 
-      <section id="screenshot-wishlist" class="docs-section">
-        <h2 class="section-title">Screenshot Slots Still Needed</h2>
-        <p class="docs-text">These placeholders mark the remaining visuals that would make the guide easier for complete beginners. Capture them on the latest Bridge and EA build when you can.</p>
-        <div class="docs-grid two">
-          <div class="screenshot-placeholder">
-            <strong>Fresh Bridge v7.41 Dashboard</strong>
-            <p>Running state, version visible if possible, and no customer-sensitive account details.</p>
-          </div>
-          <div class="screenshot-placeholder">
-            <strong>Bridge Accounts Empty vs Connected</strong>
-            <p>One image where no account is connected, one where an MT5 account is online with suffix/routing visible.</p>
-          </div>
-          <div class="screenshot-placeholder">
-            <strong>Prop Safe Global and Per-Account</strong>
-            <p>Global ON with Auto Apply, then a per-account override example expanded.</p>
-          </div>
-          <div class="screenshot-placeholder">
-            <strong>Signal History Failure States</strong>
-            <p>Examples for parsed-not-routed, duplicate skipped, EA acknowledged but broker rejected, and trade opened.</p>
-          </div>
-          <div class="screenshot-placeholder">
-            <strong>MT5 Experts Error Examples</strong>
-            <p>Clean examples of 10014 invalid volume, 10016 invalid stops, 10021 wrong symbol/trading disabled, and 10027 Algo Trading disabled.</p>
-          </div>
-          <div class="screenshot-placeholder">
-            <strong>Format Lab Full Flow</strong>
-            <p>Raw provider message, rewrite rules, parsed result, and source/profile assignment visible.</p>
-          </div>
-        </div>
-      </section>
-
       <section id="known-limits" class="docs-section">
         <h2 class="section-title">Known Limits and Expectations</h2>
         <ul class="docs-list">
           <li>Signal TP splitting supports up to <strong>TP1, TP2, and TP3</strong>. Extra TP lines may be normalized for readability but should not be expected to create more signal TP legs.</li>
           <li>Provider-specific strange formats should be handled with Format Profiles, not global parser changes.</li>
-          <li>Telegram API ID and API Hash come from the customer's Telegram account. Support should never ask for Telegram login codes or passwords.</li>
+          <li>Telegram API ID and API Hash come from your own Telegram account. Never share Telegram login codes or passwords.</li>
           <li>Broker rejection errors must be checked in MT5 Experts/Journal because Bridge can deliver a valid signal that the broker later refuses.</li>
           <li>For prop accounts, drawdown and SL-required settings may intentionally block signals that look valid.</li>
         </ul>
@@ -2243,7 +2182,6 @@ const searchIndex = [
   { title: 'Contact support', keywords: 'contact support telegram whatsapp uwuxr3 tcusupport navigatoralgo', view: 'view-support', scrollId: 'contact-support' },
   { title: 'Before contacting support', keywords: 'support screenshots logs experts journal signal history', view: 'view-support', scrollId: 'support-before-contact' },
   { title: 'Support message template', keywords: 'support template bridge version ea version raw signal broker', view: 'view-support', scrollId: 'support-message-template' },
-  { title: 'Screenshot slots needed', keywords: 'screenshots needed wishlist placeholders dashboard accounts prop safe signal history experts format lab', view: 'view-support', scrollId: 'screenshot-wishlist' },
   { title: 'Known limits', keywords: 'known limits tp1 tp2 tp3 telegram passwords broker rejection', view: 'view-support', scrollId: 'known-limits' }
 ];
 
