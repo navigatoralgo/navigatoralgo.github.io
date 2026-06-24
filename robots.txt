@@ -3,6 +3,14 @@ Allow: /
 
 Sitemap: https://navigatoralgo.com/sitemap.xml
 
-# Admin pages
+# Private/auth/admin pages
 Disallow: /admin.html
 Disallow: /admin-provider.html
+Disallow: /dashboard.html
+Disallow: /profile.html
+Disallow: /signin.html
+
+# Local/temp deployment artifacts
+Disallow: /temp.html
+Disallow: /gh_temp.html
+Disallow: /worker_temp.html

@@ -30,3 +30,27 @@
 
 /robots.txt
   Cache-Control: public, max-age=86400
+
+/admin.html
+  X-Robots-Tag: noindex, nofollow
+
+/admin-provider.html
+  X-Robots-Tag: noindex, nofollow
+
+/dashboard.html
+  X-Robots-Tag: noindex, nofollow
+
+/profile.html
+  X-Robots-Tag: noindex, nofollow
+
+/signin.html
+  X-Robots-Tag: noindex, nofollow
+
+/temp.html
+  X-Robots-Tag: noindex, nofollow
+
+/gh_temp.html
+  X-Robots-Tag: noindex, nofollow
+
+/worker_temp.html
+  X-Robots-Tag: noindex, nofollow
