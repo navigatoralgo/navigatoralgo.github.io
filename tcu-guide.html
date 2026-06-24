@@ -681,6 +681,109 @@ code {
 .ea-tab-content.active {
   display: block;
 }
+.ea-tab-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 380px);
+  gap: 30px;
+  align-items: start;
+}
+.ea-tab-copy {
+  min-width: 0;
+}
+.ea-lede {
+  color: #d7e0ea;
+  font-size: 18px;
+  line-height: 1.7;
+  margin: 0 0 18px;
+}
+.ea-explain-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+.ea-explain-card {
+  background: rgba(17,24,34,0.92);
+  border: 1px solid rgba(86,105,130,0.42);
+  border-radius: 8px;
+  padding: 15px;
+}
+.ea-explain-card h4 {
+  color: var(--gold);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+.ea-explain-card p {
+  color: #aab7c7;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+.ea-support-list {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+.ea-support-list li {
+  color: #c2cfdd;
+  font-size: 14px;
+  line-height: 1.55;
+  padding-left: 20px;
+  position: relative;
+}
+.ea-support-list li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 12px rgba(0,212,200,0.45);
+  position: absolute;
+  left: 0;
+  top: 8px;
+}
+.ea-shot-panel {
+  background: linear-gradient(180deg, rgba(17,24,34,0.96), rgba(8,12,17,0.96));
+  border: 1px solid rgba(86,105,130,0.5);
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 18px 34px rgba(0,0,0,0.34);
+}
+.ea-shot-panel img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+.ea-shot-panel figcaption {
+  color: #7e8fa3;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  margin-top: 10px;
+  text-align: center;
+  text-transform: uppercase;
+}
+.ea-shot-stack {
+  display: grid;
+  gap: 12px;
+}
+.ea-wide-note {
+  background: rgba(0,212,200,0.06);
+  border: 1px solid rgba(0,212,200,0.22);
+  border-radius: 8px;
+  color: #b9e7e4;
+  font-size: 14px;
+  line-height: 1.65;
+  margin-top: 18px;
+  padding: 14px 16px;
+}
 @media (max-width: 980px) {
   .docs-layout {
     margin-top: 88px;
@@ -739,6 +842,13 @@ code {
   .code-block {
     max-width: 100%;
   }
+  .ea-tab-layout,
+  .ea-explain-grid {
+    grid-template-columns: 1fr;
+  }
+  .ea-tab-layout {
+    gap: 22px;
+  }
 }
 @media (min-width: 1280px) {
   .docs-grid.two {
@@ -756,6 +866,9 @@ code {
   }
   .ea-content-area {
     padding: 22px 18px;
+  }
+  .ea-lede {
+    font-size: 16px;
   }
 }
 </style>
@@ -1050,77 +1163,313 @@ https://api.telegram.org</pre>
           </div>
           <div class="ea-content-area">
             <div id="tab-home" class="ea-tab-content active">
-              <h3 class="section-subtitle" style="margin-top:0">Home Dashboard</h3>
-              <p class="docs-text">Shows armed state, current mode, connection state, and the last accepted signal. If the EA says DISARMED or Bridge offline, fix that before checking advanced settings.</p>
-              <div class="docs-img-container"><img src="assets/docs/Screenshot 2026-06-12 122106.png" alt="EA Home tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Home Dashboard</h3>
+                  <p class="ea-lede">This is the first screen to check before touching any advanced setting. It tells you whether the EA is armed, which source mode is active, and whether the last signal was accepted or blocked.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Use Bridge mode, keep the EA DISARMED while testing messages, then switch to ARMED only when routing, lots, and broker symbol are confirmed.</p></div>
+                    <div class="ea-explain-card"><h4>What support checks</h4><p>Screenshot the full Home tab when a trade does not open. The armed state, source state, symbol, spread, and last status usually reveal the first problem.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li><strong>DISARMED</strong> means the EA can receive signals but will intentionally block execution.</li>
+                    <li><strong>Bridge offline</strong> usually means WebRequest, port, firewall, or Bridge status must be checked.</li>
+                    <li>If a signal appears on Home but no order opens, move next to Lots, Filters, Prop, and the MT5 Experts tab.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-home.png" alt="EA Home tab">
+                  <figcaption>Home tab status, source, symbol, and armed state</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-source" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Source</h3>
-              <p class="docs-text">Turn on <strong>Enable Bridge</strong>, set port <code>5555</code>, and confirm WebRequest includes <code>http://127.0.0.1</code>. If direct Telegram Bot API is enabled, also add <code>https://api.telegram.org</code>.</p>
-              <div class="docs-img-container"><img src="assets/docs/Screenshot 2026-06-12 122043.png" alt="EA Source tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Source</h3>
+                  <p class="ea-lede">Source decides where the EA listens for signals. For this support guide, Bridge mode is the main path because it covers Telegram private groups, Discord/webhook routing, and multi-account Bridge control.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Bridge setup</h4><p>Enable Bridge, use the same local port shown in Bridge, and add <code>http://127.0.0.1</code> to MT5 WebRequest allowed URLs.</p></div>
+                    <div class="ea-explain-card"><h4>Direct bot mode</h4><p>Only use Bot API mode if the Telegram bot is actually inside a bot-readable group. Private channels normally need Bridge instead.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>If Bridge says the account is not connected, check this tab before checking group routing.</li>
+                    <li>If MT5 shows WebRequest errors, confirm the exact URL is allowed in MT5 Options -> Expert Advisors.</li>
+                    <li>Do not enable multiple source paths for the same provider unless duplicate filtering is understood.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-source.png" alt="EA Source tab">
+                  <figcaption>Source mode, Bridge port, and connection controls</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-copier" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Copier</h3>
-              <p class="docs-text">Use this only for EA-to-EA copying inside Trade Copier Ultimate. If you only copy Telegram signals through Bridge, leave local copier mode disabled unless you intentionally need MASTER/SLAVE behavior.</p>
-              <div class="docs-img-container"><img src="assets/docs/copier_tab_slave.png" alt="EA Copier tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Copier</h3>
+                  <p class="ea-lede">This tab is for EA-to-EA replication inside Trade Copier Ultimate. Bridge signal copying does not require this tab to be enabled, so most Bridge users should leave it off.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Bridge users</h4><p>Leave local copier mode disabled unless you intentionally want one MT5 terminal to copy another terminal on the same PC.</p></div>
+                    <div class="ea-explain-card"><h4>Advanced use</h4><p>MASTER/SLAVE mode is separate from Bridge routing. Mixing both can duplicate entries if you do not design the flow carefully.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>If a customer says trades doubled, check whether Bridge and local copier mode are both active.</li>
+                    <li>For the TCU Bridge guide, troubleshoot Bridge first; save the full local copier guide for a separate page.</li>
+                  </ul>
+                  <div class="ea-wide-note">Recommendation: keep this tab visible in the guide, but explain that it is not needed for the normal Bridge workflow. That prevents beginners from enabling it by accident.</div>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-copier.png" alt="EA Copier tab">
+                  <figcaption>Local EA copier controls, separate from Bridge signal mode</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-lots" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Lots and Risk Sizing</h3>
-              <p class="docs-text">Choose fixed lot, risk percent, or per-symbol overrides. Error <strong>10014</strong> usually means the broker rejected the volume, so check minimum lot, maximum lot, and lot step for that symbol.</p>
-              <div class="docs-img-row">
-                <img src="assets/docs/Screenshot 2026-06-12 123313.png" alt="EA Lots tab" style="max-width: 310px;">
-                <img src="assets/docs/Screenshot 2026-06-12 123403.png" alt="EA per-symbol lots" style="max-width: 460px;">
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Lots and Risk Sizing</h3>
+                  <p class="ea-lede">Lots controls how big each copied trade becomes. Start with a small fixed lot for testing, then move to risk percent or per-symbol overrides after the signal path is proven.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Use fixed lot <code>0.01</code> or your broker minimum until the first clean test trade opens and closes correctly.</p></div>
+                    <div class="ea-explain-card"><h4>Advanced sizing</h4><p>Use per-symbol lots for XAUUSD, indices, crypto, or symbols where one standard lot has a very different value.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>Error <strong>10014</strong> usually means invalid volume. Check broker min lot, max lot, and lot step.</li>
+                    <li>If risk percent opens a surprising size, confirm SL exists and the symbol contract value is correct.</li>
+                    <li>For prop accounts, test the smallest lot first before allowing full risk automation.</li>
+                  </ul>
+                </div>
+                <div class="ea-shot-stack">
+                  <figure class="ea-shot-panel">
+                    <img src="assets/tcu/tcu-tab-lots.png" alt="EA Lots tab">
+                    <figcaption>Lot mode, risk mode, and default sizing</figcaption>
+                  </figure>
+                  <figure class="ea-shot-panel">
+                    <img src="assets/tcu/tcu-tab-lots-popup.png" alt="EA per-symbol lots popup">
+                    <figcaption>Per-symbol override area for special instruments</figcaption>
+                  </figure>
+                </div>
               </div>
             </div>
             <div id="tab-filter" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Filters</h3>
-              <p class="docs-text">Controls spread limits, slippage, symbol whitelist/blacklist, cooldown, duplicate filtering, and skip keywords. If a signal is received but skipped, filters are one of the first places to check.</p>
-              <div class="docs-img-container"><img src="assets/docs/filter_tab.png" alt="EA Filter tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Filters</h3>
+                  <p class="ea-lede">Filters are the safety gate between a received signal and a real order. They can block bad spreads, repeated signals, wrong symbols, bad keywords, and entries that arrive too fast.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Keep strict filters simple at first: spread limit, duplicate filter, and symbol mapping. Add keywords and cooldown after basic copying works.</p></div>
+                    <div class="ea-explain-card"><h4>Support clue</h4><p>If Bridge received the message but MT5 did not trade, this tab is one of the first places to inspect.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>Spread filter blocks entries when broker spread is above your max value.</li>
+                    <li>Slippage settings protect market orders from filling too far away from expected price.</li>
+                    <li>Whitelist and blacklist decide which symbols are allowed or blocked.</li>
+                    <li>Duplicate and cooldown rules prevent the same signal from opening multiple times.</li>
+                    <li>Skip keywords are useful for messages like "analysis", "wait", "closed", or provider chat that should not trade.</li>
+                  </ul>
+                </div>
+                <div class="ea-shot-stack">
+                  <figure class="ea-shot-panel">
+                    <img src="assets/tcu/tcu-tab-filter-1.png" alt="EA Filter tab spread settings">
+                    <figcaption>Spread, slippage, duplicate, and cooldown controls</figcaption>
+                  </figure>
+                  <figure class="ea-shot-panel">
+                    <img src="assets/tcu/tcu-tab-filter-4.png" alt="EA Filter tab keyword settings">
+                    <figcaption>Symbol, keyword, and advanced blocking rules</figcaption>
+                  </figure>
+                </div>
+              </div>
             </div>
             <div id="tab-trade" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Trade Execution</h3>
-              <p class="docs-text">Controls pending orders, opposite-signal behavior, close commands, modification behavior, and symbol suffix. Keep suffix blank unless your broker requires a suffix and auto-detection did not solve it.</p>
-              <div class="docs-img-container"><img src="assets/docs/trade_tab.png" alt="EA Trade tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Trade Execution</h3>
+                  <p class="ea-lede">Trade settings decide what the EA does after a signal passes source, lot, and filter checks. This includes market orders, pending orders, close commands, opposite signals, and modification behavior.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Allow normal BUY/SELL first. Add pending orders, opposite-signal closing, and modification handling only after clean market signals work.</p></div>
+                    <div class="ea-explain-card"><h4>Broker symbols</h4><p>Keep suffix blank unless your broker uses names like <code>XAUUSDm</code> and auto-detection does not map it correctly.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>Error <strong>10015</strong> often points to invalid pending order price or crossed price.</li>
+                    <li>Error <strong>10016</strong> usually means SL/TP is too close for broker StopLevel rules.</li>
+                    <li>If CLOSE or MODIFY messages do nothing, confirm those actions are enabled here and the magic number matches.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-trade.png" alt="EA Trade tab">
+                  <figcaption>Order handling, modifications, close commands, and suffix behavior</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-autosltp" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Auto SL/TP</h3>
-              <p class="docs-text">Adds a fallback SL or TP when the signal does not contain one. Use carefully: prop rules often require a real SL, but fallback values must still respect the broker's minimum stop distance.</p>
-              <div class="docs-img-container"><img src="assets/docs/autosltp_tab.png" alt="EA Auto SL TP tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Auto SL/TP</h3>
+                  <p class="ea-lede">Auto SL/TP adds fallback protection when a provider sends an entry without a stop loss or take profit. It is helpful, but it should be tested carefully because every broker has different stop-distance rules.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Leave fallback values off until basic signals are working. Then test on demo with one symbol before using real risk.</p></div>
+                    <div class="ea-explain-card"><h4>Prop accounts</h4><p>Prop rules may require SL on every trade. Auto SL can help, but Prop tab rules may still reject missing original SL depending on your settings.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>If orders fail with invalid stops, increase the fallback distance or check broker StopLevel.</li>
+                    <li>Do not set fallback SL/TP so tight that normal spread instantly violates broker limits.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-autosltp.png" alt="EA Auto SL TP tab">
+                  <figcaption>Fallback stop loss and take profit controls</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-sigtp" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Signal TP Splitting</h3>
-              <p class="docs-text">Reads TP, TP1, TP2, and TP3 from the incoming signal and can split the trade into separate positions. Current signal TP extraction supports up to <strong>three targets</strong>; TP4+ should not be expected to create extra signal legs.</p>
-              <div class="docs-img-container"><img src="assets/docs/sigtp_tab.png" alt="EA Signal TP tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Signal TP Splitting</h3>
+                  <p class="ea-lede">Signal TP reads the provider's TP1, TP2, and TP3 levels and can split one signal into multiple positions so each leg has its own target.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Start with one TP target or simple splitting. Confirm volume math before enabling multiple legs on live accounts.</p></div>
+                    <div class="ea-explain-card"><h4>Current limit</h4><p>Signal TP extraction supports up to three targets. TP4+ may be cleaned by Bridge profiles, but should not be expected to create extra EA legs.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>If total lot size is too large, check whether each TP leg is opening a separate position.</li>
+                    <li>If only TP1 opens, confirm the original signal text has recognizable TP2 and TP3 labels.</li>
+                    <li>Partial close is a different feature; do not confuse it with Signal TP splitting.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-sigtp.png" alt="EA Signal TP tab">
+                  <figcaption>TP1, TP2, TP3 split-trade behavior</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-trail" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Trailing Stop</h3>
-              <p class="docs-text">Moves SL after a position reaches your configured profit threshold. Trailing only manages positions with this EA's magic number.</p>
-              <div class="docs-img-container"><img src="assets/docs/trail_tab.png" alt="EA Trail tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Trailing Stop</h3>
+                  <p class="ea-lede">Trailing Stop moves SL after price reaches your configured profit threshold. It is a trade-management layer, not a signal-entry rule.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Leave trailing off until entries, SL, and TP behave correctly. Then test with one simple rule on demo.</p></div>
+                    <div class="ea-explain-card"><h4>Advanced use</h4><p>Use trailing with breakeven and partial close only when you understand which feature moves SL first.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>Trailing manages positions opened with this EA's magic number.</li>
+                    <li>If SL does not move, confirm the trade reached the trigger distance and broker stop distance allows the new SL.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-trail.png" alt="EA Trail tab">
+                  <figcaption>Trailing trigger, step, and SL movement controls</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-news" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">News Pause</h3>
-              <p class="docs-text">Pauses new entries around selected economic calendar events. If a valid signal is skipped during news time, this setting may be the reason.</p>
-              <div class="docs-img-container"><img src="assets/docs/news_tab.png" alt="EA News tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">News Pause</h3>
+                  <p class="ea-lede">News Pause blocks new entries near selected economic events. This protects accounts from sudden spread spikes and fast broker price movement.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Keep high-impact protection enabled if you trade forex or gold and do not want entries during major releases.</p></div>
+                    <div class="ea-explain-card"><h4>Support clue</h4><p>If a valid signal skipped only during a time window, check News before assuming the parser failed.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>Match news currencies to traded symbols, for example USD news affects XAUUSD and major USD pairs.</li>
+                    <li>Bridge also has news controls; avoid accidentally stacking two different pause windows unless intended.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-news.png" alt="EA News tab">
+                  <figcaption>Economic event pause controls</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-partial" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Partial Close</h3>
-              <p class="docs-text">Automatically closes part of a position at pip milestones and can move SL after each milestone. This is separate from Signal TP splitting.</p>
-              <div class="docs-img-container"><img src="assets/docs/partial_tab.png" alt="EA Partial close tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Partial Close</h3>
+                  <p class="ea-lede">Partial Close manages one open trade after it is already running. It can close a percentage at profit milestones and optionally move SL after each milestone.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Keep partial close off until you know the copied trade opens at the right size and closes normally.</p></div>
+                    <div class="ea-explain-card"><h4>Different from SigTP</h4><p>Signal TP opens separate TP legs from the start. Partial Close reduces one position later.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>If a partial close fails, confirm the remaining volume respects broker min lot and lot step.</li>
+                    <li>On very small accounts, a 0.01 lot trade often cannot be partially closed because the remainder would be too small.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-partial.png" alt="EA Partial close tab">
+                  <figcaption>Milestone close percentages and SL movement</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-alerts" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Alerts and Broadcast</h3>
-              <p class="docs-text">Controls sounds, popups, and optional broadcast of copied trades to your own Telegram or Discord destinations.</p>
-              <div class="docs-img-container"><img src="assets/docs/alerts_tab.png" alt="EA Alerts tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Alerts and Broadcast</h3>
+                  <p class="ea-lede">Alerts help you see what the EA is doing without watching MT5 all day. Broadcast options can send copied trade events to your own Telegram or Discord destinations.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Use local popups or sound while testing. Add external broadcast only after execution is stable.</p></div>
+                    <div class="ea-explain-card"><h4>Privacy note</h4><p>Do not paste bot tokens, webhook URLs, or private chat IDs into public support chats.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>If alerts fire but trades do not open, the signal reached the EA and was blocked later.</li>
+                    <li>If external alerts do not send, check the destination token/webhook and WebRequest permission.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-alerts.png" alt="EA Alerts tab">
+                  <figcaption>Popups, sounds, Telegram, and Discord notifications</figcaption>
+                </figure>
+              </div>
             </div>
             <div id="tab-prop" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">Prop Firm Protection</h3>
-              <p class="docs-text">Can require SL, limit daily drawdown, restrict open positions, and stop trading after risk limits are hit. If Prop Firm Mode is enabled, missing SL signals are intentionally rejected.</p>
-              <div class="docs-img-container"><img src="assets/docs/prop_tab.png" alt="EA Prop tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">Prop Firm Protection</h3>
+                  <p class="ea-lede">Prop Firm Protection adds hard rules for accounts that must respect daily drawdown, maximum open positions, required SL, and other challenge limits.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Only enable prop rules after you understand what each rule blocks. A safe rejection is still a rejection.</p></div>
+                    <div class="ea-explain-card"><h4>Support clue</h4><p>If missing-SL signals do not open while Prop mode is active, the EA is likely doing exactly what it was told to do.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>Use Require SL for prop firms that invalidate trades without stops.</li>
+                    <li>Daily drawdown rules can stop new entries even when the signal format is valid.</li>
+                    <li>Max position limits can block extra TP legs, duplicate signals, or multiple symbols.</li>
+                  </ul>
+                </div>
+                <div class="ea-shot-stack">
+                  <figure class="ea-shot-panel">
+                    <img src="assets/tcu/tcu-tab-prop-1.png" alt="EA Prop tab risk controls">
+                    <figcaption>Prop risk controls and required-SL logic</figcaption>
+                  </figure>
+                  <figure class="ea-shot-panel">
+                    <img src="assets/tcu/tcu-tab-prop-2-safe.png" alt="EA Prop safe state">
+                    <figcaption>Safe-state example after prop protections are configured</figcaption>
+                  </figure>
+                </div>
+              </div>
             </div>
             <div id="tab-system" class="ea-tab-content">
-              <h3 class="section-subtitle" style="margin-top:0">System</h3>
-              <p class="docs-text">Set magic number, diagnostics, report logs, restart behavior, and broker suffix. For troubleshooting, enable diagnostic logs only when needed, then send the relevant log lines to support.</p>
-              <div class="docs-img-container"><img src="assets/docs/system_tab.png" alt="EA System tab" style="max-width: 340px;"></div>
+              <div class="ea-tab-layout">
+                <div class="ea-tab-copy">
+                  <h3 class="section-subtitle" style="margin-top:0">System</h3>
+                  <p class="ea-lede">System contains identity, diagnostics, and maintenance settings. This is where support looks when orders open with the wrong magic number, logs are missing, or broker symbol mapping needs confirmation.</p>
+                  <div class="ea-explain-grid">
+                    <div class="ea-explain-card"><h4>Beginner default</h4><p>Do not change magic number or diagnostic settings unless the guide or support asks. Defaults are enough for most single-EA setups.</p></div>
+                    <div class="ea-explain-card"><h4>Troubleshooting</h4><p>Enable extra diagnostics only while reproducing an issue, then turn them back down so logs stay readable.</p></div>
+                  </div>
+                  <ul class="ea-support-list">
+                    <li>Magic number separates this EA's trades from manual trades or other robots.</li>
+                    <li>Broker suffix should match the symbol actually tradable in Market Watch.</li>
+                    <li>When contacting support, include this tab plus Experts log lines around the failed signal time.</li>
+                  </ul>
+                </div>
+                <figure class="ea-shot-panel">
+                  <img src="assets/tcu/tcu-tab-system.png" alt="EA System tab">
+                  <figcaption>Magic number, diagnostics, reporting, and symbol maintenance</figcaption>
+                </figure>
+              </div>
             </div>
           </div>
         </div>
